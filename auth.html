@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Authorisation | XeTute Technologies</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="Keywords" content="Login, Register, XeTute, XeTute Technologies, AI, LLM, Flare, Chat, Chatbot">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="basic.css">
+    <link rel="icon" type="image/png" href="logo.jpg"/>
+</head>
+<body onload="_autoSignIn()">
+    <h1>Hello, Friend.</h1>
+    <div id="signin">
+        <p style="margin-bottom: 20px;">Let's continue where we left off.</p>
+        <input placeholder="Email" id="signin-inp-email" type="email" autocomplete="off" autofocus="on"/>
+        <input placeholder="Password" id="signin-inp-password" type="password"/>
+        <button onclick="_signIn('signin-inp-email', 'signin-inp-password')">Sign In</button>
+    </div>
+    <div id="signup" style="display: none;">
+        <p style="margin-bottom: 20px;">Let's get you started.</p>
+        <input placeholder="Email" id="signup-inp-email" type="email" autocomplete="off" autofocus="on"/>
+        <input placeholder="Password" id="signup-inp-password0" type="password"/>
+        <input placeholder="Confirm Password" id="signup-inp-password1" type="password"/>
+        <button onclick="_signUp('signup-inp-email', 'signup-inp-password0', 'signup-inp-password1')">Sign Up</button>
+    </div>
+    <p id="note"></p>
+    <div style="margin: 20px; padding: 10px;">
+        <p id="form-refer-txt">Not part of the Community yet?</p>
+        <button onclick="_switchForm()" id="form-refer-btn">Join in!</button>
+    </div>
+    <a style="position: absolute; bottom: 3.5%; text-decoration: none;" href="ToS.html">By creating an account, you accept our ToS</a>
+
+    <script src="pocketbase.umd.js"></script>
+    <script>
+        const pb = new PocketBase(link); // link in pocketbase.umd.js
+
+        let email, password, authData = undefined;
+
+        async function autoSignIn(referSuccess, referFail)
+        {
+            if ((localStorage.getItem('email') !== null) && (localStorage.getItem('password') !== null))
+            {
+                try { authData = await pb.collection('users').authRefresh(); }
+                catch
+                {
+                    try
+                    {
+                        email = localStorage.getItem('email');
+                        password = localStorage.getItem('password');
+
+                        authData = await pb.collection('users').authWithPassword(email, password);
+                        if (referSuccess !== undefined) window.location.href = referSuccess;
+                    }
+                    catch
+                    {
+                        if (referFail !== undefined) window.location.href = referFail; // For auth page
+                        return false;
+                    }
+                }
+                if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
+                else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
+                else if (!authData.record.verified) return false; 
+                return true;
+            } else if (referFail !== undefined) window.location.href = referFail
+        }
+
+        async function signIn(emailID, passID, referSuccess, referFail)
+        {
+            email = document.getElementById(emailID).value;
+            password = document.getElementById(passID).value;
+
+            try { authData = await pb.collection('users').authWithPassword(email, password); }
+            catch { if (referFail !== undefined) window.location.href = referFail; return false; }
+
+            localStorage.setItem('email', email);
+            localStorage.setItem('password', password);
+
+            if (referSuccess !== undefined && authData.record.verified) window.location.href = referSuccess;
+            return true;
+        }
+
+        async function signUp(emailID, passID1, passID0, noteID)
+        {
+            email = document.getElementById(emailID).value;
+            password = document.getElementById(passID0).value;
+
+            console.log(document.getElementById(emailID).value);
+            const data =
+            {
+                "password": password,
+                "passwordConfirm": document.getElementById(passID1).value,
+                "email": email,
+                "verified": false, // If you're reading this, try setting it to true to feel like a hacker till you get an error.
+                "name": "user"
+            };
+
+            try { authData = await pb.collection('users').create(data); }
+            catch { return false; }
+
+            localStorage.setItem('email', email);
+            localStorage.setItem('password', password);
+
+            try { await pb.collection('users').requestVerification(email); }
+            catch { return false; }
+            document.getElementById(noteID).innerHTML = '<p style="color:green">Send verification Email</p>';
+            return true;
+        }
+
+        function switchForm(elem0, elem1)
+        {
+            if (document.getElementById(elem0).style.display === 'none')
+            {
+                document.getElementById(elem0).style.display = 'flex';
+                document.getElementById(elem1).style.display = 'none';
+            }
+            else
+            {
+                document.getElementById(elem1).style.display = 'flex';
+                document.getElementById(elem0).style.display = 'none';
+            }
+        }
+    </script>
+    <script>
+        let refer = undefined;
+
+        if (location.search) { refer = decodeURIComponent(location.search.substr(1), {}); }
+        else window.location.href = 'https://xetute.com';
+
+        function _autoSignIn() { autoSignIn(refer); }
+
+        async function _signIn(emailID, passID)
+        {
+            if (!(await signIn(emailID, passID, refer, undefined))) { document.getElementById('note').innerHTML = '<p style="color:red">Failed to Sign In</p>'; }
+        }
+
+        function _switchForm()
+        {
+            switchForm('signin', 'signup');
+            if (document.getElementById('signin').style.display === 'none')
+            {
+                document.getElementById('form-refer-txt').textContent = 'Already part of the community?';
+                document.getElementById('form-refer-btn').textContent = 'Continue!';
+            }
+            else
+            {
+                document.getElementById('form-refer-txt').textContent = 'Not part of the Community yet?';
+                document.getElementById('form-refer-btn').textContent = 'Join in!';
+            }
+        }
+
+        async function _signUp(emailID, passID0, passID1)
+        {
+            if (!(await signUp(emailID, passID0, passID1, 'note'))) { document.getElementById('note').innerHTML = '<p style="color:red">Failed to Sign Up</p>'; }
+            else _switchForm();
+        }
+    </script>
+</body>
+</html>

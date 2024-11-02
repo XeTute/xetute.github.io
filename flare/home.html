@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Home | Flare</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="Keywords" content="XeTute, XeTute Technologies, AI, LLM, Flare, Chat, Chatbot">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../basic.css">
+        <link rel="icon" type="image/png" href="logo.jpg"/>
+    </head>
+    <style>
+        .recent-chats
+        {
+            border-bottom: 1px solid #fff;
+            border-top: 1px solid #fff;
+            min-width: 200px;
+            max-width: 800px;
+            gap: 1rem;
+            flex-direction: row;
+        }
+
+        .characters
+        {
+            border-bottom: 1px solid #fff;
+            border-top: 1px solid #fff;
+            overflow-y: auto;
+            justify-content: flex-start;
+            margin: 0px;
+            padding: 1rem;
+            min-width: 200px;
+            max-width: 800px;
+            
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+
+        .chatCard
+        {
+            border-radius: 15px;
+            border: 2px solid #222;
+            background: #111;
+            width: 200px;
+            height: 100px;
+            transition: 0.35s ease-in-out;
+        }
+        .chatCard h3 { margin: 0px; }
+        .chatCard:hover { background: #222; border: 2px solid #111; color: #fff; }
+    </style>
+    <body onload="autoAuth()" style="overflow-x: hidden;">
+        <div style="margin-top: 3.5%;">
+            <h1>Hello, Friend</h1>
+            <p id="greeting-authas">You're authorized as </p>
+        </div>
+
+        <h2 style="margin: 10px; margin-bottom: 0px;">Recent Chats</h2>
+        <div class="recent-chats" id="recent-chats"></div>
+        
+        <h2 style="margin: 10px; margin-bottom: 0px;">Characters</h2>
+        <div class="characters">
+            <section id="characters"></section>
+        </div>
+    </body>
+    <script src="../pocketbase.umd.js"></script>
+    <script>
+        const pb = new PocketBase(link); // link in pocketbase.umd.js
+
+        let email, password, authData = undefined;
+
+        async function autoSignIn(referSuccess, referFail)
+        {
+            if ((localStorage.getItem('email') !== null) && (localStorage.getItem('password') !== null))
+            {
+                try { authData = await pb.collection('users').authRefresh(); }
+                catch
+                {
+                    try
+                    {
+                        email = localStorage.getItem('email');
+                        password = localStorage.getItem('password');
+
+                        authData = await pb.collection('users').authWithPassword(email, password);
+                        if (referSuccess !== undefined) window.location.href = referSuccess;
+                    }
+                    catch
+                    {
+                        if (referFail !== undefined) window.location.href = referFail; // For auth page
+                        return false;
+                    }
+                }
+                if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
+                else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
+                else if (!authData.record.verified) return false; 
+                return true;
+            } else if (referFail !== undefined) window.location.href = referFail
+        }
+    </script>
+    <script>
+        async function populateRecentChats()
+        {
+            let tmpKeys = undefined;
+            try { tmpKeys = Object.keys(authData.record.chats); } catch {}
+            if (tmpKeys?.length === 0 || authData.record.chats === null) document.getElementById('recent-chats').innerHTML = '<p>No recent Chats.</p>';
+            else
+            {
+                for (let i = 0; i < tmpKeys.length; ++i)
+                {
+                    document.getElementById('recent-chats').innerHTML += 
+                    `<button class="chatCard" type="button" onclick="openChat('${tmpKeys[i]}')">
+                        <h3>${authData.record.chats[tmpKeys[i]].name}</h3>
+                    </button>`;
+                }
+            }
+        }
+
+        async function autoAuth()
+        {
+            await autoSignIn(undefined, '../auth.html?./flare/home.html');
+            document.getElementById('greeting-authas').textContent += authData.record.name + '.';
+            populateRecentChats();
+        }
+
+        let characterRecords = undefined;
+        async function populateCharacters()
+        {
+            characterRecords = await pb.collection('flare_characters').getList(1, 50, {});
+            for (let i = 0; i < characterRecords.items.length; ++i)
+            {
+                document.getElementById('characters').innerHTML +=
+                `<button class="chatCard" type="button" onclick="openChat('${characterRecords.items[i].id}')">
+                    <h3>${characterRecords.items[i].name}</h3>
+                    <p>${(characterRecords.items[i].description.length > 20) ? characterRecords.items[i].description.substr(0, 17) + '...' : characterRecords.items[i].description}</p>
+                </button>`;
+            }
+        }
+        populateCharacters();
+
+        function openChat(chatid) { window.location.href = './chat.html?' + chatid; }
+    </script>
+</html>

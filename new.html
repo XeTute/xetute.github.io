@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>XeTute Technologies</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="Keywords" content="XeTute, XeTute Technologies, AI, LLM, Flare, Chat, Chatbot">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="basic.css">
+        <link rel="icon" type="image/png" href="logo.jpg"/>
+    </head>
+    <style>
+        button, a { text-decoration: underline; border: 0; border-radius: 0; padding: 0; }
+        button:hover, a:hover { text-decoration: underline; border: 0; border-radius: 0; padding: 0; color: #fff; background: #000; }
+    </style>
+    <body onload="load()" style="flex-direction: column;">
+        <div id="post" style="width: 80%; justify-content: flex-start;"></div>
+    </body>
+    <script src="pocketbase.umd.js"></script>
+    <script defer>
+        const pb = new PocketBase(link);
+
+        async function load()
+        {
+            if (location.search)
+            {
+                try
+                {
+                    const recordid = decodeURIComponent(location.search.substr(1), {});
+                    const record = await pb.collection('company_news').getOne(recordid, {});
+
+                    document.getElementById('post').innerHTML =
+                    `<p style="font-size: 12.5px">${record.created}</p>
+                    <h1 style="margin: 10px;">${record.title}</h1><em style="margin: 20px; margin-top: 0px; margin-bottom: 40px;">${record.description}</em>
+                    ${record.content}`;
+                }
+                catch { window.location.href = './index.html' }
+            }
+            else window.location.href = './index.html';
+        }
+    </script>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Chat | Flare</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="Keywords" content="XeTute, XeTute Technologies, AI, LLM, Flare, Chat, Chatbot">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../basic.css">
+        <link rel="icon" type="image/png" href="logo.jpg"/>
+    </head>
+    <style>
+        .firstmsg
+        {
+            background: #122;
+            top: 3.5%;
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 15px;
+            justify-content: flex-start;
+        }
+
+        .usermsg
+        {
+            background: #111;
+            right: 3.5%;
+            text-align: right;
+            max-width: 75%;
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .botmsg
+        {
+            background: #222;
+            left: 3.5%;
+            text-align: left;
+            max-width: 75%;
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .messages
+        {
+            justify-content: flex-start;
+            overflow-y: auto;
+            margin-bottom: 100px;
+            margin-top: 100px;
+            gap: 20px;
+        }
+    </style>
+    <body onload="autoAuth()">
+        <div style="position: absolute; top: 3.5%;">
+            <div class="top" style="flex-direction: row; border-bottom: 2px solid #777;">
+                <a href="./home.html" style="text-decoration: none;"><</a>
+                <h1 id="top-charname" style="margin: 10px;">Loading...</h1>
+            </div>
+        </div>
+        <div id="messages" class="messages"></div>
+        <p id="error" style="color:rgb(220, 70, 70)"></p>
+        <div style="position: absolute; bottom: 3.5%; flex-direction: row;">
+            <textarea placeholder="Reply..." id="msginp"></textarea>
+            <button type="button" onclick="proccessMessage()">Send</button>
+        </div>
+    </body>
+    <script src="../pocketbase.umd.js"></script>
+    <script>
+        const pb = new PocketBase(link); // link in pocketbase.umd.js
+
+        let email, password, authData = undefined;
+
+        async function autoSignIn(referSuccess, referFail)
+        {
+            if ((localStorage.getItem('email') !== null) && (localStorage.getItem('password') !== null))
+            {
+                try { authData = await pb.collection('users').authRefresh(); }
+                catch
+                {
+                    try
+                    {
+                        email = localStorage.getItem('email');
+                        password = localStorage.getItem('password');
+                    
+                        authData = await pb.collection('users').authWithPassword(email, password);
+                        if (referSuccess !== undefined) window.location.href = referSuccess;
+                    }
+                    catch
+                    {
+                        if (referFail !== undefined) window.location.href = referFail; // For auth page
+                        return false;
+                    }
+                }
+                if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
+                else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
+                else if (!authData.record.verified) return false; 
+                return true;
+            } else if (referFail !== undefined) window.location.href = referFail
+        }
+
+        function switchForm(elem0, elem1)
+        {
+            if (document.getElementById(elem0).style.display === 'none')
+            {
+                document.getElementById(elem0).style.display = 'flex';
+                document.getElementById(elem1).style.display = 'none';
+            }
+            else
+            {
+                document.getElementById(elem1).style.display = 'flex';
+                document.getElementById(elem0).style.display = 'none';
+            }
+        }
+    </script>
+    <script>
+        let chatid = undefined;
+        let character = undefined;
+
+        function formatMarkdown(input) // My shitty markdown implementation. Your welcome.
+        {
+          return input
+            // Replace ***text*** with <em><strong>text</strong></em>
+            .replace(/\*\*\*(.*?)\*\*\*/g, '<em><strong>$1</strong></em>')
+            // Replace **text** with <strong>text</strong>
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            // Replace *text* or _text_ with <em>text</em>
+            .replace(/(\*|_)(.*?)\1/g, '<em>$2</em>')
+            // Replace ```text``` with <code>text</code>
+            .replace(/```(.*?)```/g, '<code>$1</code>')
+            // Replace `text` with <code>text</code>
+            .replace(/`(.*?)`/g, '<code>$1</code>');
+        }
+
+        function reverseFormatMarkdown(input)
+        {
+          return input
+            // Replace <em><strong>text</strong></em> with ***text***
+            .replace(/<em><strong>(.*?)<\/strong><\/em>/g, '***$1***')
+            // Replace <strong>text</strong> with **text**
+            .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
+            // Replace <em>text</em> with *text*
+            .replace(/<em>(.*?)<\/em>/g, '*$1*')
+            // Replace <code>text</code> with ```text``` (for multi-backtick cases first)
+            .replace(/<code>(.*?)<\/code>/g, '`$1`');
+        }
+
+        function escapeHtml(input)
+        {
+          return input
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+        }
+
+        
+        async function getCharacterFromID(id) { return await pb.collection('flare_characters').getOne(id, {}); }
+
+        function add_msg_UI(msg, msgID, user)
+        {
+            document.getElementById('messages').innerHTML += `<div id="msg-${msgID}" class="${user ? 'usermsg' : 'botmsg'}"><p>${formatMarkdown(escapeHtml(msg))}</p></div>`;
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        }
+
+        function sub_msg_UI(msgID)
+        {
+            document.getElementById('msg-' + msgID).outerHTML = '';
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        }
+
+        async function loadChat()
+        {
+            if (authData.record.chats !== null)
+            {
+                if (authData.record.chats[chatid] === undefined)
+                {
+                    character = await getCharacterFromID(chatid);
+                    authData.record.chats[chatid] = { "name": "", "persona": "", "messages": [] };
+                    authData.record.chats[chatid].name = character.name;
+                    authData.record.chats[chatid].persona = character.persona;
+                    authData.record.chats[chatid].messages =
+                    {
+                        "max_context_length": 1024 * 16 /*For anyone seeing this, that's the max*/,
+                        "max_tokens": 150,
+                        "temperature": 0.65,
+                        "messages": [{"role": "system", "content": `--- ${character.name} ---\n${character.persona}\n` + (authData.record.persona ? (`--- ${authData.record.name} ---\n${authData.record.persona}\n`) : '') }]
+                    };
+                    try { await pb.collection('users').update(authData.record.id, { "chats": authData.record.chats }); }
+                    catch { document.getElementById('error').textContent = 'Failed to create a new Chat'; return; }
+                }
+            }
+            else { authData.record.chats = {}; await loadChat(); return; }
+            
+            character =
+            {
+                "name": authData.record.chats[chatid].name,
+                "persona": authData.record.chats[chatid].persona,
+                "messages": authData.record.chats[chatid].messages.messages
+            };
+
+            document.getElementById('top-charname').textContent = character.name;
+            document.getElementById('messages').innerHTML += `<div id="msg-0" class="firstmsg"><p>${character.persona}</p></div>`;
+
+            for (let i = 1; i < character.messages.length; ++i) // Starting at 1 cuz sys msg counts in
+            {
+                add_msg_UI(character.messages[i].content, i, (i % 2));
+            }
+        }
+
+        async function autoAuth()
+        {
+            if (location.search.substr(1)) chatid = location.search.substr(1);
+            else window.location.href = 'https://xetute.com/';
+
+            await autoSignIn(undefined, '../auth.html?./flare/home.html');
+            await loadChat();
+        }
+
+        document.getElementById('msginp').addEventListener('keydown', function(event)
+        {
+            if (event.key === 'Enter') proccessMessage();
+        });
+
+        let processing = false;
+        async function proccessMessage()
+        {
+            if (processing) return;
+            processing = true;
+            const usermsg = document.getElementById('msginp').value.trim();
+            if (usermsg)
+            {
+                let response = undefined;
+                character.messages.push( { "role": "user", "content": usermsg } );
+
+                document.getElementById('msginp').value = '';
+                add_msg_UI(usermsg, character.messages.length - 1, true);
+
+                try
+                {
+                    response = await fetch(ai_endpoint, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(authData.record.chats[chatid].messages)});
+                }
+                catch
+                {
+                    sub_msg_UI(character.messages.length - 1);
+                    authData.record.chats[chatid].messages.messages.pop();
+
+                    document.getElementById('msginp').value = usermsg;
+                    document.getElementById('error').textContent = 'Failed to send';
+                    processing = false;
+                    return;
+                }
+
+                const data = await response.json();
+                authData.record.chats[chatid].messages.messages.push(data.choices[0].message);
+                add_msg_UI(data.choices[0].message.content, character.messages.length - 1, false);
+
+                try { await pb.collection('users').update(authData.record.id, { "chats": authData.record.chats } ); }
+                catch { document.getElementById('Failed to save message'); }
+            }
+            processing = false;
+            return;
+        }
+
+    </script>
+</html>
