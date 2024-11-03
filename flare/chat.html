@@ -52,14 +52,15 @@
         }
     </style>
     <body onload="autoAuth()">
+        <a href="./home.html" style="text-decoration: none; position: absolute; left: 0%;"><</a>
         <div style="position: absolute; top: 3.5%;">
-            <div class="top" style="flex-direction: row; border-bottom: 2px solid #777;">
-                <a href="./home.html" style="text-decoration: none;"><</a>
-                <h1 id="top-charname" style="margin: 10px;">Loading...</h1>
+            <div class="top" style="border-bottom: 2px solid #777;">
+                <div style="flex-direction: row;"><img id="botpp" style="border-radius: 50%; width: 2.5rem; height: 2.5rem;"/>
+                <h1 id="top-charname" style="margin: 10px;">Loading...</h1></div>
+                <p id="error" style="color:rgb(220, 70, 70)"></p>
             </div>
         </div>
         <div id="messages" class="messages"></div>
-        <p id="error" style="color:rgb(220, 70, 70)"></p>
         <div style="position: absolute; bottom: 3.5%; flex-direction: row;">
             <textarea placeholder="Reply..." id="msginp"></textarea>
             <button type="button" onclick="proccessMessage()">Send</button>
@@ -112,6 +113,8 @@
                 document.getElementById(elem0).style.display = 'none';
             }
         }
+
+        function getImageURL(collectionID, recID, filename) { return `${link}api/files/${collectionID}/${recID}/${filename}`; }
     </script>
     <script>
         let chatid = undefined;
@@ -172,20 +175,20 @@
 
         async function loadChat()
         {
+            const tmp = await getCharacterFromID(chatid);
             if (authData.record.chats !== null)
             {
                 if (authData.record.chats[chatid] === undefined)
                 {
-                    character = await getCharacterFromID(chatid);
-                    authData.record.chats[chatid] = { "name": "", "persona": "", "messages": [] };
-                    authData.record.chats[chatid].name = character.name;
-                    authData.record.chats[chatid].persona = character.persona;
+                    authData.record.chats[chatid] = { "name": "", "persona": "", "messages": {} };
+                    authData.record.chats[chatid].name = tmp.name;
+                    authData.record.chats[chatid].persona = tmp.persona;
                     authData.record.chats[chatid].messages =
                     {
                         "max_context_length": 1024 * 16 /*For anyone seeing this, that's the max*/,
                         "max_tokens": 150,
                         "temperature": 0.65,
-                        "messages": [{"role": "system", "content": `--- ${character.name} ---\n${character.persona}\n` + (authData.record.persona ? (`--- ${authData.record.name} ---\n${authData.record.persona}\n`) : '') }]
+                        "messages": [{"role": "system", "content": `--- ${tmp.name} ---\n${tmp.persona}\n` + (authData.record.persona ? (`--- ${authData.record.name} ---\n${authData.record.persona}\n`) : '') }]
                     };
                     try { await pb.collection('users').update(authData.record.id, { "chats": authData.record.chats }); }
                     catch { document.getElementById('error').textContent = 'Failed to create a new Chat'; return; }
@@ -199,6 +202,7 @@
                 "persona": authData.record.chats[chatid].persona,
                 "messages": authData.record.chats[chatid].messages.messages
             };
+            document.getElementById('botpp').src = getImageURL(tmp.collectionId, tmp.id, tmp.image);
 
             document.getElementById('top-charname').textContent = character.name;
             document.getElementById('messages').innerHTML += `<div id="msg-0" class="firstmsg"><p>${character.persona}</p></div>`;

@@ -12,57 +12,79 @@
         <link rel="icon" type="image/png" href="logo.jpg"/>
     </head>
     <style>
-        .recent-chats
+        div { justify-content: flex-start; }
+        .rccard
         {
-            border-bottom: 1px solid #fff;
-            border-top: 1px solid #fff;
-            min-width: 200px;
-            max-width: 800px;
-            gap: 1rem;
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 8px;
+            background: #050505;
+        }
+        .rccard img
+        {
+            width: 5rem;
+            height: 5rem;
+            border: 2px solid #222;
+            border-radius: 15px;
+        }
+        .rccard h3, .rccard p, .rccard img { margin: 0px; }
+
+        .nccard
+        {
+            width: 10rem;
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 8px;
+            background: #050505;
+        }
+        .nccard img
+        {
+            width: 5rem;
+            height: 5rem;
+            border: 2px solid #222;
+            border-radius: 15px;
+        }
+        .nccard h3, .nccard p, .nccard img { margin: 0px; }
+
+        .rc
+        {
+            justify-content: left;
+            max-width: 80%;
+            min-height: 30%;
+            overflow-x: auto;
             flex-direction: row;
         }
 
-        .characters
+        @media (min-width: 500px)
         {
-            border-bottom: 1px solid #fff;
-            border-top: 1px solid #fff;
-            overflow-y: auto;
-            justify-content: flex-start;
-            margin: 0px;
-            padding: 1rem;
-            min-width: 200px;
-            max-width: 800px;
-            
-            display: grid;
-            gap: 1rem;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            .chars
+            {
+                display: grid;
+                grid-template-columns: auto auto;
+            }
         }
 
-        .chatCard
+        @media (min-width: 600px)
         {
-            border-radius: 15px;
-            border: 2px solid #222;
-            background: #111;
-            width: 200px;
-            height: 100px;
-            transition: 0.35s ease-in-out;
+            .chars
+            {
+                display: grid;
+                grid-template-columns: auto auto auto;
+            }
         }
-        .chatCard h3 { margin: 0px; }
-        .chatCard:hover { background: #222; border: 2px solid #111; color: #fff; }
     </style>
-    <body onload="autoAuth()" style="overflow-x: hidden;">
-        <div style="margin-top: 3.5%;">
+    <body onload="autoAuth()" style="max-width: 100%; max-height: 100%; overflow: hidden;">
+        <div style="margin: 20px; margin-top: 3.5%;">
             <h1>Hello, Friend</h1>
             <p id="greeting-authas">You're authorized as </p>
         </div>
 
-        <h2 style="margin: 10px; margin-bottom: 0px;">Recent Chats</h2>
-        <div class="recent-chats" id="recent-chats"></div>
-        
-        <h2 style="margin: 10px; margin-bottom: 0px;">Characters</h2>
-        <div class="characters">
-            <section id="characters"></section>
-        </div>
+        <h2 style="margin: 10px; margin-bottom: 0;">Recent Chats</h2>
+        <div id="recent-chats" class="rc" style="margin: 20px; margin-top: 10px; padding: 0;"></div>
+
+        <h2>All Characters</h2>
+        <input placeholder="Coming soon..."/>
+        <div id="characters" class="chars" style="overflow-y: auto;"></div>
     </body>
     <script src="../pocketbase.umd.js"></script>
     <script>
@@ -97,8 +119,18 @@
                 return true;
             } else if (referFail !== undefined) window.location.href = referFail
         }
+
+        function getImageURL(collectionID, recID, filename) { return `${link}api/files/${collectionID}/${recID}/${filename}`; }
     </script>
     <script>
+        async function autoAuth()
+        {
+            await autoSignIn(undefined, '../auth.html?./flare/home.html');
+            document.getElementById('greeting-authas').textContent += authData.record.name + '.';
+            await populateRecentChats();
+            await populateCharacters();
+        }
+
         async function populateRecentChats()
         {
             let tmpKeys = undefined;
@@ -108,21 +140,17 @@
             {
                 for (let i = 0; i < tmpKeys.length; ++i)
                 {
+                    let record = undefined;
+                    try { record = await pb.collection('flare_characters').getOne(tmpKeys[i], {}); } catch { ++i; }
                     document.getElementById('recent-chats').innerHTML += 
-                    `<button class="chatCard" type="button" onclick="openChat('${tmpKeys[i]}')">
+                    `<button type="button" class="rccard" onclick="openChat('${tmpKeys[i]}')">
+                        <img src="${getImageURL(record.collectionId, record.id, record.image)}"/>
                         <h3>${authData.record.chats[tmpKeys[i]].name}</h3>
                     </button>`;
                 }
             }
         }
-
-        async function autoAuth()
-        {
-            await autoSignIn(undefined, '../auth.html?./flare/home.html');
-            document.getElementById('greeting-authas').textContent += authData.record.name + '.';
-            populateRecentChats();
-        }
-
+        
         let characterRecords = undefined;
         async function populateCharacters()
         {
@@ -130,13 +158,13 @@
             for (let i = 0; i < characterRecords.items.length; ++i)
             {
                 document.getElementById('characters').innerHTML +=
-                `<button class="chatCard" type="button" onclick="openChat('${characterRecords.items[i].id}')">
+                `<button class="nccard" type="button" onclick="openChat('${characterRecords.items[i].id}')">
+                    <img src="${getImageURL(characterRecords.items[i].collectionId, characterRecords.items[i].id, characterRecords.items[i].image)}"/>
                     <h3>${characterRecords.items[i].name}</h3>
-                    <p>${(characterRecords.items[i].description.length > 20) ? characterRecords.items[i].description.substr(0, 17) + '...' : characterRecords.items[i].description}</p>
+                    <p>${(characterRecords.items[i].description.length > 23) ? characterRecords.items[i].description.substr(0, 20) + '...' : characterRecords.items[i].description}</p>
                 </button>`;
             }
         }
-        populateCharacters();
 
         function openChat(chatid) { window.location.href = './chat.html?' + chatid; }
     </script>

@@ -74,5 +74,5 @@ div, form
     text-align: center;
 }
 
-::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar { width: 0px; max-height: 0px; }
 ::-webkit-scrollbar-thumb { background: #111; border-radius: 10px; }
