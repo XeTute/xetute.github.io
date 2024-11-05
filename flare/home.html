@@ -73,18 +73,18 @@
             }
         }
     </style>
-    <body onload="autoAuth()" style="max-width: 100%; max-height: 100%; overflow: hidden;">
+    <body onload="autoAuth()">
         <div style="margin: 20px; margin-top: 3.5%;">
             <h1>Hello, Friend</h1>
             <p id="greeting-authas">You're authorized as </p>
         </div>
 
         <h2 style="margin: 10px; margin-bottom: 0;">Recent Chats</h2>
-        <div id="recent-chats" class="rc" style="margin: 20px; margin-top: 10px; padding: 0;"></div>
+        <div id="recent-chats" class="rc" style="padding: 0; margin: -2%;"></div>
 
         <h2>All Characters</h2>
-        <input placeholder="Coming soon..."/>
-        <div id="characters" class="chars" style="overflow-y: auto;"></div>
+        <input placeholder="Search..." id="search" autocomplete="off"/>
+        <div id="characters" class="chars" style="justify-content: flex-start; overflow-y: auto; margin-top: 0;"></div>
     </body>
     <script src="../pocketbase.umd.js"></script>
     <script>
@@ -123,6 +123,8 @@
         function getImageURL(collectionID, recID, filename) { return `${link}api/files/${collectionID}/${recID}/${filename}`; }
     </script>
     <script>
+        let characterRecords = undefined;
+
         async function autoAuth()
         {
             await autoSignIn(undefined, '../auth.html?./flare/home.html');
@@ -130,6 +132,37 @@
             await populateRecentChats();
             await populateCharacters();
         }
+
+        document.getElementById('search').addEventListener('input', async function(e)
+        {
+            if (e.target.value === '') populateCharacters();
+            else
+            {
+                characterRecords = await pb.collection('flare_characters').getFullList({ filter: `name ~ "${e.target.value}"` });
+                document.getElementById('characters').innerHTML = '';
+                try
+                {
+                    for (let i = 0; i < characterRecords.length; ++i)
+                    {
+                        document.getElementById('characters').innerHTML +=
+                        `<button class="nccard" type="button" onclick="openChat('${characterRecords[i].id}')">
+                            <img src="${getImageURL(characterRecords[i].collectionId, characterRecords[i].id, characterRecords[i].image)}"/>
+                            <h3>${characterRecords[i].name}</h3>
+                            <p>${(characterRecords[i].description.length > 23) ? characterRecords[i].description.substr(0, 20) + '...' : characterRecords[i].description}</p>
+                        </button>`;
+                    }
+                }
+                catch
+                {
+                    document.getElementById('characters').innerHTML +=
+                    `<button class="nccard" type="button" onclick="openChat('${characterRecords[0].id}')">
+                        <img src="${getImageURL(characterRecords[0].collectionId, characterRecords[0].id, characterRecords[0].image)}"/>
+                        <h3>${characterRecords[0].name}</h3>
+                        <p>${(characterRecords[0].description.length > 23) ? characterRecords[0].description.substr(0, 20) + '...' : characterRecords[0].description}</p>
+                    </button>`;
+                }
+            }
+        });
 
         async function populateRecentChats()
         {
@@ -151,10 +184,10 @@
             }
         }
         
-        let characterRecords = undefined;
         async function populateCharacters()
         {
             characterRecords = await pb.collection('flare_characters').getList(1, 50, {});
+            document.getElementById('characters').innerHTML = '';
             for (let i = 0; i < characterRecords.items.length; ++i)
             {
                 document.getElementById('characters').innerHTML +=
