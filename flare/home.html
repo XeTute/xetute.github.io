@@ -32,6 +32,7 @@
         .nccard
         {
             width: 10rem;
+            height: 13.5rem;
             border: 2px solid #333;
             border-radius: 15px;
             padding: 8px;
@@ -55,6 +56,17 @@
             flex-direction: row;
         }
 
+        .del-rc
+        {
+            background: #933;
+            padding: 5px;
+            border: 0;
+            border-radius: 15px;
+            text-align: center;
+            transition: 0.35s;
+        }
+        .regen-msg:hover { background: #944; }
+        
         @media (min-width: 500px)
         {
             .chars
@@ -176,10 +188,13 @@
                     let record = undefined;
                     try { record = await pb.collection('flare_characters').getOne(tmpKeys[i], {}); } catch { ++i; }
                     document.getElementById('recent-chats').innerHTML += 
-                    `<button type="button" class="rccard" onclick="openChat('${tmpKeys[i]}')">
-                        <img src="${getImageURL(record.collectionId, record.id, record.image)}"/>
-                        <h3>${authData.record.chats[tmpKeys[i]].name}</h3>
-                    </button>`;
+                    `<div>
+                        <button type="button" class="rccard" onclick="openChat('${tmpKeys[i]}')">
+                            <img src="${getImageURL(record.collectionId, record.id, record.image)}"/>
+                            <h3>${authData.record.chats[tmpKeys[i]].name}</h3>
+                        </button>
+                        <button class="del-rc" onclick="del_chat('${tmpKeys[i]}')">Delete</button>
+                    </div>`;
                 }
             }
         }
@@ -200,5 +215,15 @@
         }
 
         function openChat(chatid) { window.location.href = './chat.html?' + chatid; }
+
+        async function del_chat(id)
+        {
+            try
+            {
+                delete authData.record.chats[id];
+                await pb.collection('users').update(authData.record.id, { "chats": authData.record.chats } );
+                window.location.href = './home.html';
+            } catch {}
+        }
     </script>
 </html>

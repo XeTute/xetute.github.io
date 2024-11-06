@@ -37,7 +37,7 @@
             background: #222;
             left: 3.5%;
             text-align: left;
-            max-width: 75%;
+            max-width: 65%;
             padding: 15px;
             border-radius: 15px;
         }
@@ -50,6 +50,21 @@
             margin-top: 100px;
             gap: 20px;
         }
+
+        @media (min-width: 450px) { .messages { max-width: 420px; } }
+        @media (min-width: 600px) { .messages { max-width: 520px; } }
+
+        .regen-msg
+        {
+            background: #151515;
+            width: 10%;
+            height: 70%;
+            border: 2px solid #222;
+            border-radius: 15px;
+            margin-left: 0.3rem;
+            transition: 0.35s;
+        }
+        .regen-msg:hover { height: 60%; border: 2px solid #252525; margin-left: 0.2rem; }
     </style>
     <body onload="autoAuth()">
         <a href="./home.html" style="text-decoration: none; position: absolute; left: 0%;"><</a>
@@ -163,7 +178,19 @@
 
         function add_msg_UI(msg, msgID, user)
         {
-            document.getElementById('messages').innerHTML += `<div id="msg-${msgID}" class="${user ? 'usermsg' : 'botmsg'}"><p>${formatMarkdown(escapeHtml(msg))}</p></div>`;
+            if (user)
+            {
+                document.getElementById('messages').innerHTML += `<div id="msg-${msgID}" class="usermsg"><p>${formatMarkdown(escapeHtml(msg))}</p></div>`;
+            }
+            else
+            {
+                if (msgID > 2) { document.getElementById(`msg-${msgID - 2}`).querySelector('.regen-msg').outerHTML = ''; }
+                document.getElementById('messages').innerHTML +=
+                `<div id="msg-${msgID}" style="flex-direction: row;">
+                    <div class="botmsg"><p>${formatMarkdown(escapeHtml(msg))}</p></div>
+                    <div class="regen-msg" onclick="regen_msg(${msgID})"><img style="width:1rem;height:1rem;" src="./refresh.svg"/></i></div>
+                </div>`;
+            }
             document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
         }
 
@@ -185,7 +212,7 @@
                     authData.record.chats[chatid].persona = tmp.persona;
                     authData.record.chats[chatid].messages =
                     {
-                        "max_context_length": 1024 * 16 /*For anyone seeing this, that's the max*/,
+                        "max_context_length": 1024 * 6 /*For anyone seeing this, that's the max*/,
                         "max_tokens": 150,
                         "temperature": 0.65,
                         "messages": [{"role": "system", "content": `--- ${tmp.name} ---\n${tmp.persona}\n` + (authData.record.persona ? (`--- ${authData.record.name} ---\n${authData.record.persona}\n`) : '') }]
@@ -224,7 +251,7 @@
 
         document.getElementById('msginp').addEventListener('keydown', function(event)
         {
-            if (event.key === 'Enter') proccessMessage();
+            if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); proccessMessage(); }
         });
 
         let processing = false;
@@ -267,5 +294,36 @@
             return;
         }
 
+        async function regen_msg(msgID)
+        {
+            if (processing) return;
+            processing = true;
+            sub_msg_UI(msgID);
+            let response = undefined;
+            const botmsg = character.messages[character.messages.length - 1].content;
+            character.messages.pop();
+
+            try
+            {
+                response = await fetch(ai_endpoint, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(authData.record.chats[chatid].messages)});
+            }
+            catch
+            {
+                character.messages.push( { "role": "assistant", "content": botmsg } )
+                document.getElementById('error').textContent = 'Failed to regenerate';
+                processing = false;
+                return;
+            }
+
+            const data = await response.json();
+            authData.record.chats[chatid].messages.messages.push(data.choices[0].message);
+            add_msg_UI(data.choices[0].message.content, character.messages.length - 1, false);
+
+            try { await pb.collection('users').update(authData.record.id, { "chats": authData.record.chats } ); }
+            catch { document.getElementById('Failed to save message'); }
+
+            processing = false;
+            return;
+        }
     </script>
 </html>
