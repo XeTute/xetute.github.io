@@ -4,7 +4,6 @@
         <title>Home | Flare</title>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="Keywords" content="XeTute, XeTute Technologies, AI, LLM, Flare, Chat, Chatbot">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
@@ -134,13 +133,13 @@
 
         function getImageURL(collectionID, recID, filename) { return `${link}api/files/${collectionID}/${recID}/${filename}`; }
     </script>
-    <script>
+    <script defer>
         let characterRecords = undefined;
 
         async function autoAuth()
         {
             await autoSignIn(undefined, '../auth.html?./flare/home.html');
-            document.getElementById('greeting-authas').textContent += authData.record.name + '.';
+            document.getElementById('greeting-authas').innerHTML += `<a href='./profile.html' style='padding: 4px; margin: 4px;'>${authData.record.name}</a>.`;
             await populateRecentChats();
             await populateCharacters();
         }

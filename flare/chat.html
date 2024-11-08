@@ -4,7 +4,6 @@
         <title>Chat | Flare</title>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="Keywords" content="XeTute, XeTute Technologies, AI, LLM, Flare, Chat, Chatbot">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
@@ -51,8 +50,8 @@
             gap: 20px;
         }
 
-        @media (min-width: 450px) { .messages { max-width: 420px; } }
-        @media (min-width: 600px) { .messages { max-width: 520px; } }
+        @media (min-width: 450px) { .messages, #botProfile { max-width: 420px; } }
+        @media (min-width: 600px) { .messages, #botProfile { max-width: 520px; } }
 
         .regen-msg
         {
@@ -70,9 +69,17 @@
         <a href="./home.html" style="text-decoration: none; position: absolute; left: 0%;"><</a>
         <div style="position: absolute; top: 3.5%;">
             <div class="top" style="border-bottom: 2px solid #777;">
-                <div style="flex-direction: row;"><img id="botpp" style="border-radius: 50%; width: 2.5rem; height: 2.5rem;"/>
+                <div style="flex-direction: row;"><img id="botpp" style="border-radius: 50%; width: 2.5rem; height: 2.5rem;" onclick="showBotProfile()"/>
                 <h1 id="top-charname" style="margin: 10px;">Loading...</h1></div>
                 <p id="error" style="color:rgb(220, 70, 70)"></p>
+            </div>
+        </div>
+        <div id="botProfile" style="position: absolute; display: none; width: 100%; height: 100%;">
+            <div style="background: rgba(0, 0, 0, .9); z-index: 1; width: 100%; height: 100%;" onclick="showBotProfile()">
+                <h2 onclick="showBotProfile()"></h2>
+                <img id="botppm" style="border-radius: 15px; width: 50%; margin: 20px;" onclick="showBotProfile()"/>
+                <div style="max-height: 200px; overflow-y: auto; margin: 20px; justify-content: flex-start;"><p onclick="showBotProfile()"></p></div>
+                <p style="color: #f5f5f5; margin: 20px;">Tip: If the text above isn't complete, you can scroll it!</p>
             </div>
         </div>
         <div id="messages" class="messages"></div>
@@ -82,7 +89,7 @@
         </div>
     </body>
     <script src="../pocketbase.umd.js"></script>
-    <script>
+    <script defer>
         const pb = new PocketBase(link); // link in pocketbase.umd.js
 
         let email, password, authData = undefined;
@@ -135,6 +142,12 @@
         let chatid = undefined;
         let character = undefined;
 
+        function showBotProfile()
+        {
+            if (document.getElementById('botProfile').style.display === 'none') document.getElementById('botProfile').style.display = 'flex';
+            else document.getElementById('botProfile').style.display = 'none';
+        }
+
         function formatMarkdown(input) // My shitty markdown implementation. Your welcome.
         {
           return input
@@ -184,7 +197,7 @@
             }
             else
             {
-                if (msgID > 2) { document.getElementById(`msg-${msgID - 2}`).querySelector('.regen-msg').outerHTML = ''; }
+                try { if (msgID > 2) { document.getElementById(`msg-${msgID - 2}`).querySelector('.regen-msg').outerHTML = ''; } } catch {}
                 document.getElementById('messages').innerHTML +=
                 `<div id="msg-${msgID}" style="flex-direction: row;">
                     <div class="botmsg"><p>${formatMarkdown(escapeHtml(msg))}</p></div>
@@ -230,9 +243,12 @@
                 "messages": authData.record.chats[chatid].messages.messages
             };
             document.getElementById('botpp').src = getImageURL(tmp.collectionId, tmp.id, tmp.image);
+            document.getElementById('botProfile').querySelector('img').src = document.getElementById('botpp').src;
 
             document.getElementById('top-charname').textContent = character.name;
             document.getElementById('messages').innerHTML += `<div id="msg-0" class="firstmsg"><p>${character.persona}</p></div>`;
+            document.getElementById('botProfile').querySelector('h2').textContent = character.name;
+            document.getElementById('botProfile').querySelector('p').textContent = character.persona;
 
             for (let i = 1; i < character.messages.length; ++i) // Starting at 1 cuz sys msg counts in
             {
@@ -288,7 +304,7 @@
                 add_msg_UI(data.choices[0].message.content, character.messages.length - 1, false);
 
                 try { await pb.collection('users').update(authData.record.id, { "chats": authData.record.chats } ); }
-                catch { document.getElementById('Failed to save message'); }
+                catch { document.getElementById('error').textContent = 'Failed to save message'; }
             }
             processing = false;
             return;
@@ -298,7 +314,6 @@
         {
             if (processing) return;
             processing = true;
-            sub_msg_UI(msgID);
             let response = undefined;
             const botmsg = character.messages[character.messages.length - 1].content;
             character.messages.pop();
@@ -317,6 +332,7 @@
 
             const data = await response.json();
             authData.record.chats[chatid].messages.messages.push(data.choices[0].message);
+            sub_msg_UI(msgID);
             add_msg_UI(data.choices[0].message.content, character.messages.length - 1, false);
 
             try { await pb.collection('users').update(authData.record.id, { "chats": authData.record.chats } ); }

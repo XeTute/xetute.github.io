@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Profile | XeTute Technologies</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../basic.css">
+        <link rel="icon" type="image/png" href="logo.jpg"/>
+    </head>
+    <style>
+        @media (min-height: 800px) { body { justify-content: center; } }
+        @media (max-height: 700px) { body { justify-content: flex-start; } }
+    </style>
+    <body onload="autoAuth()">
+        <h1>Hello, Friend.</h1>
+        <p style="color: green;" id="greeting-authas">We authorized you as </p>
+
+        <div style="margin: 25px; padding: 10px; border-radius: 15px; border: 2px solid #444;">
+            <h2 style="margin: 15px;">Credentials</h2>
+            <div style="flex-direction: row; margin: 5px;">
+                <p>Email: </p>
+                <a id="email"></a>
+            </div>
+            <div style="flex-direction: row; margin: 5px;">
+                <p>Password: </p>
+                <div>
+                    <button onclick="updatePass()">Update Password</button>
+                    <p style="color: rgb(220, 70, 70)" id="updatePassTxt"></p>
+                </div>
+            </div>
+        </div>
+        <div style="margin: 15px; padding: 10px; border-radius: 15px; border: 2px solid #444;">
+            <h2 style="margin: 15px;">Name</h2>
+            <div style="flex-direction: row; margin: 5px">
+                <input id="name" placeholder="Enter Name..." maxlength="15" autocomplete="off"/>
+                <button onclick="updateName()">Update</button>
+            </div>
+            <p id="updateNameTxt"></p>
+        </div>
+        <div style="margin: 15px; padding: 10px; border-radius: 15px; border: 2px solid #444">
+            <h2 style="margin: 15px;">Persona</h2>
+            <textarea placeholder="Template:&#10;Name: Ken&#10;Age: 23&#10;Likes: ...&#10;Dislikes: ...&#10;" style="height: 100%;" id="persona"></textarea>
+            <button onclick="updatePersona()">Update</button>
+            <p id="updatePersonaTxt"></p>
+        </div>
+    </body>
+    <script src="../pocketbase.umd.js"></script>
+    <script>
+        const pb = new PocketBase(link); // link in pocketbase.umd.js
+
+        let email, password, authData = undefined;
+
+        async function autoSignIn(referSuccess, referFail)
+        {
+            if ((localStorage.getItem('email') !== null) && (localStorage.getItem('password') !== null))
+            {
+                try { authData = await pb.collection('users').authRefresh(); }
+                catch
+                {
+                    try
+                    {
+                        email = localStorage.getItem('email');
+                        password = localStorage.getItem('password');
+
+                        authData = await pb.collection('users').authWithPassword(email, password);
+                        if (referSuccess !== undefined) window.location.href = referSuccess;
+                    }
+                    catch
+                    {
+                        if (referFail !== undefined) window.location.href = referFail; // For auth page
+                        return false;
+                    }
+                }
+                if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
+                else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
+                else if (!authData.record.verified) return false; 
+                return true;
+            } else if (referFail !== undefined) window.location.href = referFail
+        }
+    </script>
+    <script defer>
+        async function autoAuth()
+        {
+            await autoSignIn(undefined, '../auth.html');
+
+            document.getElementById('greeting-authas').textContent += authData.record.name + '.';
+            document.getElementById('name').value = authData.record.name;
+            document.getElementById('email').textContent = authData.record.email;
+            document.getElementById('persona').value = authData.record.persona;
+        }
+
+        async function updatePass()
+        {
+            try
+            {
+                await pb.collection('users').requestPasswordReset(authData.record.email);
+                document.getElementById('updatePassTxt').innerHTML = `<p style="color:green">Sent email</p>`;
+            }
+            catch { document.getElementById('updatePassTxt').textContent = 'Failed to send email'; }
+        }
+
+        let processing = [ false, false ]; // Name, Persona
+        async function updateName()
+        {
+            if (processing[0]) return;
+            processing[0] = true;
+
+            try
+            {
+                await pb.collection('users').update(authData.record.id, { "name": document.getElementById('name').value } );
+                document.getElementById('updateNameTxt').innerHTML = '<p style="color:green">Updated Name</p>';
+            }
+            catch { document.getElementById('updateNameTxt').innerHTML = '<p style="color:rgb(220, 70, 70)">Failed to Update</p>'; }
+
+            processing[0] = false;
+        }
+
+        async function updatePersona()
+        {
+            if (processing[1]) return;
+            processing[1] = true;
+
+            try
+            {
+                await pb.collection('users').update(authData.record.id, { "persona": document.getElementById('persona').value } );
+                document.getElementById('updatePersonaTxt').innerHTML = '<p style="color:green">Updated Persona</p>';
+            }
+            catch { document.getElementById('updatePersonaTxt').innerHTML = '<p style="color:rgb(220, 70, 70)">Failed to Update</p>'; }
+
+            processing[1] = false;
+        }
+    </script>
+</html>
