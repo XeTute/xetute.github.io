@@ -66,7 +66,7 @@
         .regen-msg:hover { height: 60%; border: 2px solid #252525; margin-left: 0.2rem; }
     </style>
     <body onload="autoAuth()">
-        <a href="./home.html" style="text-decoration: none; position: absolute; left: 0%;"><</a>
+        <a href="./home.html" style="text-decoration: none; position: absolute; left: 0%; top: 46.5%;"><</a>
         <div style="position: absolute; top: 3.5%;">
             <div class="top" style="border-bottom: 2px solid #777;">
                 <div style="flex-direction: row;"><img id="botpp" style="border-radius: 50%; width: 2.5rem; height: 2.5rem;" onclick="showBotProfile()"/>
@@ -89,56 +89,8 @@
         </div>
     </body>
     <script src="../pocketbase.umd.js"></script>
+    <script src="../mylib.js"></script>
     <script defer>
-        const pb = new PocketBase(link); // link in pocketbase.umd.js
-
-        let email, password, authData = undefined;
-
-        async function autoSignIn(referSuccess, referFail)
-        {
-            if ((localStorage.getItem('email') !== null) && (localStorage.getItem('password') !== null))
-            {
-                try { authData = await pb.collection('users').authRefresh(); }
-                catch
-                {
-                    try
-                    {
-                        email = localStorage.getItem('email');
-                        password = localStorage.getItem('password');
-                    
-                        authData = await pb.collection('users').authWithPassword(email, password);
-                        if (referSuccess !== undefined) window.location.href = referSuccess;
-                    }
-                    catch
-                    {
-                        if (referFail !== undefined) window.location.href = referFail; // For auth page
-                        return false;
-                    }
-                }
-                if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
-                else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
-                else if (!authData.record.verified) return false; 
-                return true;
-            } else if (referFail !== undefined) window.location.href = referFail
-        }
-
-        function switchForm(elem0, elem1)
-        {
-            if (document.getElementById(elem0).style.display === 'none')
-            {
-                document.getElementById(elem0).style.display = 'flex';
-                document.getElementById(elem1).style.display = 'none';
-            }
-            else
-            {
-                document.getElementById(elem1).style.display = 'flex';
-                document.getElementById(elem0).style.display = 'none';
-            }
-        }
-
-        function getImageURL(collectionID, recID, filename) { return `${link}api/files/${collectionID}/${recID}/${filename}`; }
-    </script>
-    <script>
         let chatid = undefined;
         let character = undefined;
 
@@ -215,7 +167,9 @@
 
         async function loadChat()
         {
-            const tmp = await getCharacterFromID(chatid);
+            let tmp = undefined;
+            try { tmp = await getCharacterFromID(chatid); }
+            catch { window.location.href = './home.html'; }
             if (authData.record.chats !== null)
             {
                 if (authData.record.chats[chatid] === undefined)
@@ -228,7 +182,7 @@
                         "max_context_length": 1024 * 6 /*For anyone seeing this, that's the max*/,
                         "max_tokens": 150,
                         "temperature": 0.65,
-                        "messages": [{"role": "system", "content": `--- ${tmp.name} ---\n${tmp.persona}\n` + (authData.record.persona ? (`--- ${authData.record.name} ---\n${authData.record.persona}\n`) : '') }]
+                        "messages": [ { "role": "system", "content": `--- ${tmp.name} ---\n${tmp.persona}\n` + (authData.record.persona ? (`--- ${authData.record.name} ---\n${authData.record.persona}\n`) : '') } ]
                     };
                     try { await pb.collection('users').update(authData.record.id, { "chats": authData.record.chats }); }
                     catch { document.getElementById('error').textContent = 'Failed to create a new Chat'; return; }

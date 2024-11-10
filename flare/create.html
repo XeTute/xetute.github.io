@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Create Character | Flare</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="../basic.css">
+        <link rel="icon" type="image/png" href="logo.jpg"/>
+    </head>
+    <style>
+        input[type="file"] { display: none; }
+        label#file-label
+        {
+            font-size: 1rem;
+            font-family: 'Manrope', system-ui;
+            padding: 6px;
+            border: 1px solid #fff;
+            border-radius: 0px;
+            margin: 5px;
+            transition: 0.35s ease-in-out;
+            color: #fff;
+            background: #000;
+        }
+        label#file-label:hover
+        {
+            transition: 0.35s ease-in-out;
+            color: #000;
+            background: #fff;
+        }
+    </style>
+    <body onload="autoSignIn(undefined, '../auth.html?./flare/create.html')">
+        <h1>Create a Character</h1>
+        <div style="margin: 20px; gap: 15px; padding: 10px;">
+            <input placeholder="Name" id="name" maxlength="20" type="text" autocomplete="off"/>
+            <input placeholder="Short Description" id="description" maxlength="50" type="text" autocomplete="off"/>
+            <textarea placeholder="Persona" id="persona" maxlength="750" type="text" autocomplete="off"></textarea>
+
+            <input type="file" id="pp" onchange="updateFileName()" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif"/>
+            <label for="pp" id="file-label">Upload Profile Picture</label>
+
+            <button onclick="submit()">Create</button>
+            <p id="error" style="color: rgb(220, 70, 70)"></p>
+            <p style="max-width: 75%; color: grey;">Note: Characters you create are visible to everyone on this platform.</p>
+        </div>
+    </body>
+    <script src="../pocketbase.umd.js"></script>
+    <script src="../mylib.js"></script>
+    <script defer>
+        let profilePicture = undefined;
+
+        function updateFileName() 
+        {
+            const input = document.getElementById("pp");
+            const label = document.getElementById("file-label");
+            const fileName = input.files.length ? (input.files[0].name.length > 17 ? (input.files[0].name.substr(0, 17) + '...') : input.files[0].name) : "Add File";
+            label.textContent = fileName;
+            profilePicture = document.getElementById('pp');
+        }
+
+        function openChat(chatid) { window.location.href = './chat.html?' + chatid; }
+
+        async function submit()
+        {
+            formData = new FormData();
+
+            const name = document.getElementById('name').value;
+            const persona = document.getElementById('persona').value;
+            const description = document.getElementById('description').value;
+            let record = undefined;
+
+            if (name.length < 3)
+            {
+                document.getElementById('error').textContent = 'Name must be longer than three characters';
+                return;
+            }
+            else if (persona.length < 35)
+            {
+                document.getElementById('error').textContent = 'Persona must be longer than 35 characters';
+                return;
+            }
+            else if (description.length < 12)
+            {
+                document.getElementById('error').textContent = 'Description must be longer than 12 characters';
+                return;
+            }
+
+            try
+            {
+                formData.append('image', profilePicture.files[0]);
+                formData.append('name', name);
+                formData.append('persona', persona);
+                formData.append('description', description);
+
+                record = await pb.collection('flare_characters').create(formData);
+                openChat(record.id);
+            }
+            catch
+            {
+                document.getElementById('error').innerHTML = 'An unknown error occurred.<br>We\'re sorry.';
+            }
+        }
+    </script>
+</html>

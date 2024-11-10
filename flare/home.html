@@ -18,6 +18,7 @@
             border-radius: 15px;
             padding: 8px;
             background: #050505;
+            flex-direction: column;
         }
         .rccard img
         {
@@ -98,41 +99,7 @@
         <div id="characters" class="chars" style="justify-content: flex-start; overflow-y: auto; margin-top: 0;"></div>
     </body>
     <script src="../pocketbase.umd.js"></script>
-    <script>
-        const pb = new PocketBase(link); // link in pocketbase.umd.js
-
-        let email, password, authData = undefined;
-
-        async function autoSignIn(referSuccess, referFail)
-        {
-            if ((localStorage.getItem('email') !== null) && (localStorage.getItem('password') !== null))
-            {
-                try { authData = await pb.collection('users').authRefresh(); }
-                catch
-                {
-                    try
-                    {
-                        email = localStorage.getItem('email');
-                        password = localStorage.getItem('password');
-
-                        authData = await pb.collection('users').authWithPassword(email, password);
-                        if (referSuccess !== undefined) window.location.href = referSuccess;
-                    }
-                    catch
-                    {
-                        if (referFail !== undefined) window.location.href = referFail; // For auth page
-                        return false;
-                    }
-                }
-                if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
-                else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
-                else if (!authData.record.verified) return false; 
-                return true;
-            } else if (referFail !== undefined) window.location.href = referFail
-        }
-
-        function getImageURL(collectionID, recID, filename) { return `${link}api/files/${collectionID}/${recID}/${filename}`; }
-    </script>
+    <script src="../mylib.js"></script>
     <script defer>
         let characterRecords = undefined;
 
@@ -179,23 +146,26 @@
         {
             let tmpKeys = undefined;
             try { tmpKeys = Object.keys(authData.record.chats); } catch {}
-            if (tmpKeys?.length === 0 || authData.record.chats === null) document.getElementById('recent-chats').innerHTML = '<p>No recent Chats.</p>';
-            else
+            if (tmpKeys?.length !== 0 && authData.record.chats !== null)
             {
                 for (let i = 0; i < tmpKeys.length; ++i)
                 {
                     let record = undefined;
                     try { record = await pb.collection('flare_characters').getOne(tmpKeys[i], {}); } catch { ++i; }
                     document.getElementById('recent-chats').innerHTML += 
-                    `<div>
-                        <button type="button" class="rccard" onclick="openChat('${tmpKeys[i]}')">
-                            <img src="${getImageURL(record.collectionId, record.id, record.image)}"/>
-                            <h3>${authData.record.chats[tmpKeys[i]].name}</h3>
-                        </button>
-                        <button class="del-rc" onclick="del_chat('${tmpKeys[i]}')">Delete</button>
-                    </div>`;
+                    `<div style="flex-direction:column;"><button class="rccard" onclick="openChat('${tmpKeys[i]}')">
+                        <img src="${getImageURL(record.collectionId, record.id, record.image)}"/>
+                        <h3>${authData.record.chats[tmpKeys[i]].name}</h3>
+                    </button>
+                    <button class="del-rc" onclick="del_chat('${tmpKeys[i]}')">Delete</button></div>`;
                 }
             }
+
+            document.getElementById('recent-chats').innerHTML +=
+            `<a href="create.html" style="text-decoration:none;" class="rccard">
+                <h1>+</h1>
+                <h3>Create<br>Character</h3>
+            </a>`;
         }
         
         async function populateCharacters()

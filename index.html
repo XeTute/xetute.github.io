@@ -63,6 +63,8 @@
             width: 100%;
             height: 100%;
         }
+
+        .heading { margin-top: 20px; margin-bottom: 10px; }
     </style>
     <body onload="auto_auth()">
         <div class="tv"> <!-- Old TV -->
@@ -84,43 +86,18 @@
                 </div>
             </div>
         </div>
-        <h2 style="margin-top: 20px; margin-bottom: 10px;">Recent Events</h2>
+
+        <h2 class="heading">Our Apps</h2>
+        <div style="flex-direction: row;">
+            <a href="./flare/home.html">Flare</a>
+            <a href="./cye/home.html">CYE</a>
+        </div>
+
+        <h2 class="heading">Recent Events</h2>
         <div class="cards" id="cards"></div>
     </body>
     <script src="pocketbase.umd.js"></script>
-    <script>
-        const pb = new PocketBase(link); // link in pocketbase.umd.js
-
-        let email, password, authData = undefined;
-
-        async function autoSignIn(referSuccess, referFail)
-        {
-            if ((localStorage.getItem('email') !== null) && (localStorage.getItem('password') !== null))
-            {
-                try { authData = await pb.collection('users').authRefresh(); }
-                catch
-                {
-                    try
-                    {
-                        email = localStorage.getItem('email');
-                        password = localStorage.getItem('password');
-
-                        authData = await pb.collection('users').authWithPassword(email, password);
-                        if (referSuccess !== undefined) window.location.href = referSuccess;
-                    }
-                    catch
-                    {
-                        if (referFail !== undefined) window.location.href = referFail; // For auth page
-                        return false;
-                    }
-                }
-                if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
-                else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
-                else if (!authData.record.verified) return false; 
-                return true;
-            } else if (referFail !== undefined) window.location.href = referFail
-        }
-    </script>
+    <script src="mylib.js"></script>
     <script defer>
         async function auto_auth()
         {

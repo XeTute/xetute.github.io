@@ -14,9 +14,11 @@
     <style>
         button, a { text-decoration: underline; border: 0; border-radius: 0; padding: 0; }
         button:hover, a:hover { text-decoration: underline; border: 0; border-radius: 0; padding: 0; color: #fff; background: #000; }
+        @media (min-height: 800px) { #post { max-width: 50%; } }
+        @media (max-height: 700px) { #post { max-width: 80%; } }
     </style>
-    <body onload="load()" style="flex-direction: column;">
-        <div id="post" style="width: 80%; justify-content: flex-start;"></div>
+    <body onload="load()">
+        <div id="post"></div>
     </body>
     <script src="pocketbase.umd.js"></script>
     <script defer>
@@ -34,7 +36,7 @@
                     document.getElementById('post').innerHTML =
                     `<p style="font-size: 12.5px">${record.created}</p>
                     <h1 style="margin: 10px;">${record.title}</h1><em style="margin: 20px; margin-top: 0px; margin-bottom: 40px;">${record.description}</em>
-                    ${record.content}`;
+                    <div style="text-align: left;">${record.content}</div>`;
                 }
                 catch { window.location.href = './index.html' }
             }

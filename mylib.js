@@ -10,19 +10,8 @@
                 try { authData = await pb.collection('users').authRefresh(); }
                 catch
                 {
-                    try
-                    {
-                        email = localStorage.getItem('email');
-                        password = localStorage.getItem('password');
-
-                        authData = await pb.collection('users').authWithPassword(email, password);
-                        if (referSuccess !== undefined) window.location.href = referSuccess;
-                    }
-                    catch
-                    {
-                        if (referFail !== undefined) window.location.href = referFail; // For auth page
-                        return false;
-                    }
+                    if (referFail !== undefined) window.location.href = referFail; // For auth page
+                    return false;
                 }
                 if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
                 else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
@@ -85,3 +74,5 @@
                 document.getElementById(elem0).style.display = 'none';
             }
         }
+
+        function getImageURL(collectionID, recID, filename) { return `${link}api/files/${collectionID}/${recID}/${filename}`; }
