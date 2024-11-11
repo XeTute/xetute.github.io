@@ -44,6 +44,7 @@
                 "passwordConfirm": document.getElementById(passID1).value,
                 "email": email,
                 "verified": false, // If you're reading this, try setting it to true to feel like a hacker till you get an error.
+                "name": 'user'
             };
 
             try { authData = await pb.collection('users').create(data); }
