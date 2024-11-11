@@ -70,4 +70,4 @@
             }
         }
 
-        function getImageURL(collectionID, recID, filename) { return `${link}api/files/${collectionID}/${recID}/${filename}`; }
+        function getImageURL(collectionID, recID, filename) { return `${link}/api/files/${collectionID}/${recID}/${filename}`; }
