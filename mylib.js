@@ -25,9 +25,6 @@
             try { authData = await pb.collection('users').authWithPassword(email, password); }
             catch { if (referFail !== undefined) window.location.href = referFail; return false; }
 
-            localStorage.setItem('email', email);
-            localStorage.setItem('password', password);
-
             if (referSuccess !== undefined && authData.record.verified) window.location.href = referSuccess;
             return true;
         }
@@ -44,7 +41,7 @@
                 "passwordConfirm": document.getElementById(passID1).value,
                 "email": email,
                 "verified": false, // If you're reading this, try setting it to true to feel like a hacker till you get an error.
-                "name": 'user'
+		        "name": 'user',
             };
 
             try { authData = await pb.collection('users').create(data); }
