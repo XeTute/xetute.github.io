@@ -5,19 +5,16 @@
 
         async function autoSignIn(referSuccess, referFail)
         {
-            if ((localStorage.getItem('email') !== null) && (localStorage.getItem('password') !== null))
+            try { authData = await pb.collection('users').authRefresh(); }
+            catch
             {
-                try { authData = await pb.collection('users').authRefresh(); }
-                catch
-                {
-                    if (referFail !== undefined) window.location.href = referFail; // For auth page
-                    return false;
-                }
-                if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
-                else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
-                else if (!authData.record.verified) return false; 
-                return true;
-            } else if (referFail !== undefined) window.location.href = referFail
+                if (referFail !== undefined) window.location.href = referFail; // For auth page
+                return false;
+            }
+            if (authData.record.verified && (referSuccess !== undefined)) window.location.href = referSuccess;
+            else if (!authData.record.verified && (referFail !== undefined)) window.location.href = referFail;
+            else if (!authData.record.verified) return false; 
+            return true;
         }
 
         async function signIn(emailID, passID, referSuccess, referFail)
@@ -51,9 +48,6 @@
 
             try { authData = await pb.collection('users').create(data); }
             catch { return false; }
-
-            localStorage.setItem('email', email);
-            localStorage.setItem('password', password);
 
             try { await pb.collection('users').requestVerification(email); }
             catch { return false; }
