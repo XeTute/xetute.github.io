@@ -181,7 +181,7 @@
                     {
                         "max_context_length": 1024 * 6 /*For anyone seeing this, that's the max*/,
                         "max_tokens": 150,
-                        "temperature": 0.65,
+                        "temperature": 0.5,
                         "messages": [ { "role": "system", "content": `--- ${tmp.name} ---\n${tmp.persona}\n` + (authData.record.persona ? (`--- ${authData.record.name} ---\n${authData.record.persona}\n`) : '') } ]
                     };
                     try { await pb.collection('users').update(authData.record.id, { "chats": authData.record.chats }); }
