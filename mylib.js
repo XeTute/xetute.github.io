@@ -67,4 +67,10 @@
             }
         }
 
+        function switchForm(elem0)
+        {
+            if (document.getElementById(elem0).style.display === 'none') document.getElementById(elem0).style.display = 'flex';
+            else document.getElementById(elem0).style.display = 'none';
+        }
+
         function getImageURL(collectionID, recID, filename) { return `${link}/api/files/${collectionID}/${recID}/${filename}`; }
