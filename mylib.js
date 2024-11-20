@@ -53,24 +53,28 @@
             return true;
         }
 
-        function switchForm(elem0, elem1)
+        function switchForm(elem0, elem1 = null)
         {
-            if (document.getElementById(elem0).style.display === 'none')
+            if (elem1 === null)
             {
-                document.getElementById(elem0).style.display = 'flex';
-                document.getElementById(elem1).style.display = 'none';
+                const element = document.getElementById(elem0);
+                element.style.display = element.style.display === 'none' ? 'flex' : 'none';
             }
             else
             {
-                document.getElementById(elem1).style.display = 'flex';
-                document.getElementById(elem0).style.display = 'none';
+                const element0 = document.getElementById(elem0);
+                const element1 = document.getElementById(elem1);
+                if (element0.style.display === 'none')
+                {
+                    element0.style.display = 'flex';
+                    element1.style.display = 'none';
+                }
+                else
+                {
+                    element1.style.display = 'flex';
+                    element0.style.display = 'none';
+                }
             }
-        }
-
-        function switchForm(elem0)
-        {
-            if (document.getElementById(elem0).style.display === 'none') document.getElementById(elem0).style.display = 'flex';
-            else document.getElementById(elem0).style.display = 'none';
         }
 
         function getImageURL(collectionID, recID, filename) { return `${link}/api/files/${collectionID}/${recID}/${filename}`; }
