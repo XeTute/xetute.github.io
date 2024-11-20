@@ -11,8 +11,8 @@ html, body
     width: 100%;
     height: 100%;
 }
-@media (min-height: 800px) { body { justify-content: center; } }
-@media (max-height: 700px) { body { justify-content: flex-start; } }
+@media (min-height: 844px) { body { justify-content: center; } }
+@media (max-height: 844px) { body { justify-content: flex-start; } }
 
 h1 { font-size: 2rem; margin: 0px; }
 h2 { font-size: 1.5rem; margin: 0px; }

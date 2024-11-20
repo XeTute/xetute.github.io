@@ -10,11 +10,14 @@
         <link rel="stylesheet" href="../basic.css">
         <link rel="icon" type="image/png" href="logo.jpg"/>
     </head>
+    <style>
+        .box { margin: 25px; padding: 10px; border-radius: 15px; border: 2px solid #444; }
+    </style>
     <body onload="autoAuth()">
         <h1>Hello, Friend.</h1>
         <p style="color: green;" id="greeting-authas">We authorized you as </p>
 
-        <div style="margin: 25px; padding: 10px; border-radius: 15px; border: 2px solid #444;">
+        <div class="box">
             <h2 style="margin: 15px;">Credentials</h2>
             <div style="flex-direction: row; margin: 5px;">
                 <p>Email: </p>
@@ -24,23 +27,42 @@
                 <p>Password: </p>
                 <div>
                     <button onclick="updatePass()">Update Password</button>
-                    <p style="color: rgb(220, 70, 70)" id="updatePassTxt"></p>
+                    <p style="color: rgb(220, 70, 70);" id="updatePassTxt"></p>
                 </div>
             </div>
         </div>
-        <div style="margin: 15px; padding: 10px; border-radius: 15px; border: 2px solid #444;">
-            <h2 style="margin: 15px;">Name</h2>
+        <div class="box">
+            <h2 style="margin: 15px; margin-bottom: -4px;">Name</h2>
             <div style="flex-direction: row; margin: 5px">
                 <input id="name" placeholder="Enter Name..." maxlength="15" autocomplete="off"/>
                 <button onclick="updateName()">Update</button>
             </div>
             <p id="updateNameTxt"></p>
-        </div>
-        <div style="margin: 15px; padding: 10px; border-radius: 15px; border: 2px solid #444">
-            <h2 style="margin: 15px;">Persona</h2>
-            <textarea placeholder="Template:&#10;Name: Ken&#10;Age: 23&#10;Likes: ...&#10;Dislikes: ...&#10;" style="height: 100%;" id="persona"></textarea>
+
+            <h2 style="margin: 15px; margin-bottom: -4px;">Persona</h2>
+            <textarea placeholder="Template:&#10;Name: Ken&#10;Age: 23&#10;Likes: ...&#10;Dislikes: ...&#10;" style="height: 100px;" id="persona"></textarea>
             <button onclick="updatePersona()">Update</button>
             <p id="updatePersonaTxt"></p>
+        </div>
+        <div class="box">
+            <h2 style="margin: 15px;">Authentication</h2>
+            <div style="flex-direction: row;">
+                <button onclick="pb.authStore.clear()" style="color: rgb(220, 70, 70);">Log Out</button>
+                <button onclick="switchForm('delAcc')" style="color: rgb(220, 70, 70);">Delete Account</button>
+            </div>
+        </div>
+        <div id="delAcc" style="position: absolute; display: none; width: 100%; height: 100%;">
+            <div style="background: rgba(0, 0, 0, .9); z-index: 1; width: 100%; height: 100%;" onclick="switchForm('delAcc')">
+                <h2 onclick="switchForm('delAcc')">Account Deletion</h2>
+                <p onclick="switchForm('delAcc')" style="margin: 20px;">
+                    You're about to delete your XeTute Technologies Account. This is permanent. If you click the button below, there will be no 
+                    email, no verification, your account will be deleted and we won't be able to restore the data on your account, as we do not
+                    use it to train any AI models or for any other sort of processing. If you do not want to delete your account, press any area 
+                    which is dimmed, as long as it's not this text or the button below. If you do want to delete your account, you can do so by 
+                    pressing the button below.
+                </p>
+                <button onclick="delAcc()" style="color: rgb(220, 70, 70);">Delete Account</button>
+            </div>
         </div>
     </body>
     <script src="../pocketbase.umd.js"></script>
@@ -65,6 +87,8 @@
             }
             catch { document.getElementById('updatePassTxt').textContent = 'Failed to send email'; }
         }
+
+        async function delAcc() { await pb.collection('users').delete(authData.record.id); window.location.href='#'; }
 
         let processing = [ false, false ]; // Name, Persona
         async function updateName()
