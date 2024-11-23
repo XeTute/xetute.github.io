@@ -62,45 +62,102 @@
 
         function openChat(chatid) { window.location.href = './chat.html?' + chatid; }
 
+        function compressAndScaleImage(file, maxSize, callback)
+        {
+            const reader = new FileReader();
+            reader.onload = function (event)
+            {
+                const img = new Image();
+                img.onload = function ()
+                {
+                    let width = img.width;
+                    let height = img.height;
+                    let quality = 1.0;
+
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+
+                    function compress() {
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const compressedDataUrl = canvas.toDataURL("image/jpeg", quality);
+                        const compressedSize = Math.ceil(compressedDataUrl.length * (3 / 4)); // Base64 to bytes
+
+                        if (compressedSize <= maxSize) callback(null, compressedDataUrl);
+                        else if (width > 256)
+                        {
+                            width = Math.max(width / 2, 256);
+                            height = Math.max(height / 2, 256);
+                            quality *= 0.9;
+                            compress();
+                        } else callback("Image too large.");
+                    }
+
+                    compress();
+                };
+                img.onerror = function () {
+                    callback("Invalid image file.");
+                };
+                img.src = event.target.result;
+            };
+            reader.onerror = function () {
+                callback("Error reading image file.");
+            };
+            reader.readAsDataURL(file);
+        }
+
         async function submit()
         {
-            formData = new FormData();
+            const maxFileSize = 524288; // 512 kB
+            const formData = new FormData();
 
             const name = document.getElementById('name').value;
             const persona = document.getElementById('persona').value;
             const description = document.getElementById('description').value;
-            let record = undefined;
 
             if (name.length < 3)
             {
                 document.getElementById('error').textContent = 'Name must be longer than three characters';
                 return;
-            }
-            else if (persona.length < 35)
+            } else if (persona.length < 35)
             {
                 document.getElementById('error').textContent = 'Persona must be longer than 35 characters';
                 return;
-            }
-            else if (description.length < 12)
+            } else if (description.length < 12)
             {
                 document.getElementById('error').textContent = 'Description must be longer than 12 characters';
                 return;
             }
 
-            try
+            const file = profilePicture.files[0];
+            if (!file)
             {
-                formData.append('image', profilePicture.files[0]);
-                formData.append('name', name);
-                formData.append('persona', persona);
-                formData.append('description', description);
+                document.getElementById('error').textContent = 'Please select an image file.';
+                return;
+            }
 
-                record = await pb.collection('flare_characters').create(formData);
-                openChat(record.id);
-            }
-            catch
+            compressAndScaleImage(file, maxFileSize, async (error, compressedImageDataUrl) =>
             {
-                document.getElementById('error').innerHTML = 'An unknown error occurred.<br>We\'re sorry.';
-            }
+                if (error)
+                {
+                    document.getElementById('error').textContent = error;
+                    return;
+                }
+
+                try
+                {
+                    const blob = await (await fetch(compressedImageDataUrl)).blob();
+                    formData.append('image', blob, file.name);
+                    formData.append('name', name);
+                    formData.append('persona', persona);
+                    formData.append('description', description);
+
+                    const record = await pb.collection('flare_characters').create(formData);
+                    openChat(record.id);
+                } catch { document.getElementById('error').innerHTML = 'An unknown error occurred.<br>We\'re sorry.'; }
+            });
         }
     </script>
 </html>
