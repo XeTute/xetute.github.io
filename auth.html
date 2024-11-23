@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="basic.css">
     <link rel="icon" type="image/png" href="logo.jpg"/>
 </head>
+<style>
+    body { justify-content: center; }
+</style>
 <body onload="_autoSignIn()">
     <h1>Hello, Friend.</h1>
     <div id="signin">
@@ -24,14 +27,14 @@
         <input placeholder="Email" id="signup-inp-email" type="email" autocomplete="off" autofocus="on"/>
         <input placeholder="Password" id="signup-inp-password0" type="password"/>
         <input placeholder="Confirm Password" id="signup-inp-password1" type="password"/>
-        <button onclick="_signUp('signup-inp-email', 'signup-inp-password0', 'signup-inp-password1')">Sign Up</button>
+        <div style="margin: 10px; flex-direction: row; padding: 0px;">
+            <input type="checkbox" id="tos-checkbox" onchange="toggleSignUpButton()" style="margin: 5px; max-width: 20px;"/>
+            <label for="tos-checkbox" style="margin: 0px;">I agree to the <a href="ToS.html" target="_blank" style="border:0; margin: 0;">Terms of Service</a>.</label>
+        </div>
+        <button id="signup-btn" onclick="_signUp('signup-inp-email', 'signup-inp-password0', 'signup-inp-password1')" disabled>Sign Up</button>
     </div>
     <p id="note"></p>
-    <div style="margin: 20px; padding: 10px;">
-        <p id="form-refer-txt">Not part of the Community yet?</p>
-        <button onclick="_switchForm()" id="form-refer-btn">Join in!</button>
-    </div>
-    <a style="position: absolute; bottom: 3.5%; text-decoration: none;" href="ToS.html">By creating an account, you accept our ToS</a>
+    <button onclick="_switchForm()" id="form-refer-btn" style="position: absolute; bottom: 3.5%; text-decoration: none;">Not part of the Community yet?</button>
 
     <script src="pocketbase.umd.js"></script>
     <script src="mylib.js"></script>
@@ -39,34 +42,38 @@
         let refer = undefined;
 
         if (location.search) { refer = decodeURIComponent(location.search.substr(1), {}); }
-        else window.location.href = 'https://xetute.com';
+        else window.location.href = './index.html';
 
         function _autoSignIn() { autoSignIn(refer); }
 
         async function _signIn(emailID, passID)
         {
-            if (!(await signIn(emailID, passID, refer, undefined))) { document.getElementById('note').innerHTML = '<p style="color:red">Failed to Sign In</p>'; }
+            if (!(await signIn(emailID, passID, refer, undefined))) document.getElementById('note').innerHTML = '<p style="color:red">Failed to Sign In</p>';
         }
 
         function _switchForm()
         {
             switchForm('signin', 'signup');
-            if (document.getElementById('signin').style.display === 'none')
-            {
-                document.getElementById('form-refer-txt').textContent = 'Already part of the community?';
-                document.getElementById('form-refer-btn').textContent = 'Continue!';
-            }
-            else
-            {
-                document.getElementById('form-refer-txt').textContent = 'Not part of the Community yet?';
-                document.getElementById('form-refer-btn').textContent = 'Join in!';
-            }
+            if (document.getElementById('signin').style.display === 'none') document.getElementById('form-refer-btn').textContent = 'Already part of the community?';
+            else document.getElementById('form-refer-btn').textContent = 'Not part of the Community yet?';
         }
 
         async function _signUp(emailID, passID0, passID1)
         {
-            if (!(await signUp(emailID, passID0, passID1, 'note'))) { document.getElementById('note').innerHTML = '<p style="color:red">Failed to Sign Up</p>'; }
-            else _switchForm();
+            if (!(await signUp(emailID, passID0, passID1, 'note'))) document.getElementById('note').innerHTML = '<p style="color:red">Failed to Sign Up</p>'; 
+            else
+            {
+                _switchForm();
+                document.getElementById('signin-inp-email').value = document.getElementById('signup-inp-email').value;
+                document.getElementById('signin-inp-password').value = document.getElementById('signup-inp-password0').value;
+            }
+        }
+
+        function toggleSignUpButton()
+        {
+            const checkbox = document.getElementById('tos-checkbox');
+            const signUpButton = document.getElementById('signup-btn');
+            signUpButton.disabled = !checkbox.checked;
         }
     </script>
 </body>
