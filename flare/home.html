@@ -67,7 +67,7 @@
         }
         .regen-msg:hover { background: #944; }
         
-        @media (min-width: 500px)
+        @media (min-width: 400px)
         {
             .chars
             {
@@ -84,8 +84,9 @@
                 grid-template-columns: auto auto auto;
             }
         }
+        
     </style>
-    <body onload="autoAuth()">
+    <body onload="autoAuth()" style="justify-content: flex-start;">
         <div style="margin: 20px; margin-top: 3.5%;">
             <h1>Hello, Friend</h1>
             <p id="greeting-authas">You're authorized as </p>
@@ -96,7 +97,7 @@
 
         <h2>All Characters</h2>
         <input placeholder="Search..." id="search" autocomplete="off"/>
-        <div id="characters" class="chars" style="justify-content: flex-start; overflow-y: auto; margin-top: 0;"></div>
+        <div id="characters" class="chars" style="justify-content: flex-start; margin-top: 0;"></div>
     </body>
     <script src="../pocketbase.umd.js"></script>
     <script src="../mylib.js"></script>
