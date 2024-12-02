@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="The official webpage of XeTute Technologies">
+        <meta name="keywords" content="XeTute Technologies, XeTute">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+
+        <title>Hello, Friend.</title>
+        <link rel="icon" href="../logo.jpg"/>
+
+        <style>
+            body, html
+            {
+                background: #000;
+                color: #fff;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                overflow-x: hidden;
+                overflow-y: auto;
+                font-family: "Advent Pro", sans-serif;
+            }
+            
+            .navbar
+            {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                padding: 15px 30px;
+                box-sizing: border-box;
+                background: rgba(0,0,0,0.7);
+            }
+
+            .logo-container
+            {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+            .logo-container img
+            {
+                max-width: 35px;
+                max-height: 35px;
+                margin-right: 10px;
+                transition: transform 0.3s ease;
+            }
+            .logo-container img:hover { transform: scale(1.1); }
+
+            .logo-container p
+            {
+                font-size: 1.3rem;
+                margin: 0;
+                font-weight: 500;
+            }
+
+            .nav-links
+            {
+                display: flex;
+                align-items: center;
+            }
+            
+            a
+            {
+                font-size: 1.15rem;
+                border: 1px solid #fff;
+                color: #fff;
+                text-decoration: none;
+                padding: 6px 12px;
+                margin: 0 8px;
+                transition: 0.35s ease-in-out;
+                border-radius: 4px;
+            }
+            a:hover
+            {
+                color: #000;
+                background: #fff;
+            }
+
+            .chat-container
+            {
+                width: 100%;
+                max-width: 800px;
+                height: calc(100vh - 100px);
+                display: flex;
+                flex-direction: column;
+                margin-top: 20px;
+            }
+
+            .messages-container
+            {
+                flex-grow: 1;
+                overflow-y: auto;
+                border: 1px solid #151515;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 15px;
+                background: #000;
+            }
+
+            .message
+            {
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 8px;
+                max-width: 70%;
+                clear: both;
+            }
+
+            .client-message
+            {
+                background-color: #fff;
+                color: #000;
+                float: right;
+                clear: both;
+            }
+
+            .opponent-message
+            {
+                background-color: #000;
+                border: 2px solid #fff;
+                color: #fff;
+                float: left;
+                clear: both;
+            }
+
+            .chat-input-container
+            {
+                display: flex;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            #message-input
+            {
+                flex-grow: 1;
+                padding: 10px;
+                background: #080808;
+                border: 2px solid #222;
+                outline: 0;
+                color: #fff;
+                border-radius: 0;
+                margin-left: -5px;
+                margin-right: -5px;
+            }
+
+            #clear-button, #send-button
+            {
+                padding: 10px 20px;
+                background: #fff;
+                color: #000;
+                border: 0;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+            #clear-button { border-radius: 8px 0 0 8px; }
+            #send-button { border-radius: 0 8px 8px 0; }
+            #clear-button:hover, #send-button:hover
+            {
+                background: #080808;
+                border: 1px solid #222;
+                color: #fff;
+            }
+
+            @media (max-width: 768px)
+            {
+                .navbar
+                {
+                    flex-direction: column;
+                    padding: 15px 10px;
+                }
+
+                .nav-links
+                {
+                    margin-top: 10px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+
+                a { margin: 5px; }
+                .chat-container { width: 95%; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="logo-container" onclick="window.location.href='../index.html'">
+                <img src="../logo.jpg" alt="XeTute Technologies Logo"/>
+                <p>XeTute Technologies</p>
+            </div>
+
+            <div class="nav-links">
+                <a href="https://github.com/XeTute">GitHub</a>
+                <a href="https://huggingface.co/XeTute">HuggingFace</a>
+                <a href="https://ko-fi.com/XeTute">Donate</a>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div id="messages-container" class="messages-container">
+            </div>
+            <div class="chat-input-container">
+                <button id="clear-button">Clear</button>
+                <input type="text" id="message-input" placeholder="Type your message...">
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+
+        <script defer>
+            const ai_endpoint = 'https://xetute.com/ai/v1/chat/completions';
+            const STORAGE_KEY = 'xetute_chat_history';
+            const MAX_HISTORY_LENGTH = 150;
+
+            const SYSTEM_PROMPT =
+            `
+            You are FlareAI, a Chatbot designed by XeTute Technologies.
+            About XeTute Technologies:
+            - HuggingFace: https://huggingface.co/XeTute
+            - GitHub: https://github.com/XeTute
+            - Webpage: https://xetute.com
+            About you, FlareAI:
+            - You are an AI model with the Transformers Architecture
+            - Your maximum chat history length is ${MAX_HISTORY_LENGTH}, after this limit exceeds, the first messages are removed.
+            - Remain helpful, but with boundaries: Insulting Religions or other groups is a no-go.
+            `;
+        
+            let messageHistory = [];
+        
+            const messageInput = document.getElementById('message-input');
+            const sendButton = document.getElementById('send-button');
+            const clearButton = document.getElementById('clear-button');
+            const messagesContainer = document.getElementById('messages-container');
+        
+            function loadConversationHistory()
+            {
+                const storedHistory = localStorage.getItem(STORAGE_KEY);
+                if (storedHistory)
+                {
+                    messageHistory = JSON.parse(storedHistory);
+                    messageHistory.forEach(msg => { addMessageToChat(msg.content, msg.isUser); });
+                }
+            }
+        
+            function saveConversationHistory()
+            {
+                if (messageHistory.length > MAX_HISTORY_LENGTH) messageHistory = messageHistory.slice(-MAX_HISTORY_LENGTH);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(messageHistory));
+            }
+        
+            function addMessageToChat(message, isUser = false)
+            {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', isUser ? 'client-message' : 'opponent-message');
+                messageElement.textContent = message;
+        
+                messagesContainer.appendChild(messageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        
+            async function sendMessageToAI(userMessage)
+            {
+                const conversationContext = [
+                    { role: 'system', content: SYSTEM_PROMPT },
+                    ...messageHistory.map(msg => ({ role: msg.isUser ? 'user' : 'assistant', content: msg.content })) ];
+                conversationContext.push({ role: 'user', content: userMessage });
+            
+                try
+                {
+                    const response = await fetch(ai_endpoint,
+                    {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            messages: conversationContext, 
+                            max_tokens: 150,
+                            temperature: 0.5,
+                            stream: false
+                        })
+                    });
+
+                    const responseText = await response.text();
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
+                
+                    const data = JSON.parse(responseText);
+                    const aiResponse = data.choices[0].message.content.trim();
+                
+                    messageHistory.push( { content: userMessage, isUser: true },  { content: aiResponse, isUser: false } );
+                    saveConversationHistory();
+                
+                    return aiResponse;
+                } 
+                catch (error)
+                {
+                    console.error('Error:', error);
+                    return 'Sorry, there was an error processing your message.';
+                }
+            }
+        
+            sendButton.addEventListener('click', async () =>
+            {
+                const messageText = messageInput.value.trim();
+                if (messageText)
+                {
+                    addMessageToChat(messageText, true);
+                    messageInput.value = '';
+        
+                    messageInput.disabled = true;
+                    sendButton.disabled = true;
+                
+                    try
+                    {
+                        const aiResponse = await sendMessageToAI(messageText);
+                        addMessageToChat(aiResponse, false);
+                    }
+                    catch (error)
+                    {
+                        console.error('Error in message processing:', error);
+                        addMessageToChat('Sorry, I encountered an error.', false);
+                    }
+                    finally
+                    {
+                        messageInput.disabled = false;
+                        sendButton.disabled = false;
+                        messageInput.focus();
+                    }
+                }
+            });
+        
+            clearButton.addEventListener('click', () => { messagesContainer.innerHTML = ''; localStorage.removeItem(STORAGE_KEY); messageHistory = []; });
+            messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendButton.click(); });
+        
+            loadConversationHistory();
+        </script>
+    </body>
+</html>

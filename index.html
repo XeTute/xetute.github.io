@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="The official webpage of XeTute Technologies">
+        <meta name="keywords" content="XeTute Technologies, XeTute">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+
+        <title>Hello, Friend.</title>
+        <link rel="icon" href="logo.jpg"/>
+
+        <style>
+            body, html
+            {
+                background: #000;
+                color: #fff;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                overflow-x: hidden;
+                overflow-y: auto;
+                font-family: "Advent Pro", sans-serif;
+            }
+            
+            .navbar
+            {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                padding: 15px 30px;
+                box-sizing: border-box;
+                background: rgba(0,0,0,0.7);
+            }
+
+            .logo-container
+            {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+            .logo-container img
+            {
+                max-width: 35px;
+                max-height: 35px;
+                margin-right: 10px;
+                transition: transform 0.3s ease;
+            }
+            .logo-container img:hover { transform: scale(1.1); }
+
+            .logo-container p
+            {
+                font-size: 1.3rem;
+                margin: 0;
+                font-weight: 500;
+            }
+
+            .nav-links
+            {
+                display: flex;
+                align-items: center;
+            }
+            
+            a
+            {
+                font-size: 1.15rem;
+                border: 1px solid #fff;
+                color: #fff;
+                text-decoration: none;
+                padding: 6px 12px;
+                margin: 0 8px;
+                transition: 0.35s ease-in-out;
+                border-radius: 4px;
+            }
+            a:hover
+            {
+                color: #000;
+                background: #fff;
+            }
+
+            .hero-section
+            {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: calc(100vh - 80px);
+                text-align: center;
+                padding: 0 20px;
+            }
+
+            .hero-title
+            {
+                font-size: 3.75rem;
+                margin: 0;
+                line-height: 1.2;
+                animation: fadeIn 1.5s ease-out;
+            }
+
+            .divider
+            {
+                width: 10rem;
+                height: 2px;
+                background: #fff;
+                margin: 15px 0;
+                animation: stretch 1.5s ease-out;
+            }
+
+            .hero-subtitle
+            {
+                font-size: 1.25rem;
+                margin: 0;
+                font-style: italic;
+                animation: fadeIn 1.5s ease-out 0.5s backwards;
+            }
+
+            @keyframes fadeIn
+            {
+                from
+                {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to
+                {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes stretch
+            {
+                from { width: 0; }
+                to { width: 10rem; }
+            }
+
+            @media (max-width: 768px)
+            {
+                .navbar
+                {
+                    flex-direction: column;
+                    padding: 15px 10px;
+                }
+
+                .nav-links
+                {
+                    margin-top: 10px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+
+                a { margin: 5px; }
+                .hero-title { font-size: 2.5rem; }
+                .divider { width: 7rem; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="logo-container" onclick="window.location.href=''">
+                <img src="logo.jpg" alt="XeTute Technologies Logo"/>
+                <p>XeTute Technologies</p>
+            </div>
+
+            <div class="nav-links">
+                <a href="https://github.com/XeTute">GitHub</a>
+                <a href="https://huggingface.co/XeTute">HuggingFace</a>
+                <a href="https://ko-fi.com/XeTute">Donate</a>
+            </div>
+        </div>
+
+        <div class="hero-section">
+            <h1 class="hero-title">Hello, Friend.</h1>
+            <div class="divider"></div>
+            <p class="hero-subtitle"><em>Let's dream together.</em></p>
+            <a href="./flare-demo/index.html" style="margin: 35px">Chat with FlareAI</a>
+        </div>
+    </body>
+    <script defer>
+    </script>
+</html>
