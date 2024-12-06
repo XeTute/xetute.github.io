@@ -9,86 +9,13 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
-
+        
         <title>Hello, Friend.</title>
         <link rel="icon" href="logo.jpg"/>
+        <link rel="stylesheet" href="basic.css"/>
 
         <style>
-            body, html
-            {
-                background: #000;
-                color: #fff;
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: center;
-                overflow-x: hidden;
-                overflow-y: auto;
-                font-family: "Advent Pro", sans-serif;
-            }
             
-            .navbar
-            {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                padding: 15px 30px;
-                box-sizing: border-box;
-                background: rgba(0,0,0,0.7);
-            }
-
-            .logo-container
-            {
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-            }
-
-            .logo-container img
-            {
-                max-width: 35px;
-                max-height: 35px;
-                margin-right: 10px;
-                transition: transform 0.3s ease;
-            }
-            .logo-container img:hover { transform: scale(1.1); }
-
-            .logo-container p
-            {
-                font-size: 1.3rem;
-                margin: 0;
-                font-weight: 500;
-            }
-
-            .nav-links
-            {
-                display: flex;
-                align-items: center;
-            }
-            
-            a
-            {
-                font-size: 1.15rem;
-                border: 1px solid #fff;
-                color: #fff;
-                text-decoration: none;
-                padding: 6px 12px;
-                margin: 0 8px;
-                transition: 0.35s ease-in-out;
-                border-radius: 4px;
-            }
-            a:hover
-            {
-                color: #000;
-                background: #fff;
-            }
-
             .hero-section
             {
                 display: flex;
@@ -144,26 +71,6 @@
                 from { width: 0; }
                 to { width: 10rem; }
             }
-
-            @media (max-width: 768px)
-            {
-                .navbar
-                {
-                    flex-direction: column;
-                    padding: 15px 10px;
-                }
-
-                .nav-links
-                {
-                    margin-top: 10px;
-                    flex-wrap: wrap;
-                    justify-content: center;
-                }
-
-                a { margin: 5px; }
-                .hero-title { font-size: 2.5rem; }
-                .divider { width: 7rem; }
-            }
         </style>
     </head>
     <body>
@@ -183,8 +90,16 @@
         <div class="hero-section">
             <h1 class="hero-title">Hello, Friend.</h1>
             <div class="divider"></div>
-            <p class="hero-subtitle"><em>Let's dream together.</em></p>
-            <a href="./flare-demo/index.html" style="margin: 35px">Chat with FlareAI</a>
+            <p class="hero-subtitle">
+                <em>Let's dream together</em>
+                <p>—because that's how it begins.</p>
+            </p>
+            
+            <div style="margin: 35px;"></div>
+
+            <a href="./flare-demo/index.html">FlareAI Chat—Coming Soon!</a>
+            <a href="./ANNA/index.html">Build your AI—ANNA</a>
+            <a href="https://www.youtube.com/@XeTuteTechnologies">Events & Trailers—YT</a>
         </div>
     </body>
     <script defer>

@@ -12,82 +12,9 @@
 
         <title>XeTute Technologies Naive CSV Editor</title>
         <link rel="icon" href="../logo.jpg"/>
+        <link rel="stylesheet" href="../basic.css"/>
 
         <style>
-            body, html
-            {
-                background: #000;
-                color: #fff;
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                align-items: center;
-                overflow-x: hidden;
-                overflow-y: auto;
-                font-family: "Advent Pro", sans-serif;
-            }
-            
-            .navbar
-            {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                padding: 15px 30px;
-                box-sizing: border-box;
-                background: rgba(0,0,0,0.7);
-            }
-
-            .logo-container
-            {
-                display: flex;
-                align-items: center;
-                cursor: pointer;
-            }
-            .logo-container img
-            {
-                max-width: 35px;
-                max-height: 35px;
-                margin-right: 10px;
-                transition: transform 0.3s ease;
-            }
-            .logo-container img:hover { transform: scale(1.1); }
-
-            .logo-container p
-            {
-                font-size: 1.3rem;
-                margin: 0;
-                font-weight: 500;
-            }
-
-            .nav-links
-            {
-                display: flex;
-                align-items: center;
-            }
-            
-            a
-            {
-                font-size: 1.15rem;
-                border: 1px solid #fff;
-                color: #fff;
-                text-decoration: none;
-                padding: 6px 12px;
-                margin: 0 8px;
-                transition: 0.35s ease-in-out;
-                border-radius: 4px;
-            }
-
-            a:hover
-            {
-                color: #000;
-                background: #fff;
-            }
 
             .csv-container
             {
@@ -196,39 +123,8 @@
                 padding: 4px;
             }
 
-            button
-            {
-                border: 1px solid #fff;
-                background: #000;
-                color: #fff;
-                padding: 5px 10px;
-                cursor: pointer;
-                transition: 0.35s ease-in-out;
-                border-radius: 4px;
-            }
-
-            button:hover
-            {
-                background: #fff;
-                color: #000;
-            }
-
             @media (max-width: 768px)
             {
-                .navbar
-                {
-                    flex-direction: column;
-                    padding: 15px 10px;
-                }
-
-                .nav-links
-                {
-                    margin-top: 10px;
-                    flex-wrap: wrap;
-                    justify-content: center;
-                }
-
-                a { margin: 5px; }
                 .csv-container { width: 95%; }
             }
         </style>
