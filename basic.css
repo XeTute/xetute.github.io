@@ -106,3 +106,9 @@ button:hover
     }
     a { margin: 5px; }
 }
+
+input, textarea
+{
+    font-family: 'Advent Pro';
+    text-align: center;
+}
