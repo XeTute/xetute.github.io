@@ -8,14 +8,13 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&family=Oswald:wght@200..700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
         <title>Hello, Friend.</title>
         <link rel="icon" href="../logo.jpg"/>
         <link rel="stylesheet" href="../basic.css"/>
 
         <style>
-
             .chat-container
             {
                 width: 100%;
@@ -44,6 +43,8 @@
                 border-radius: 8px;
                 max-width: 70%;
                 clear: both;
+                word-wrap: break-word;
+                white-space: pre-wrap;
             }
 
             .client-message
@@ -61,6 +62,31 @@
                 color: #fff;
                 float: left;
                 clear: both;
+            }
+
+            .loading-indicator
+            {
+                display: flex;
+                align-items: center;
+            }
+
+            .loading-dot
+            {
+                width: 6px;
+                height: 6px;
+                background-color: #fff;
+                border-radius: 50%;
+                margin: 0 3px;
+                animation: loading-pulse 1.4s infinite ease-in-out;
+                opacity: 0.6;
+            }
+
+            .loading-dot:nth-child(1) { animation-delay: -0.3s; }
+            .loading-dot:nth-child(2) { animation-delay: -0.15s; }
+
+            @keyframes loading-pulse {
+                0%, 80%, 100% { opacity: 0.6; }
+                40% { opacity: 1; }
             }
 
             .chat-input-container
@@ -105,6 +131,20 @@
             {
                 .chat-container { width: 95%; }
             }
+
+            /* Markdown styles */
+            .message strong, .message b { font-weight: bold; }
+            .message em, .message i { font-style: italic; }
+            .message u { text-decoration: underline; }
+            .message del, .message s { text-decoration: line-through; }
+            .message code
+            { 
+                background-color: #333; 
+                color: #fff; 
+                padding: 2px 4px; 
+                border-radius: 4px; 
+                font-family: monospace; 
+            }
         </style>
     </head>
     <body>
@@ -126,13 +166,14 @@
             </div>
             <div class="chat-input-container">
                 <button id="clear-button">Clear</button>
-                <input type="text" id="message-input" placeholder="Type your message...">
+                <textarea id="message-input" placeholder="Type your message..."></textarea>
                 <button id="send-button">Send</button>
             </div>
         </div>
 
         <script defer>
-            const ai_endpoint = 'https://devsdocode-openai.hf.space/chat/completions';
+            const GROQ_API_KEY = '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';
+            const ai_endpoint = 'https://api.groq.com/openai/v1/chat/completions';
             const STORAGE_KEY = 'xetute_chat_history';
             const MAX_HISTORY_LENGTH = 150;
 
@@ -172,11 +213,74 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(messageHistory));
             }
         
+            function parseMarkdown(message)
+            {
+                return message
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')  // Italic
+                    .replace(/__(.*?)__/g, '<u>$1</u>')  // Underline
+                    .replace(/~~(.*?)~~/g, '<del>$1</del>')  // Strikethrough
+                    .replace(/`(.*?)`/g, '<code>$1</code>');  // Inline code
+            }
+        
+            function addLoadingIndicator(isUser = false)
+            {
+                const loadingElement = document.createElement('div');
+                loadingElement.classList.add('message', isUser ? 'client-message' : 'opponent-message', 'loading-indicator');
+                
+                for (let i = 0; i < 3; ++i)
+                {
+                    const dot = document.createElement('div');
+                    dot.classList.add('loading-dot');
+                    loadingElement.appendChild(dot);
+                }
+        
+                messagesContainer.appendChild(loadingElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                return loadingElement;
+            }
+        
+            function removeLoadingIndicator(loadingElement)
+            {
+                if (loadingElement && loadingElement.parentNode) loadingElement.parentNode.removeChild(loadingElement);
+            }
+        
+            function typeWriterEffect(messageElement, fullText, speed = 15)
+            {
+                messageElement.innerHTML = '';
+                let index = 0;
+                const randomChars = 'az40!$>€^~#-'.split('');
+                const typeNextCharacter = () =>
+                {
+                    if (index < fullText.length)
+                    {
+                        let displayText = fullText.slice(0, index);
+                    
+                        const preRandomCount = Math.random() < 0.7 ? Math.floor(Math.random() * 3) : 0;
+                        for (let i = 0; i < preRandomCount; ++i) displayText += randomChars[Math.floor(Math.random() * randomChars.length)];
+                    
+                        let currentChar = fullText[index];
+                        if (Math.random() < 0.3) currentChar += randomChars[Math.floor(Math.random() * randomChars.length)];
+                        displayText += currentChar;
+                    
+                        messageElement.innerHTML = parseMarkdown(displayText);
+                        ++index;
+                    
+                        const variation = Math.random() * 50 - 25;
+                        setTimeout(typeNextCharacter, speed + variation);
+                    } 
+                    else messageElement.innerHTML = parseMarkdown(fullText);
+                };
+                typeNextCharacter();
+            }
+        
             function addMessageToChat(message, isUser = false)
             {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', isUser ? 'client-message' : 'opponent-message');
-                messageElement.textContent = message;
+        
+                if (!isUser) typeWriterEffect(messageElement, message);
+                else messageElement.innerHTML = parseMarkdown(message);
         
                 messagesContainer.appendChild(messageElement);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
@@ -189,20 +293,26 @@
                     ...messageHistory.map(msg => ({ role: msg.isUser ? 'user' : 'assistant', content: msg.content })) ];
                 conversationContext.push({ role: 'user', content: userMessage });
             
+                const loadingIndicator = addLoadingIndicator();
+                
                 try
                 {
                     const response = await fetch(ai_endpoint,
                     {
                         method: 'POST',
-                        headers: { 
+                        headers:
+                        { 
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${GROQ_API_KEY}`
                         },
-                        body: JSON.stringify({ 
+                        body: JSON.stringify(
+                        { 
                             messages: conversationContext, 
                             max_tokens: 150,
-                            temperature: 0.3,
-                            stream: false
+                            temperature: 0.5,
+                            stream: false,
+                            model: "llama-3.1-8b-instant"
                         })
                     });
 
@@ -212,6 +322,8 @@
                     const data = JSON.parse(responseText);
                     const aiResponse = data.choices[0].message.content.trim();
                 
+                    removeLoadingIndicator(loadingIndicator);
+                    
                     messageHistory.push( { content: userMessage, isUser: true },  { content: aiResponse, isUser: false } );
                     saveConversationHistory();
                 
@@ -219,6 +331,7 @@
                 } 
                 catch (error)
                 {
+                    removeLoadingIndicator(loadingIndicator);
                     console.error('Error:', error);
                     return 'Sorry, there was an error processing your message.';
                 }
@@ -255,7 +368,19 @@
             });
         
             clearButton.addEventListener('click', () => { messagesContainer.innerHTML = ''; localStorage.removeItem(STORAGE_KEY); messageHistory = []; });
-            messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendButton.click(); });
+            
+            messageInput.addEventListener('keydown', (e) =>
+            {
+                if (e.key === 'Enter')
+                {
+                    if (e.shiftKey) return;
+                    else
+                    {
+                        e.preventDefault();
+                        sendButton.click();
+                    }
+                }
+            });
         
             loadConversationHistory();
         </script>
