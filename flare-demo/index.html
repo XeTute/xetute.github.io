@@ -172,7 +172,7 @@
         </div>
 
         <script defer>
-            const GROQ_API_KEY = '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';
+            const GROQ_API_KEY = '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'; // Capped by Groqs free tier lmao
             const ai_endpoint = 'https://api.groq.com/openai/v1/chat/completions';
             const STORAGE_KEY = 'xetute_chat_history';
             const MAX_HISTORY_LENGTH = 150;
@@ -309,7 +309,7 @@
                         body: JSON.stringify(
                         { 
                             messages: conversationContext, 
-                            max_tokens: 150,
+                            max_tokens: 450,
                             temperature: 0.5,
                             stream: false,
                             model: "llama-3.1-8b-instant"
