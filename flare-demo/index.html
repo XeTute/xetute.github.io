@@ -2,15 +2,15 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="description" content="The official webpage of XeTute Technologies">
-        <meta name="keywords" content="XeTute Technologies, XeTute">
+        <meta name="description" content="FlareAI by XeTute Technologies">
+        <meta name="keywords" content="XeTute Technologies, XeTute, Flare, AI, FlareAI, AI Chat, Free AI, Free AI Chat">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
-        <title>Hello, Friend.</title>
+        <title>Hello, Friend. \\ FlareAI</title>
         <link rel="icon" href="../logo.jpg"/>
         <link rel="stylesheet" href="../basic.css"/>
 
@@ -213,14 +213,41 @@
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(messageHistory));
             }
         
+            function escapeHTML(html)
+            {
+                return html.replace(/&/g, '&amp;')
+                           .replace(/</g, '&lt;')
+                           .replace(/>/g, '&gt;');
+            }
+
+            function decodeHTML(html)
+            {
+                return html.replace(/&lt;/g, '<')
+                           .replace(/&gt;/g, '>')
+                           .replace(/&amp;/g, '&');
+            }
+
             function parseMarkdown(message)
             {
-                return message
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Bold
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')  // Italic
-                    .replace(/__(.*?)__/g, '<u>$1</u>')  // Underline
-                    .replace(/~~(.*?)~~/g, '<del>$1</del>')  // Strikethrough
-                    .replace(/`(.*?)`/g, '<code>$1</code>');  // Inline code
+                const codeBlockRegex = /```([\w]*)\n([\s\S]*?)```/g;
+                const inlineCodeRegex = /`([^`]+)`/g;
+            
+                let formattedMessage = message.replace(codeBlockRegex, (match, lang, code) =>
+                {
+                    const languageClass = lang ? `language-${lang}` : '';
+                    const decodedCode = decodeHTML(code);
+                    return `<pre><code class="${languageClass}">${escapeHTML(decodedCode)}</code></pre>`;
+                });
+            
+                formattedMessage = formattedMessage.replace(inlineCodeRegex, (match, code) => { return `<code>${escapeHTML(code)}</code>`; });
+            
+                formattedMessage = formattedMessage
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/__(.*?)__/g, '<u>$1</u>')
+                    .replace(/~~(.*?)~~/g, '<del>$1</del>');
+            
+                return formattedMessage;
             }
         
             function addLoadingIndicator(isUser = false)
@@ -245,8 +272,14 @@
                 if (loadingElement && loadingElement.parentNode) loadingElement.parentNode.removeChild(loadingElement);
             }
         
-            function typeWriterEffect(messageElement, fullText, speed = 1)
+            function typeWriterEffect(messageElement, fullText, speed = 0)
             {
+                if (/```[\s\S]*```|`[^`]+`/.test(fullText))
+                {
+                    messageElement.innerHTML = parseMarkdown(fullText);
+                    return;
+                }
+
                 messageElement.innerHTML = '';
                 let index = 0;
                 const randomChars = 'az40!$>€^~#-'.split('');
@@ -268,11 +301,13 @@
                     
                         const variation = Math.random() * 50 - 25;
                         setTimeout(typeNextCharacter, speed + variation);
-                    } 
-                    else messageElement.innerHTML = parseMarkdown(fullText);
+                    } else {
+                        messageElement.innerHTML = parseMarkdown(fullText);
+                    }
                 };
                 typeNextCharacter();
             }
+
         
             function addMessageToChat(message, isUser = false)
             {
