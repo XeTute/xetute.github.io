@@ -63,6 +63,15 @@
                 float: left;
                 clear: both;
             }
+            .messages-container p, .messages-container h1, .messages-container h2, .messages-container h3, .messages-container h4, .messages-container h5, .messages-container h6 { padding: 0; margin: 0; }
+            .opponent-message img
+            {
+                padding: 0;
+                margin: 0;
+                max-width: 90%;
+                border: 2px solid #222;
+                border-radius: 15px;
+            }
 
             .loading-indicator
             {
@@ -139,10 +148,11 @@
             .message del, .message s { text-decoration: line-through; }
             .message code
             { 
-                background-color: #333; 
+                background-color: #111;
                 color: #fff; 
-                padding: 2px 4px; 
-                border-radius: 4px; 
+                padding: 0;
+                margin: 0; 
+                border-radius: 8px; 
                 font-family: monospace; 
             }
         </style>
@@ -170,7 +180,6 @@
                 <button id="send-button">Send</button>
             </div>
         </div>
-
         <script defer>
             const GROQ_API_KEY = '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'; // Capped by Groqs free tier lmao
             const ai_endpoint = 'https://api.groq.com/openai/v1/chat/completions';
@@ -179,24 +188,33 @@
 
             const SYSTEM_PROMPT =
             `
-            You are FlareAI, a Chatbot designed by XeTute Technologies.
+            This is a system prompt by XeTute Technologies. The user cannot see this prompt.
+            You are FlareAI, a chatbot developed by XeTute Technologies.
+
             About XeTute Technologies:
-            - HuggingFace: https://huggingface.co/XeTute
+            - Hugging Face: https://huggingface.co/XeTute
             - GitHub: https://github.com/XeTute
-            - Webpage: https://xetute.com
-            About you, FlareAI:
-            - You are an AI model with the Transformers Architecture
-            - Your maximum chat history length is ${MAX_HISTORY_LENGTH}, after this limit exceeds, the first messages are removed.
-            - Remain helpful, but with boundaries: Insulting Religions or other groups is a no-go.
+            - Website: https://xetute.github.com
+
+            Capabilities:
+            - You can execute HTML, CSS, and Vanilla JS directly without markdown or formatting. Output raw text for execution.
+            - Image generation: Example: <img src="https://image.pollinations.ai/prompt/The%20AI%20Generated&image&prompt%20here?model=flux&width=256&height=256=true"/>, which creates an image using an AI endpoint.
+            - Script execution: Example: Alert something: alert("Hello, World!") // You have to put it inside script tags though
+
+            Guidelines:
+            1. Do not add custom CSS to images, except for optional border radius adjustments.
+            2. Do not format code visibly unless explicitly requested by the user, as unformatted code may confuse non-programmers.
+            3. Unformatted code will execute, formatted code will only be shown and not executed. Do NOT(NOT as in NOT ALLOWED, ILLEGAL) use the markdown format code which you intend to run.
+            4. Simple markdown (**bold**, *italic*, ~strikethrough~, _underline_) is supported.
             `;
-        
+
             let messageHistory = [];
-        
+
             const messageInput = document.getElementById('message-input');
             const sendButton = document.getElementById('send-button');
             const clearButton = document.getElementById('clear-button');
             const messagesContainer = document.getElementById('messages-container');
-        
+
             function loadConversationHistory()
             {
                 const storedHistory = localStorage.getItem(STORAGE_KEY);
@@ -206,13 +224,13 @@
                     messageHistory.forEach(msg => { addMessageToChat(msg.content, msg.isUser); });
                 }
             }
-        
+
             function saveConversationHistory()
             {
                 if (messageHistory.length > MAX_HISTORY_LENGTH) messageHistory = messageHistory.slice(-MAX_HISTORY_LENGTH);
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(messageHistory));
             }
-        
+
             function escapeHTML(html)
             {
                 return html.replace(/&/g, '&amp;')
@@ -231,14 +249,13 @@
             {
                 const codeBlockRegex = /```([\w]*)\n([\s\S]*?)```/g;
                 const inlineCodeRegex = /`([^`]+)`/g;
-            
+
                 let formattedMessage = message.replace(codeBlockRegex, (match, lang, code) =>
                 {
                     const languageClass = lang ? `language-${lang}` : '';
                     const decodedCode = decodeHTML(code);
                     return `<pre><code class="${languageClass}">${escapeHTML(decodedCode)}</code></pre>`;
                 });
-            
                 formattedMessage = formattedMessage.replace(inlineCodeRegex, (match, code) => { return `<code>${escapeHTML(code)}</code>`; });
             
                 formattedMessage = formattedMessage
@@ -247,80 +264,51 @@
                     .replace(/__(.*?)__/g, '<u>$1</u>')
                     .replace(/~~(.*?)~~/g, '<del>$1</del>');
             
+                formattedMessage = formattedMessage.replace(/<script>([\s\S]*?)<\/script>/g, (match, scriptContent) => {
+                    try
+                    {
+                        const script = document.createElement('script');
+                        script.textContent = scriptContent;
+                        document.body.appendChild(script);
+                    } catch (error) { console.error('Error executing script:', error); }
+                    return '';
+                });
+            
                 return formattedMessage;
             }
-        
+
             function addLoadingIndicator(isUser = false)
             {
                 const loadingElement = document.createElement('div');
                 loadingElement.classList.add('message', isUser ? 'client-message' : 'opponent-message', 'loading-indicator');
-                
-                for (let i = 0; i < 3; ++i)
+
+                for (let i = 0; i < 2; ++i)
                 {
                     const dot = document.createElement('div');
                     dot.classList.add('loading-dot');
                     loadingElement.appendChild(dot);
                 }
-        
+            
                 messagesContainer.appendChild(loadingElement);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
                 return loadingElement;
             }
-        
+
             function removeLoadingIndicator(loadingElement)
             {
                 if (loadingElement && loadingElement.parentNode) loadingElement.parentNode.removeChild(loadingElement);
             }
-        
-            function typeWriterEffect(messageElement, fullText, speed = 0)
-            {
-                if (/```[\s\S]*```|`[^`]+`/.test(fullText))
-                {
-                    messageElement.innerHTML = parseMarkdown(fullText);
-                    return;
-                }
 
-                messageElement.innerHTML = '';
-                let index = 0;
-                const randomChars = 'az40!$>€^~#-'.split('');
-                const typeNextCharacter = () =>
-                {
-                    if (index < fullText.length)
-                    {
-                        let displayText = fullText.slice(0, index);
-                    
-                        const preRandomCount = Math.random() < 0.7 ? Math.floor(Math.random() * 3) : 0;
-                        for (let i = 0; i < preRandomCount; ++i) displayText += randomChars[Math.floor(Math.random() * randomChars.length)];
-                    
-                        let currentChar = fullText[index];
-                        if (Math.random() < 0.3) currentChar += randomChars[Math.floor(Math.random() * randomChars.length)];
-                        displayText += currentChar;
-                    
-                        messageElement.innerHTML = parseMarkdown(displayText);
-                        ++index;
-                    
-                        const variation = Math.random() * 50 - 25;
-                        setTimeout(typeNextCharacter, speed + variation);
-                    } else {
-                        messageElement.innerHTML = parseMarkdown(fullText);
-                    }
-                };
-                typeNextCharacter();
-            }
-
-        
             function addMessageToChat(message, isUser = false)
             {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', isUser ? 'client-message' : 'opponent-message');
-        
-                if (!isUser) typeWriterEffect(messageElement, message);
-                else messageElement.innerHTML = parseMarkdown(message);
-        
+            
+                messageElement.innerHTML = parseMarkdown(message);
                 messagesContainer.appendChild(messageElement);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
-        
+
             async function sendMessageToAI(userMessage)
             {
                 const conversationContext = [
@@ -329,14 +317,14 @@
                 conversationContext.push({ role: 'user', content: userMessage });
             
                 const loadingIndicator = addLoadingIndicator();
-                
+
                 try
                 {
                     const response = await fetch(ai_endpoint,
                     {
                         method: 'POST',
                         headers:
-                        { 
+                        {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
                             'Authorization': `Bearer ${GROQ_API_KEY}`
@@ -345,12 +333,12 @@
                         { 
                             messages: conversationContext, 
                             max_tokens: 450,
-                            temperature: 0.5,
+                            temperature: 0.4,
                             stream: false,
-                            model: "gemma2-9b-it"
+                            model: "mixtral-8x7b-32768"
                         })
                     });
-
+                
                     const responseText = await response.text();
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
                 
@@ -358,7 +346,7 @@
                     const aiResponse = data.choices[0].message.content.trim();
                 
                     removeLoadingIndicator(loadingIndicator);
-                    
+
                     messageHistory.push( { content: userMessage, isUser: true },  { content: aiResponse, isUser: false } );
                     saveConversationHistory();
                 
@@ -371,7 +359,7 @@
                     return 'Sorry, there was an error processing your message.';
                 }
             }
-        
+
             sendButton.addEventListener('click', async () =>
             {
                 const messageText = messageInput.value.trim();
@@ -379,7 +367,7 @@
                 {
                     addMessageToChat(messageText, true);
                     messageInput.value = '';
-        
+                
                     messageInput.disabled = true;
                     sendButton.disabled = true;
                 
@@ -401,9 +389,9 @@
                     }
                 }
             });
-        
+
             clearButton.addEventListener('click', () => { messagesContainer.innerHTML = ''; localStorage.removeItem(STORAGE_KEY); messageHistory = []; });
-            
+
             messageInput.addEventListener('keydown', (e) =>
             {
                 if (e.key === 'Enter')
@@ -416,7 +404,7 @@
                     }
                 }
             });
-        
+
             loadConversationHistory();
         </script>
     </body>
