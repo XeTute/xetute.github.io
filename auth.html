@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords" content="XeTute Technologies, XeTute, Sign In, Register, Create Account, Account, Authentication, Auth, Log In">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+        <title>XeTute Technologies Authentication(XTTA)</title>
+        <link rel="icon" href="logo.jpg"/>
+        <link rel="stylesheet" href="basic.css"/>
+
+        <style>
+            div
+            {
+                
+                margin: 10px;
+                padding: 0;
+
+                display: flex;
+                flex-direction: column;
+
+                align-items: center;
+                justify-content: center;
+
+                text-align: center;
+            }
+
+            .form
+            {
+                display: flex;
+                flex-direction: column;
+
+                align-items: center;
+                justify-content: center;
+
+                width: 375px;
+                height: 375px;
+
+                max-width: 50%;
+                max-height: 50%;
+
+                -webkit-backdrop-filter: blur(14px);
+                backdrop-filter: blur(14px);
+
+                border: 2px solid #999;
+                border-radius: 15px;
+
+                padding: 15px;
+            }
+
+            .header h1, .header p
+            {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="form" style="display: flex;" id="signIn">
+            <div class="header">
+                <h1>Hello, Friend.</h1>
+                <p>Let's continue where we left off.</p>
+            </div>
+            <div class="input">
+                <input placeholder="E-Mail" id="Sign-In-Email" autocomplete="off"/>
+                <input placeholder="Password" id="Sign-In-Password" autocomplete="off"/>
+            </div>
+            <button onclick="signIn()" id="Sign-In-Btn">Sign In</button>
+        </div>
+        <div class="form" style="display: none;" id="signUp">
+            <div class="header">
+                <h1>Hello, Friend.</h1>
+                <p>Let's explore a new community.</p>
+            </div>
+            <div class="input">
+                <input placeholder="E-Mail" id="Sign-Up-Email" autocomplete="off"/>
+                <input placeholder="Password" id="Sign-Up-Password0" autocomplete="off"/>
+                <input placeholder="Password" id="Sign-Up-Password1" autocomplete="off"/>
+            </div>
+            <button id="Sign-Up-Btn">Sign Up</button>
+            <p id="error" style="color: red;"></p>
+        </div>
+        <div style="max-height: 10%; flex-direction: row;">
+            <button onclick="changeForm()" id="changeFormBtn">Sign Up</button>
+            <a hreF="ToS.html">ToS</a>
+        </div>
+        <p style="color: transparent;" id="Auth-Refer">./index.html</p>
+    </body>
+    <script type="module" src="firebase.js"></script>
+    <script defer>
+        if (window.location.search.substr(1))
+        {
+            document.getElementById('Auth-Refer').textContent = window.location.search.substr(1);
+        }
+
+        function changeForm()
+        {
+            const btn = document.getElementById('changeFormBtn');
+            const form = [ document.getElementById('signIn'), document.getElementById('signUp') ];
+
+            if (form[0].style.display === 'flex')
+            {
+                alert("By Signing Up, you accept our Terms of Service.\nIf you do not accept our Terms Of Servie, you may not use our services and not create an account.");
+                form[0].style.display = 'none';
+                form[1].style.display = 'flex';
+                btn.textContent = 'Sign In'
+            }
+            else
+            {
+                form[0].style.display = 'flex';
+                form[1].style.display = 'none';
+                btn.textContent = 'Sign Up'
+            }
+        }
+    </script>
+</html>

@@ -13,6 +13,30 @@
         <title>Hello, Friend. \\ FlareAI</title>
         <link rel="icon" href="../logo.jpg"/>
         <link rel="stylesheet" href="../basic.css"/>
+    </head>
+    <body>
+        <div class="navbar">
+            <div class="logo-container" onclick="window.location.href='../index.html'">
+                <img src="../logo.jpg" alt="XeTute Technologies Logo"/>
+                <p>XeTute Technologies</p>
+            </div>
+
+            <div class="nav-links">
+                <a href="https://github.com/XeTute">GitHub</a>
+                <a href="https://huggingface.co/XeTute">HuggingFace</a>
+                <a href="https://ko-fi.com/XeTute">Donate</a>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div id="messages-container" class="messages-container">
+            </div>
+            <div class="chat-input-container">
+                <button id="clear-button">Clear</button>
+                <textarea id="message-input" placeholder="Type your message..."></textarea>
+                <button id="send-button">Send</button>
+            </div>
+        </div>
 
         <style>
             .chat-container
@@ -93,7 +117,8 @@
             .loading-dot:nth-child(1) { animation-delay: -0.3s; }
             .loading-dot:nth-child(2) { animation-delay: -0.15s; }
 
-            @keyframes loading-pulse {
+            @keyframes loading-pulse
+            {
                 0%, 80%, 100% { opacity: 0.6; }
                 40% { opacity: 1; }
             }
@@ -108,27 +133,19 @@
             #message-input
             {
                 flex-grow: 1;
-                padding: 10px;
-                background: #080808;
-                border: 2px solid #222;
-                outline: 0;
-                color: #fff;
-                border-radius: 0;
-                margin-left: -5px;
-                margin-right: -5px;
+                background: #050505;
+                margin: 0;
             }
 
             #clear-button, #send-button
             {
-                padding: 10px 20px;
+                width: 4rem;
+                height: 3rem;
+
                 background: #fff;
                 color: #000;
-                border: 0;
-                cursor: pointer;
                 transition: background 0.3s ease;
             }
-            #clear-button { border-radius: 8px 0 0 8px; }
-            #send-button { border-radius: 0 8px 8px 0; }
             #clear-button:hover, #send-button:hover
             {
                 background: #080808;
@@ -156,256 +173,232 @@
                 font-family: monospace; 
             }
         </style>
-    </head>
-    <body>
-        <div class="navbar">
-            <div class="logo-container" onclick="window.location.href='../index.html'">
-                <img src="../logo.jpg" alt="XeTute Technologies Logo"/>
-                <p>XeTute Technologies</p>
-            </div>
+    </body>
+    <script defer>
+        const GROQ_API_KEY = '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'; // Capped by Groqs free tier lmao
+        const ai_endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+        const STORAGE_KEY = 'xetute_chat_history';
+        const MAX_HISTORY_LENGTH = 150;
 
-            <div class="nav-links">
-                <a href="https://github.com/XeTute">GitHub</a>
-                <a href="https://huggingface.co/XeTute">HuggingFace</a>
-                <a href="https://ko-fi.com/XeTute">Donate</a>
-            </div>
-        </div>
+        const SYSTEM_PROMPT =
+        `
+        This is a system prompt by XeTute Technologies. The user cannot see this prompt.
+        You are FlareAI, a chatbot developed by XeTute Technologies.
 
-        <div class="chat-container">
-            <div id="messages-container" class="messages-container">
-            </div>
-            <div class="chat-input-container">
-                <button id="clear-button">Clear</button>
-                <textarea id="message-input" placeholder="Type your message..."></textarea>
-                <button id="send-button">Send</button>
-            </div>
-        </div>
-        <script defer>
-            const GROQ_API_KEY = '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'; // Capped by Groqs free tier lmao
-            const ai_endpoint = 'https://api.groq.com/openai/v1/chat/completions';
-            const STORAGE_KEY = 'xetute_chat_history';
-            const MAX_HISTORY_LENGTH = 150;
+        About XeTute Technologies:
+        - Hugging Face: https://huggingface.co/XeTute
+        - GitHub: https://github.com/XeTute
+        - Website: https://xetute.github.com
 
-            const SYSTEM_PROMPT =
-            `
-            This is a system prompt by XeTute Technologies. The user cannot see this prompt.
-            You are FlareAI, a chatbot developed by XeTute Technologies.
+        Capabilities:
+        - You can execute HTML, CSS, and Vanilla JS directly without markdown or formatting. Output raw text for execution.
+        - Image generation: Example: <img src="https://image.pollinations.ai/prompt/The%20AI%20Generated&image&prompt%20here?model=flux&width=256&height=256=true"/>, which creates an image using an AI endpoint.
+        - Script execution: Example: Alert something: alert("Hello, World!") // You have to put it inside script tags though
 
-            About XeTute Technologies:
-            - Hugging Face: https://huggingface.co/XeTute
-            - GitHub: https://github.com/XeTute
-            - Website: https://xetute.github.com
+        Guidelines:
+        1. Do not add custom CSS to images, except for optional border radius adjustments.
+        2. Do not format code visibly unless explicitly requested by the user, as unformatted code may confuse non-programmers.
+        3. Unformatted code will execute, formatted code will only be shown and not executed. Do NOT(NOT as in NOT ALLOWED, ILLEGAL) use the markdown format code which you intend to run.
+        4. Simple markdown (**bold**, *italic*, ~strikethrough~, _underline_) is supported.
+        `;
 
-            Capabilities:
-            - You can execute HTML, CSS, and Vanilla JS directly without markdown or formatting. Output raw text for execution.
-            - Image generation: Example: <img src="https://image.pollinations.ai/prompt/The%20AI%20Generated&image&prompt%20here?model=flux&width=256&height=256=true"/>, which creates an image using an AI endpoint.
-            - Script execution: Example: Alert something: alert("Hello, World!") // You have to put it inside script tags though
+        let messageHistory = [];
 
-            Guidelines:
-            1. Do not add custom CSS to images, except for optional border radius adjustments.
-            2. Do not format code visibly unless explicitly requested by the user, as unformatted code may confuse non-programmers.
-            3. Unformatted code will execute, formatted code will only be shown and not executed. Do NOT(NOT as in NOT ALLOWED, ILLEGAL) use the markdown format code which you intend to run.
-            4. Simple markdown (**bold**, *italic*, ~strikethrough~, _underline_) is supported.
-            `;
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const clearButton = document.getElementById('clear-button');
+        const messagesContainer = document.getElementById('messages-container');
 
-            let messageHistory = [];
-
-            const messageInput = document.getElementById('message-input');
-            const sendButton = document.getElementById('send-button');
-            const clearButton = document.getElementById('clear-button');
-            const messagesContainer = document.getElementById('messages-container');
-
-            function loadConversationHistory()
+        function loadConversationHistory()
+        {
+            const storedHistory = localStorage.getItem(STORAGE_KEY);
+            if (storedHistory)
             {
-                const storedHistory = localStorage.getItem(STORAGE_KEY);
-                if (storedHistory)
-                {
-                    messageHistory = JSON.parse(storedHistory);
-                    messageHistory.forEach(msg => { addMessageToChat(msg.content, msg.isUser); });
-                }
+                messageHistory = JSON.parse(storedHistory);
+                messageHistory.forEach(msg => { addMessageToChat(msg.content, msg.isUser); });
             }
+        }
 
-            function saveConversationHistory()
+        function saveConversationHistory()
+        {
+            if (messageHistory.length > MAX_HISTORY_LENGTH) messageHistory = messageHistory.slice(-MAX_HISTORY_LENGTH);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(messageHistory));
+        }
+
+        function escapeHTML(html)
+        {
+            return html.replace(/&/g, '&amp;')
+                       .replace(/</g, '&lt;')
+                       .replace(/>/g, '&gt;');
+        }
+
+        function decodeHTML(html)
+        {
+            return html.replace(/&lt;/g, '<')
+                       .replace(/&gt;/g, '>')
+                       .replace(/&amp;/g, '&');
+        }
+
+        function parseMarkdown(message)
+        {
+            const codeBlockRegex = /```([\w]*)\n([\s\S]*?)```/g;
+            const inlineCodeRegex = /`([^`]+)`/g;
+
+            let formattedMessage = message.replace(codeBlockRegex, (match, lang, code) =>
             {
-                if (messageHistory.length > MAX_HISTORY_LENGTH) messageHistory = messageHistory.slice(-MAX_HISTORY_LENGTH);
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(messageHistory));
-            }
-
-            function escapeHTML(html)
-            {
-                return html.replace(/&/g, '&amp;')
-                           .replace(/</g, '&lt;')
-                           .replace(/>/g, '&gt;');
-            }
-
-            function decodeHTML(html)
-            {
-                return html.replace(/&lt;/g, '<')
-                           .replace(/&gt;/g, '>')
-                           .replace(/&amp;/g, '&');
-            }
-
-            function parseMarkdown(message)
-            {
-                const codeBlockRegex = /```([\w]*)\n([\s\S]*?)```/g;
-                const inlineCodeRegex = /`([^`]+)`/g;
-
-                let formattedMessage = message.replace(codeBlockRegex, (match, lang, code) =>
-                {
-                    const languageClass = lang ? `language-${lang}` : '';
-                    const decodedCode = decodeHTML(code);
-                    return `<pre><code class="${languageClass}">${escapeHTML(decodedCode)}</code></pre>`;
-                });
-                formattedMessage = formattedMessage.replace(inlineCodeRegex, (match, code) => { return `<code>${escapeHTML(code)}</code>`; });
-            
-                formattedMessage = formattedMessage
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                    .replace(/__(.*?)__/g, '<u>$1</u>')
-                    .replace(/~~(.*?)~~/g, '<del>$1</del>');
-            
-                formattedMessage = formattedMessage.replace(/<script>([\s\S]*?)<\/script>/g, (match, scriptContent) => {
-                    try
-                    {
-                        const script = document.createElement('script');
-                        script.textContent = scriptContent;
-                        document.body.appendChild(script);
-                    } catch (error) { console.error('Error executing script:', error); }
-                    return '';
-                });
-            
-                return formattedMessage;
-            }
-
-            function addLoadingIndicator(isUser = false)
-            {
-                const loadingElement = document.createElement('div');
-                loadingElement.classList.add('message', isUser ? 'client-message' : 'opponent-message', 'loading-indicator');
-
-                for (let i = 0; i < 2; ++i)
-                {
-                    const dot = document.createElement('div');
-                    dot.classList.add('loading-dot');
-                    loadingElement.appendChild(dot);
-                }
-            
-                messagesContainer.appendChild(loadingElement);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                return loadingElement;
-            }
-
-            function removeLoadingIndicator(loadingElement)
-            {
-                if (loadingElement && loadingElement.parentNode) loadingElement.parentNode.removeChild(loadingElement);
-            }
-
-            function addMessageToChat(message, isUser = false)
-            {
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message', isUser ? 'client-message' : 'opponent-message');
-            
-                messageElement.innerHTML = parseMarkdown(message);
-                messagesContainer.appendChild(messageElement);
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }
-
-            async function sendMessageToAI(userMessage)
-            {
-                const conversationContext = [
-                    { role: 'system', content: SYSTEM_PROMPT },
-                    ...messageHistory.map(msg => ({ role: msg.isUser ? 'user' : 'assistant', content: msg.content })) ];
-                conversationContext.push({ role: 'user', content: userMessage });
-            
-                const loadingIndicator = addLoadingIndicator();
-
+                const languageClass = lang ? `language-${lang}` : '';
+                const decodedCode = decodeHTML(code);
+                return `<pre><code class="${languageClass}">${escapeHTML(decodedCode)}</code></pre>`;
+            });
+            formattedMessage = formattedMessage.replace(inlineCodeRegex, (match, code) => { return `<code>${escapeHTML(code)}</code>`; });
+        
+            formattedMessage = formattedMessage
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/__(.*?)__/g, '<u>$1</u>')
+                .replace(/~~(.*?)~~/g, '<del>$1</del>');
+        
+            formattedMessage = formattedMessage.replace(/<script>([\s\S]*?)<\/script>/g, (match, scriptContent) => {
                 try
                 {
-                    const response = await fetch(ai_endpoint,
-                    {
-                        method: 'POST',
-                        headers:
-                        {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'Authorization': `Bearer ${GROQ_API_KEY}`
-                        },
-                        body: JSON.stringify(
-                        { 
-                            messages: conversationContext, 
-                            max_tokens: 450,
-                            temperature: 0.4,
-                            stream: false,
-                            model: "mixtral-8x7b-32768"
-                        })
-                    });
-                
-                    const responseText = await response.text();
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
-                
-                    const data = JSON.parse(responseText);
-                    const aiResponse = data.choices[0].message.content.trim();
-                
-                    removeLoadingIndicator(loadingIndicator);
+                    const script = document.createElement('script');
+                    script.textContent = scriptContent;
+                    document.body.appendChild(script);
+                } catch (error) { console.error('Error executing script:', error); }
+                return '';
+            });
+        
+            return formattedMessage;
+        }
 
-                    messageHistory.push( { content: userMessage, isUser: true },  { content: aiResponse, isUser: false } );
-                    saveConversationHistory();
-                
-                    return aiResponse;
-                } 
+        function addLoadingIndicator(isUser = false)
+        {
+            const loadingElement = document.createElement('div');
+            loadingElement.classList.add('message', isUser ? 'client-message' : 'opponent-message', 'loading-indicator');
+
+            for (let i = 0; i < 2; ++i)
+            {
+                const dot = document.createElement('div');
+                dot.classList.add('loading-dot');
+                loadingElement.appendChild(dot);
+            }
+        
+            messagesContainer.appendChild(loadingElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return loadingElement;
+        }
+
+        function removeLoadingIndicator(loadingElement)
+        {
+            if (loadingElement && loadingElement.parentNode) loadingElement.parentNode.removeChild(loadingElement);
+        }
+
+        function addMessageToChat(message, isUser = false)
+        {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', isUser ? 'client-message' : 'opponent-message');
+        
+            messageElement.innerHTML = parseMarkdown(message);
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function sendMessageToAI(userMessage)
+        {
+            const conversationContext = [
+                { role: 'system', content: SYSTEM_PROMPT },
+                ...messageHistory.map(msg => ({ role: msg.isUser ? 'user' : 'assistant', content: msg.content })) ];
+            conversationContext.push({ role: 'user', content: userMessage });
+        
+            const loadingIndicator = addLoadingIndicator();
+
+            try
+            {
+                const response = await fetch(ai_endpoint,
+                {
+                    method: 'POST',
+                    headers:
+                    {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${GROQ_API_KEY}`
+                    },
+                    body: JSON.stringify(
+                    { 
+                        messages: conversationContext, 
+                        max_tokens: 450,
+                        temperature: 0.4,
+                        stream: false,
+                        model: "mixtral-8x7b-32768"
+                    })
+                });
+            
+                const responseText = await response.text();
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
+            
+                const data = JSON.parse(responseText);
+                const aiResponse = data.choices[0].message.content.trim();
+            
+                removeLoadingIndicator(loadingIndicator);
+
+                messageHistory.push( { content: userMessage, isUser: true },  { content: aiResponse, isUser: false } );
+                saveConversationHistory();
+            
+                return aiResponse;
+            } 
+            catch (error)
+            {
+                removeLoadingIndicator(loadingIndicator);
+                console.error('Error:', error);
+                return 'Sorry, there was an error processing your message.';
+            }
+        }
+
+        sendButton.addEventListener('click', async () =>
+        {
+            const messageText = messageInput.value.trim();
+            if (messageText)
+            {
+                addMessageToChat(messageText, true);
+                messageInput.value = '';
+            
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+            
+                try
+                {
+                    const aiResponse = await sendMessageToAI(messageText);
+                    addMessageToChat(aiResponse, false);
+                }
                 catch (error)
                 {
-                    removeLoadingIndicator(loadingIndicator);
-                    console.error('Error:', error);
-                    return 'Sorry, there was an error processing your message.';
+                    console.error('Error in message processing:', error);
+                    addMessageToChat('Sorry, I encountered an error.', false);
+                }
+                finally
+                {
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    messageInput.focus();
                 }
             }
+        });
 
-            sendButton.addEventListener('click', async () =>
+        clearButton.addEventListener('click', () => { messagesContainer.innerHTML = ''; localStorage.removeItem(STORAGE_KEY); messageHistory = []; });
+
+        messageInput.addEventListener('keydown', (e) =>
+        {
+            if (e.key === 'Enter')
             {
-                const messageText = messageInput.value.trim();
-                if (messageText)
+                if (e.shiftKey) return;
+                else
                 {
-                    addMessageToChat(messageText, true);
-                    messageInput.value = '';
-                
-                    messageInput.disabled = true;
-                    sendButton.disabled = true;
-                
-                    try
-                    {
-                        const aiResponse = await sendMessageToAI(messageText);
-                        addMessageToChat(aiResponse, false);
-                    }
-                    catch (error)
-                    {
-                        console.error('Error in message processing:', error);
-                        addMessageToChat('Sorry, I encountered an error.', false);
-                    }
-                    finally
-                    {
-                        messageInput.disabled = false;
-                        sendButton.disabled = false;
-                        messageInput.focus();
-                    }
+                    e.preventDefault();
+                    sendButton.click();
                 }
-            });
+            }
+        });
 
-            clearButton.addEventListener('click', () => { messagesContainer.innerHTML = ''; localStorage.removeItem(STORAGE_KEY); messageHistory = []; });
-
-            messageInput.addEventListener('keydown', (e) =>
-            {
-                if (e.key === 'Enter')
-                {
-                    if (e.shiftKey) return;
-                    else
-                    {
-                        e.preventDefault();
-                        sendButton.click();
-                    }
-                }
-            });
-
-            loadConversationHistory();
-        </script>
-    </body>
+        loadConversationHistory();
+    </script>
 </html>

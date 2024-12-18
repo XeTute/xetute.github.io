@@ -13,7 +13,7 @@ body, html
     padding: 0;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
     align-items: center;
     overflow-x: hidden;
     overflow-y: auto;
@@ -60,8 +60,10 @@ body, html
 
 a
 {
+    font-family: 'Advent Pro';
+
     font-size: 1.15rem;
-    border: 1px solid #fff;
+    border: 2px solid #fff;
     color: #fff;
     text-decoration: none;
     padding: 6px 12px;
@@ -77,8 +79,10 @@ a:hover
 
 button
 {
-    border: 1px solid #fff;
-    background: #000;
+    font-family: 'Advent Pro';
+
+    border: 2px solid #fff;
+    background: transparent;
     color: #fff;
     padding: 5px 10px;
     cursor: pointer;
@@ -107,8 +111,26 @@ button:hover
     a { margin: 5px; }
 }
 
+ul { font-family: 'Advent Pro'; }
+
 input, textarea
 {
-    font-family: 'Advent Pro';
+    font-family: Arial, Helvetica, sans-serif;
     text-align: center;
+
+    background: #050505;
+    color: #fff;
+
+    padding: 8px;
+    margin: 4px;
+
+    border: 0;
+    border-radius: 8px;
+
+    transition: 0.35s ease-in-out;
+}
+
+input:hover, textarea:hover
+{
+    margin: 8px;
 }
