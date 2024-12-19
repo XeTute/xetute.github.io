@@ -81,12 +81,7 @@
                 <p>XeTute Technologies</p>
             </div>
 
-            <div class="nav-links">
-                <a href="auth.html">Log In</a>
-                <a href="https://github.com/XeTute">GitHub</a>
-                <a href="https://huggingface.co/XeTute">HuggingFace</a>
-                <a href="https://ko-fi.com/XeTute">Donate</a>
-            </div>
+            <div class="nav-links" id="nav-links"></div>
         </div>
 
         <div class="hero-section">
@@ -104,4 +99,32 @@
             <a href="https://www.youtube.com/@XeTuteTechnologies">Other—YT</a>
         </div>
     </body>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
+
+        const firebaseConfig =
+        {
+          apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+          authDomain: "xetuteauth.firebaseapp.com",
+          projectId: "xetuteauth",
+          storageBucket: "xetuteauth.firebasestorage.app",
+          messagingSenderId: "500556520913",
+          appId: "1:500556520913:web:381dc486949b1ae84694f0",
+          measurementId: "G-VJFMP5F975"
+        };
+        const auth = getAuth(initializeApp(firebaseConfig));
+
+        onAuthStateChanged(auth, (user) =>
+        {
+            let links =
+            `
+            <a href="https://github.com/XeTute">GitHub</a>
+            <a href="https://huggingface.co/XeTute">HuggingFace</a>
+            <a href="https://ko-fi.com/XeTute">Donate</a>
+            `;
+            if (!user) links = '<a href="auth.html">Log In</a>' + links;
+            document.getElementById('nav-links').innerHTML = links;
+        })
+    </script>
 </html>
