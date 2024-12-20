@@ -88,8 +88,8 @@
             <h1 class="hero-title">Hello, Friend.</h1>
             <div class="divider"></div>
             <p class="hero-subtitle">
-                <em>Reach the end of the story in your own way.</p>
-            </em>
+                <em>Reach the end of the story in your own way.</em>
+            </p>
             
             <div style="margin: 35px;"></div>
 
@@ -112,9 +112,8 @@
           appId: "1:500556520913:web:381dc486949b1ae84694f0",
           measurementId: "G-VJFMP5F975"
         };
-        const auth = getAuth(initializeApp(firebaseConfig));
 
-        onAuthStateChanged(auth, (user) =>
+        onAuthStateChanged(getAuth(initializeApp(firebaseConfig)), (user) =>
         {
             let links =
             `
