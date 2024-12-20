@@ -13,14 +13,89 @@
         <link rel="stylesheet" href="../basic.css"/>
 
         <style>
+            div
+            {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
 
+            header
+            {
+                margin: 20px;
+                padding: 0;
+                top: 0;
+                position: absolute;
+
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+
+                width: 100%;
+                padding: 20px;
+                border: 1px solid #000;
+                border-radius: 5px;
+
+                z-index: 10;
+            }
         </style>
     </head>
     <body>
-
+        <header>
+            <div>
+                <h1 style="margin: 0;">CYE</h1>
+                <div style="width: 125px; background: #fff; height: 2px; border-radius: 8px; margin: 12px; padding: 0;"></div>
+                <div style="flex-direction: row;">
+                    <a href="./feed.html">Feed</a>
+                    <a href="./profile.html">Profile</a>
+                    <a href="./newpost.html" style="background: #fff; color: #000;">Post</a>
+                </div>
+            </div>
+        </header>
+        <p style="display: none;" id="Auth-Refer">../auth.html?CYE/feed.html</p>
     </body>
-    <script type="module" src="../firebase.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
+
+        const firebaseConfig =
+        {
+          apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+          authDomain: "xetuteauth.firebaseapp.com",
+          projectId: "xetuteauth",
+          storageBucket: "xetuteauth.firebasestorage.app",
+          messagingSenderId: "500556520913",
+          appId: "1:500556520913:web:381dc486949b1ae84694f0",
+          measurementId: "G-VJFMP5F975"
+        };
+
+        onAuthStateChanged(getAuth(initializeApp(firebaseConfig)), (user) =>
+        {
+            const refer = document.getElementById('Auth-Refer');
+            if (window.location.search.substr(1)) refer.textContent = window.location.search.substr(1);
+            if (!user) window.location.href = refer.textContent;
+        });
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script defer>
-        
+        firebase.initializeApp
+        (
+            {
+                apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+                authDomain: "xetuteauth.firebaseapp.com",
+                projectId: "xetuteauth",
+                storageBucket: "xetuteauth.firebasestorage.app",
+                messagingSenderId: "500556520913",
+                appId: "1:500556520913:web:381dc486949b1ae84694f0",
+                measurementId: "G-VJFMP5F975"
+            }
+        );
+
+        let db = firebase.firestore();
+        db.enablePersistence();
+
+        async function createPost(data) { db.collection("CYE-Post").add(data).then((ref) => { return ref; } ).catch((error) => { return error; }); }
+
     </script>
 </html>
