@@ -188,14 +188,14 @@
             if (!data.exists) window.location.href = "feed.html";
             data = data.data();
             
-            const answer = escapeXSS(data.Answer);
-            const author = escapeXSS(data.Author); //
-            const description = escapeXSS(data.Description); //
-            const explaination = escapeXSS(data.Explaination);
-            const level = escapeXSS(data.Level); //
+            const answer = data.Answer;
+            const author = data.Author;
+            const description = data.Description;
+            const explaination = data.Explaination;
+            const level = data.Level;
             const likes = data.Likes;
-            const question = escapeXSS(data.Question); //
-            const title = escapeXSS(data.Title); //
+            const question = data.Question;
+            const title = data.Title;
 
             document.getElementById('answer').textContent = answer;
             document.getElementById('author').textContent = '—' + author;
