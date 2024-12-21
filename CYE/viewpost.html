@@ -155,7 +155,7 @@
                 navigator.share
                 ({
                     title: `${document.getElementById('title').textContent} on CYE`,
-                    text: `${document.getElementById('description').textContent}: Can you solve it?`,
+                    text: `${document.getElementById('description').textContent.slice(0, -1)}: Can you solve it?`,
                     url: link
                 }).then(() => { console.log('Shared'); }).catch((e) => console.log(e));
             }
@@ -167,6 +167,8 @@
 
         async function main()
         {
+            if (window.location.search.length === 0) window.location.href = 'feed.html';
+
             firebase.initializeApp
             (
                 {
