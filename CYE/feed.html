@@ -154,56 +154,34 @@
             else return x;
         }
 
+        function escapeXSS(str)
+        {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
+
         function feedelem(post, id)
         {
-            const container = document.createElement('div');
-            container.className = 'feedelem';
-            container.onclick = () => window.location.href = `viewpost.html?${id}`;
-
-            const leftSpacer = document.createElement('div');
-            leftSpacer.style.width = '12.5%';
-            container.appendChild(leftSpacer);
-
-            const mainContent = document.createElement('div');
-            mainContent.style.maxWidth = '50%';
-
-            const title = document.createElement('h3');
-            title.textContent = post.Title.stringValue;
-            mainContent.appendChild(title);
-
-            const description = document.createElement('p');
-            description.textContent = post.Description.stringValue;
-            mainContent.appendChild(description);
-
-            const level = document.createElement('p');
-            level.textContent = post.Level.stringValue;
-            mainContent.appendChild(level);
-
-            container.appendChild(mainContent);
-
-            const rightSpacer = document.createElement('div');
-            rightSpacer.style.width = '25%';
-            container.appendChild(rightSpacer);
-
-            const likesContainer = document.createElement('div');
-            likesContainer.style.maxWidth = '50%';
-
-            const likes = document.createElement('p');
-            likes.textContent = `${post.Likes.integerValue} ❤`;
-            likesContainer.appendChild(likes);
-
-            const author = document.createElement('p');
-            author.style.flexDirection = 'row';
-            author.textContent = `—${post.Author.stringValue}`;
-            likesContainer.appendChild(author);
-
-            container.appendChild(likesContainer);
-
-            const finalSpacer = document.createElement('div');
-            finalSpacer.style.width = '12.5%';
-            container.appendChild(finalSpacer);
-
-            return container.outerHTML;
+            return `
+                <div class="feedelem" onclick="window.location.href='viewpost.html?${escapeXSS(id)}'">
+                    <div style="width: 12.5%;"></div>
+                    <div style="max-width: 50%;">
+                        <h3>${escapeXSS(post.Title.stringValue)}</h3>
+                        <p>${escapeXSS(post.Description.stringValue)}</p>
+                        <p>${escapeXSS(post.Level.stringValue)}</p>
+                    </div>
+                    <div style="width: 25%;"></div>
+                    <div style="max-width: 50%;">
+                        <p>${escapeXSS(post.Likes.integerValue.toString())} 🤍</p>
+                        <p style="flex-direction: row;">—${escapeXSS(post.Author.stringValue)}</p>
+                    </div>
+                    <div style="width: 12.5%;"></div>
+                </div>
+            `;
         }
         
         let data; // = undefined
