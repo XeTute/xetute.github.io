@@ -6,14 +6,15 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Playwrite+NG+Modern:wght@100..400&display=swap" rel="stylesheet">
 
-        <title>Create a post on CYE</title>
+        <title>View a Post on CYE</title>
         <link rel="icon" href="../logo.jpg"/>
         <link rel="stylesheet" href="../basic.css"/>
 
         <style>
-            body { justify-content: flex-start; }
+            body { justify-content: flex-start; font-family: "Playwrite NG Modern", serif; text-align: center; }
+            a, button { font-family: 'Playwrite NG Modern'; }
 
             div
             {
@@ -40,6 +41,16 @@
 
                 z-index: 10;
             }
+
+            .backdrop
+            {
+                border-radius: 15px;
+                border: 2px solid #222;
+                padding: 8px;
+                margin: 8px;
+                backdrop-filter: blur(5px);
+                -webkit-backdrop-filter: blur(5px);
+            }
         </style>
     </head>
     <body>
@@ -50,10 +61,43 @@
                 <div style="flex-direction: row;">
                     <a href="./feed.html">Feed</a>
                     <a href="./profile.html">Profile</a>
-                    <a href="./newpost.html" style="background: #fff; color: #000;">Post</a>
+                    <a href="./newpost.html">Post</a>
                 </div>
             </div>
         </header>
+        
+        <div class="backdrop">
+            <h1 id="title" style="margin-bottom: 0;"></h1>
+            <div style="width: 5rem; margin: 5px; background: #fff; height: 3px; border-radius: 25px;"></div>
+            <p id="author" style="margin: 0;"></p>
+            <p id="level" style="margin-top: 0;"></p>
+        </div>
+        
+        <div class="backdrop">
+            <em id="description"></em>
+            <p>...</p>
+            <strong id="question"></strong>
+            <p>...</p>
+            <button onclick="showAnswer()" style="margin: 8px;" id="showansbtn">Show Answer</button>
+        </div>
+
+        <div class="backdrop" id="answerdiv" style="display: none;">
+            <p id="answer"></p>
+            <strong>Explaination: </strong>
+            <p id="explaination"></p>
+        </div>
+
+        <div style="flex-direction: row;">
+            <div class="backdrop" id="likediv">
+                <p id="likes"></p>
+                <button id="likebtn" onclick="likePost()">Like 🤍</button>
+            </div>
+            <div class="backdrop">
+                <img src="share.svg" style="width: 2.8rem; height: 2.8rem;"/>
+                <div style="margin: 9px;"></div>
+                <button onclick="share()">Share</button>
+            </div>
+        </div>
     </body>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
@@ -75,24 +119,93 @@
             if (!user) window.location.href = `../auth.html?CYE/viewpost.html?${window.location.search.substr(1)}`;
         });
     </script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
     <script defer>
-        firebase.initializeApp
-        (
-            {
-                apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
-                authDomain: "xetuteauth.firebaseapp.com",
-                projectId: "xetuteauth",
-                storageBucket: "xetuteauth.firebasestorage.app",
-                messagingSenderId: "500556520913",
-                appId: "1:500556520913:web:381dc486949b1ae84694f0",
-                measurementId: "G-VJFMP5F975"
-            }
-        );
+        function escapeXSS(str)
+        {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
 
-        let db = firebase.firestore();
-        db.enablePersistence();
-        
+        function formatLikes(x)
+        {
+            if (x >= (10 ** 6)) return `${x / (10 ** 6)}`.substr(0, 3) + 'M';
+            if (x >= (10 ** 3)) return `${x / (10 ** 3)}`.substr(0, 3) + 'k';
+            else return x;
+        }
+
+        function showAnswer()
+        {
+            document.getElementById('answerdiv').style.display = 'flex';
+            document.getElementById('showansbtn').style.display = 'none';
+            document.body.scrollTop = document.body.scrollHeight;
+        }
+
+        function share()
+        {
+            const link = window.location.href;
+
+            if (navigator.share)
+            {
+                navigator.share
+                ({
+                    title: `${document.getElementById('title').textContent} on CYE`,
+                    text: `${document.getElementById('description').textContent}: Can you solve it?`,
+                    url: link
+                }).then(() => { console.log('Shared'); }).catch((e) => console.log(e));
+            }
+            else
+            {
+                navigator.clipboard.writeText(link).then(() => { alert('Copied link to Clipboard.'); });
+            }
+        }
+
+        async function main()
+        {
+            firebase.initializeApp
+            (
+                {
+                    apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+                    authDomain: "xetuteauth.firebaseapp.com",
+                    projectId: "xetuteauth",
+                    storageBucket: "xetuteauth.firebasestorage.app",
+                    messagingSenderId: "500556520913",
+                    appId: "1:500556520913:web:381dc486949b1ae84694f0",
+                    measurementId: "G-VJFMP5F975"
+                }
+            );
+
+            const db = firebase.firestore();
+
+            const id = window.location.search.substr(1);
+
+            let data = await db.collection("CYE-Post").doc(id).get();
+            if (!data.exists) window.location.href = "feed.html";
+            data = data.data();
+            
+            const answer = escapeXSS(data.Answer);
+            const author = escapeXSS(data.Author); //
+            const description = escapeXSS(data.Description); //
+            const explaination = escapeXSS(data.Explaination);
+            const level = escapeXSS(data.Level); //
+            const likes = data.Likes;
+            const question = escapeXSS(data.Question); //
+            const title = escapeXSS(data.Title); //
+
+            document.getElementById('answer').textContent = answer;
+            document.getElementById('author').textContent = '—' + author;
+            document.getElementById('description').textContent = description;
+            document.getElementById('explaination').textContent = explaination;
+            document.getElementById('level').textContent = level;
+            document.getElementById('likes').textContent = `${formatLikes(likes)} 🤍`;
+            document.getElementById('question').textContent = question;
+            document.getElementById('title').textContent = title;
+        }
+        main();
     </script>
 </html>

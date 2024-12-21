@@ -128,8 +128,8 @@
             if (!user) window.location.href = '../auth.html?CYE/feed.html';
         });
     </script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
     <script defer>
         firebase.initializeApp
         (
@@ -145,7 +145,6 @@
         );
 
         let db = firebase.firestore();
-        db.enablePersistence();
 
         function formatLikes(x)
         {
@@ -186,7 +185,7 @@
         
         let data; // = undefined
         let ce = 0; // ce current end
-        const cs = 15; // chunk size
+        const cs = 50; // chunk size
 
         function loadMore(qs)
         {
@@ -194,7 +193,7 @@
             const mx = (cs > qs.size) ? qs.size : (ce + cs);
             for (let i = ce; i < mx; ++i)
             {
-                buffer += feedelem(qs.docs[i]._delegate._document.data.value.mapValue.fields, qs.docs[0].id); // Very readable, thanks Google.
+                buffer += feedelem(qs.docs[i]._delegate._document.data.value.mapValue.fields, qs.docs[i].id); // Very readable, thanks Google.
                 // qs.forEach((doc) => { buffer += feedelem(doc.data()); } ) doesn't support chunking as far as I know
             }
             document.getElementById('feed').innerHTML += buffer;
@@ -204,6 +203,6 @@
         function removeLoadMore() { document.getElementById('loadmore').outerHTML = ''; }
         function addLoadMore() { document.getElementById('feed').innerHTML += `<button onclick="removeLoadMore(); loadMore(data); addLoadMore();" id="loadmore">Load More</a>` }
 
-        db.collection('CYE-Post').get().then( (qs) => { data = qs; loadMore(data); addLoadMore(); } ) .catch((e) => { console.log(e); } )
+        db.collection('CYE-Post').limit(500).get().then( (qs) => { data = qs; loadMore(data); addLoadMore(); } ).catch((e) => { console.log(e); } )
     </script>
 </html>
