@@ -81,7 +81,7 @@
         <div style="flex-direction: row;">
             <div class="backdrop" id="likediv">
                 <p id="likes"></p>
-                <button id="likebtn" onclick="likePost()">Like 🤍</button>
+                <button id="likebtn">Like 🤍</button>
             </div>
             <div class="backdrop">
                 <img src="share.svg" style="width: 2.8rem; height: 2.8rem;"/>
@@ -185,7 +185,7 @@
             const description = data.Description;
             const explaination = data.Explaination;
             const level = data.Level;
-            const likes = data.Likes;
+            let likes = data.Likes;
             const question = data.Question;
             const title = data.Title;
 
@@ -197,6 +197,28 @@
             document.getElementById('likes').textContent = `${formatLikes(likes)} 🤍`;
             document.getElementById('question').textContent = question;
             document.getElementById('title').textContent = title;
+
+            let liked = false;
+            if (localStorage.getItem(`liked${id}`) !== null)
+            {
+                liked = true;
+                document.getElementById('likebtn').textContent = 'Liked';
+            }
+
+            document.getElementById('likebtn').addEventListener('click', async () =>
+            {
+                if (liked) return;
+                try
+                {
+                    localStorage.setItem(`liked${id}`, '');
+                    liked = true;
+
+                    await db.collection("CYE-Post").doc(id).update({ Likes: (likes + 1) });
+                    document.getElementById('likebtn').textContent = 'Liked';
+                    ++likes;
+                    document.getElementById('likes').textContent = `${formatLikes(likes)} 🤍`;
+                } catch (error) { console.error("Error updating likes: ", error); }
+            });
         }
         main();
     </script>
