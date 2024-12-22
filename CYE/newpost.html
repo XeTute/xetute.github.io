@@ -6,13 +6,21 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Playwrite+NG+Modern:wght@100..400&display=swap" rel="stylesheet">
 
         <title>Create a post on CYE</title>
         <link rel="icon" href="../logo.jpg"/>
         <link rel="stylesheet" href="../basic.css"/>
 
         <style>
+            body
+            {
+                justify-content: flex-start;
+                font-family: "Playwrite NG Modern", serif;
+                text-align: center;
+            }
+            a, button { font-family: 'Playwrite NG Modern'; }
+
             div
             {
                 display: flex;
@@ -23,6 +31,7 @@
 
             header
             {
+                font-size: 11px;
                 margin: 0px;
                 padding: 0;
                 top: 0;
@@ -38,6 +47,16 @@
 
                 z-index: 10;
             }
+
+            input, select, select > option, textarea
+            {
+                font-family: 'Playwrite NG Modern';
+                border: 0;
+                border-radius: 15px;
+                background: transparent;
+                color: #fff;
+            }
+            select > option { background: #111; text-align: center; }
         </style>
     </head>
     <body>
@@ -52,7 +71,38 @@
                 </div>
             </div>
         </header>
+
+        <div class="container">
+            <div class="backdrop">
+                <input id="title" style="margin-bottom: 0;" placeholder="Enter a Title..."/>
+                <div style="width: 5rem; margin: 5px; background: #fff; height: 3px; border-radius: 25px;"></div>
+                <p id="author" style="margin: 0;"></p>
+                <select id="level" style="margin-top: 0;">
+                    <option value="Easy" selected>Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            
+            <div class="backdrop">
+                <textarea id="description" style="font-style: italic;" placeholder="Enter a Description..."></textarea>
+                <p>...</p>
+                <textarea id="question" style="font-weight: 500;" placeholder="Enter the Question..."></textarea>
+            </div>
+    
+            <div class="backdrop" id="answerdiv">
+                <textarea id="answer" placeholder="Enter the correct Answer..."></textarea>
+                <strong>Explaination: </strong>
+                <textarea id="explaination" placeholder="Enter an Explaination"></textarea>
+            </div>
+        </div>
+        
+        <div style="margin: 20px;">
+            <button id="submitBtn">Submit</button>
+        </div>
     </body>
+    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
@@ -71,28 +121,63 @@
         onAuthStateChanged(getAuth(initializeApp(firebaseConfig)), (user) =>
         {
             if (!user) window.location.href = '../auth.html?CYE/feed.html';
-        });
-    </script>
-    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
-    <script defer>
-        firebase.initializeApp
-        (
+            
+            firebase.initializeApp
+            (
+                {
+                    apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+                    authDomain: "xetuteauth.firebaseapp.com",
+                    projectId: "xetuteauth",
+                    storageBucket: "xetuteauth.firebasestorage.app",
+                    messagingSenderId: "500556520913",
+                    appId: "1:500556520913:web:381dc486949b1ae84694f0",
+                    measurementId: "G-VJFMP5F975"
+                }
+            );
+            let db = firebase.firestore();
+
+            let r = undefined;
+            async function createPost(data) { db.collection("CYE-Post").add(data).then((ref) => { r = ref; } ).catch((error) => { console.log(error); }); }
+            
+            let data =
             {
-                apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
-                authDomain: "xetuteauth.firebaseapp.com",
-                projectId: "xetuteauth",
-                storageBucket: "xetuteauth.firebasestorage.app",
-                messagingSenderId: "500556520913",
-                appId: "1:500556520913:web:381dc486949b1ae84694f0",
-                measurementId: "G-VJFMP5F975"
+                Answer: "",
+                Author: user.displayName ? user.displayName : 'Anonymous',
+                Description: "",
+                Explaination: "",
+                Level: "",
+                Likes: 0,
+                Question: "",
+                Title: ""
+            };
+            if (!data.Author) alert("An unknown error occurred. We're sorry. Please check your internet connection and try again.");
+
+            async function main()
+            {
+                document.getElementById('author').textContent = data.author;
+
+                document.getElementById('submitBtn').addEventListener('click', () =>
+                {
+                    data.Answer = document.getElementById('answer').value;
+                    data.Description = document.getElementById('description').value;
+                    data.Explaination = document.getElementById('explaination').value;
+                    
+                    const n = document.getElementById('level').selectedIndex;
+                    if (n === 0) data.Level = "Easy"; // for Right Click => Inspect kids on the browser
+                    else if (n === 1) data.Level = "Medium";
+                    else if (n === 2) data.Level = "Hard";
+
+                    data.Question = document.getElementById('question').value;
+                    data.Title = document.getElementById('title').value;
+
+                    if (!data.Answer || !data.Description || !data.Explaination || !data.Question || !data.Title)
+                        alert("One field is still empty. Please correctly fill it out =)");
+
+                    createPost(data);
+                    window.location.href = `viewpost.html?${ref}`;
+                });
             }
-        );
-
-        let db = firebase.firestore();
-        db.enablePersistence();
-
-        async function createPost(data) { db.collection("CYE-Post").add(data).then((ref) => { return ref; } ).catch((error) => { return error; }); }
-        
+            main();
+        });
     </script>
 </html>
