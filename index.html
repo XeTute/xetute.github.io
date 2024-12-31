@@ -1,140 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="UTF-8">
-        <meta name="description" content="The official webpage of XeTute Technologies">
-        <meta name="keywords" content="XeTute Technologies, XeTute">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, FlareAI, AI, Hello Friend"/>
+        <meta name="description" content="Follow your Curiosity — Lead Humanity forward"/>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-        
-        <title>Hello, Friend \ XeTute Technologies</title>
-        <link rel="icon" href="logo.jpg"/>
+        <title>Hello, Friend \\ XeTute Technologies</title>
+
         <link rel="stylesheet" href="basic.css"/>
-
-        <style>
-            
-            .hero-section
-            {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                height: calc(100vh - 80px);
-                text-align: center;
-                padding: 0 20px;
-                gap: 10px;
-            }
-
-            .hero-title
-            {
-                font-size: 3.75rem;
-                margin: 0;
-                line-height: 1.2;
-                animation: fadeIn 1.5s ease-out;
-            }
-
-            .divider
-            {
-                width: 10rem;
-                height: 2px;
-                background: #fff;
-                margin: 15px 0;
-                animation: stretch 1.5s ease-out;
-            }
-
-            .hero-subtitle
-            {
-                font-size: 1.25rem;
-                margin: 0;
-                font-style: italic;
-                animation: fadeIn 1.5s ease-out 0.5s backwards;
-            }
-
-            @keyframes fadeIn
-            {
-                from
-                {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                to
-                {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            @keyframes stretch
-            {
-                from { width: 0; }
-                to { width: 10rem; }
-            }
-        </style>
+        <link rel="icon" href="logo.jpg"/>
+        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     </head>
+    <style>
+        .section
+        {
+            width: 100%;
+            min-height: 100vh;
+
+            justify-content: center;
+            align-items: center;
+        }
+        .margin { margin: 20px; }
+
+        @media (max-width: 412px)
+        {
+            #links { flex-direction: column; }
+            #linksline { width: 60%; height: 3px; }
+        }
+        @media (min-width: 413px)
+        {
+            #links { flex-direction: row; }
+            #linksline { width: 3px; height: 60%; }
+        }
+    </style>
     <body>
-        <div class="loading" id="loading">
-            <div class="loading-text">
-                <span class="loading-text-words">X</span>
-                <span class="loading-text-words">E</span>
-                <span class="loading-text-words">T</span>
-                <span class="loading-text-words">U</span>
-                <span class="loading-text-words">T</span>
-                <span class="loading-text-words">E</span>
-            </div>
-        </div>
-        
-        <div class="navbar">
-            <div class="logo-container" onclick="window.location.href=''">
-                <img src="logo.jpg" alt="XeTute Technologies Logo"/>
-                <p>XeTute Technologies</p>
-            </div>
-
-            <div class="nav-links" id="nav-links"></div>
-        </div>
-
-        <div class="hero-section">
-            <h1 class="hero-title">Hello, Friend.</h1>
-            <div class="divider"></div>
-            <p class="hero-subtitle">
-                <em>The Future doesn't have to be next Lifetime.</em>
+        <!-- HEADING -->
+        <div class="section">
+            <h1 style="font-size: 5rem; margin-top: 2rem;">Hello, Friend.</h1>
+            <p style="font-size: 1.25rem;">
+                Follow your Curiosity<br>
+                Lead Humanity forward
             </p>
-            
-            <div style="margin: 35px;"></div>
-
-            <a href="products.html">View Products</a>
         </div>
+
+        <!--LINKS-->
+        <div class="section" style="height: 65vh;" id="links">
+            <div class="margin" style="width: 100%; overflow: hidden;">
+                <h1>Our Apps</h1>
+                <em>Currently designing FlareAI.</em>
+            </div>
+            <div class="line" id="linksline"></div>
+            <div class="margin" style="width: 100%; overflow: hidden;">
+                <h1 style="margin-bottom: 10px;">Our Socials</h1>
+                <a class="sb" href="https://www.youtube.com/@XeTuteTechnologies"><span>YouTube</span></a>
+                <a class="sb" href="https://bsky.app/profile/xetute.bsky.social"><span>Bluesky</span></a>
+                <a class="sb" href="https://github.com/XeTute"><span>XeTute</span></a>
+                <a class="sb" href="https://huggingface.co/XeTute"><span>HuggingFace</span></a>
+            </div>
+        </div>
+
+        <!--FOOTER-LIKE-THINGY-->
+
+
     </body>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
-
-        const firebaseConfig =
-        {
-          apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
-          authDomain: "xetuteauth.firebaseapp.com",
-          projectId: "xetuteauth",
-          storageBucket: "xetuteauth.firebasestorage.app",
-          messagingSenderId: "500556520913",
-          appId: "1:500556520913:web:381dc486949b1ae84694f0",
-          measurementId: "G-VJFMP5F975"
-        };
-
-        onAuthStateChanged(getAuth(initializeApp(firebaseConfig)), (user) =>
-        {
-            let links =
-            `
-            <a href="https://github.com/XeTute">GitHub</a>
-            <a href="https://huggingface.co/XeTute">HuggingFace</a>
-            <a href="https://ko-fi.com/XeTute">Donate</a>
-            `;
-            if (!user) links = '<a href="auth.html">Log In</a>' + links;
-            document.getElementById('nav-links').innerHTML = links;
-        });
-    </script>
-    <script defer>
-        document.getElementById('loading').style.display = 'none';
-    </script>
 </html>
