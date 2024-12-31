@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="Product-Page by XeTute Technologies">
+        <meta name="keywords" content="XeTute Technologies, XeTute, Products, Apps, CYE, Flare, FlareAI, AI">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+        <title>Products \ XeTute Technologies</title>
+        <link rel="icon" href="https://xetute.com/logo.jpg"/>
+        <link rel="stylesheet" href="basic.css"/>
+        
+        <style>
+            body { justify-content: flex-start; font-size: 20px; }
+
+            .pg { width: 500px; max-width: 80%; }
+            .card
+            {
+                text-align: center;
+                padding: 2rem;
+                margin: 20px;
+                border: 2px solid #888;
+                border-radius: 15px;
+                transition: .2s ease-in-out;
+            }
+            .card:hover
+            {
+                padding: 2.5rem;
+                border-radius: 50px;
+                border: 3px solid #999;
+            }
+            .card h1, .card p, .card button, .card a { margin: 1rem; }
+            .card h1, .card p { padding: 0; }
+            .card a, .card button { font-size: 20px; }
+        </style>
+    </head>
+    <body>
+        <div class="loading" id="loading">
+            <div class="loading-text">
+                <span class="loading-text-words">X</span>
+                <span class="loading-text-words">E</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">U</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">E</span>
+            </div>
+        </div>
+        <div class="pg">
+            <div class="card">
+                <h1>CYE</h1>
+                <p>CYE("Cook Your Exams") is a Social-Media like Webapp for Educational Posts which only contain Text.</p>
+                <a href="https://xetute.com/CYE/feed">Start Posting</a>
+            </div>
+            <div class="card">
+                <h1>FlareAI</h1>
+                <p>Currently, FlareAI is a playground for testing our AI services.</p>
+                <a href="https://xetute.com/FlareAI/">Visit Playground</a>
+            </div>
+            <div class="card">
+                <h1>Authorisation</h1>
+                <p>XeTute Technologies Authorisation is our service to Authorize you into our Apps.</p>
+                <button id="auth-btn"></button>
+            </div>
+            <div class="card">
+                <h1>ANNA</h1>
+                <p>ANNA("Asadullah's Neural Network Architecture") is a native-C++ library for training, saving, loading & inferencing ANNA AI models.</p>
+                <a href="https://github.com/XeTute/ANNA">View GitHub</a>
+            </div>
+        </div>
+    </body>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
+
+        const firebaseConfig =
+        {
+          apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+          authDomain: "xetuteauth.firebaseapp.com",
+          projectId: "xetuteauth",
+          storageBucket: "xetuteauth.firebasestorage.app",
+          messagingSenderId: "500556520913",
+          appId: "1:500556520913:web:381dc486949b1ae84694f0",
+          measurementId: "G-VJFMP5F975"
+        };
+
+        onAuthStateChanged(getAuth(initializeApp(firebaseConfig)), (user) =>
+        {
+            const x = document.getElementById('auth-btn');
+            if (!user)
+            {
+                x.textContent = 'Authorize';
+                x.href = 'https://xetute.com/auth?https://xetute.com/products'
+            }
+            else x.textContent = 'Authorized';
+        });
+    </script>
+    <script defer>
+        document.getElementById('loading').style.display = 'none';
+    </script>
+</html>

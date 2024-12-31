@@ -75,6 +75,17 @@
         </style>
     </head>
     <body>
+        <div class="loading" id="loading">
+            <div class="loading-text">
+                <span class="loading-text-words">X</span>
+                <span class="loading-text-words">E</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">U</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">E</span>
+            </div>
+        </div>
+        
         <div class="navbar">
             <div class="logo-container" onclick="window.location.href=''">
                 <img src="logo.jpg" alt="XeTute Technologies Logo"/>
@@ -93,10 +104,7 @@
             
             <div style="margin: 35px;"></div>
 
-            <a href="./CYE/feed.html">CYE Beta—Acadmic SM</a>
-            <a href="./flare-demo/index.html">Flare—AI Chat</a>
-            <a href="https://github.com/XeTute/ANNA/wiki">Build your AI—ANNA</a>
-            <a href="https://www.youtube.com/@XeTuteTechnologies">Other—YT</a>
+            <a href="products.html">View Products</a>
         </div>
     </body>
     <script type="module">
@@ -124,6 +132,9 @@
             `;
             if (!user) links = '<a href="auth.html">Log In</a>' + links;
             document.getElementById('nav-links').innerHTML = links;
-        })
+        });
+    </script>
+    <script defer>
+        document.getElementById('loading').style.display = 'none';
     </script>
 </html>

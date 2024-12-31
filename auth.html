@@ -61,6 +61,16 @@
         </style>
     </head>
     <body>
+        <div class="loading" id="loading">
+            <div class="loading-text">
+                <span class="loading-text-words">X</span>
+                <span class="loading-text-words">E</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">U</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">E</span>
+            </div>
+        </div>
         <div class="form" style="display: flex;" id="signIn">
             <div class="header">
                 <h1>Hello, Friend.</h1>
@@ -171,5 +181,7 @@
                 btn.textContent = 'Sign Up'
             }
         }
+
+        document.getElementById('loading').style.display = 'none';
     </script>
 </html>

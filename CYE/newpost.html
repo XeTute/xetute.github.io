@@ -60,6 +60,16 @@
         </style>
     </head>
     <body>
+        <div class="loading" id="loading">
+            <div class="loading-text">
+                <span class="loading-text-words">X</span>
+                <span class="loading-text-words">E</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">U</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">E</span>
+            </div>
+        </div>
         <header>
             <div>
                 <h1 style="margin: 0;">CYE</h1>
@@ -179,5 +189,7 @@
             }
             main();
         });
+
+        document.getElementById('loading').style.display = 'none';
     </script>
 </html>

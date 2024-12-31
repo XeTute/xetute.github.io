@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description" content="FlareAI by XeTute Technologies">
+        <meta name="keywords" content="XeTute Technologies, XeTute, Flare, AI, FlareAI, AI Chat, Free AI, Free AI Chat">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+        <title>Hello, Friend. \\ FlareAI</title>
+        <link rel="icon" href="../logo.jpg"/>
+        <link rel="stylesheet" href="../basic.css"/>
+    </head>
+    <body>
+        <div class="loading" id="loading">
+            <div class="loading-text">
+                <span class="loading-text-words">X</span>
+                <span class="loading-text-words">E</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">U</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">E</span>
+            </div>
+        </div>
+
+        <div class="navbar">
+            <div class="logo-container" onclick="window.location.href='../index.html'">
+                <img src="../logo.jpg" alt="XeTute Technologies Logo"/>
+                <p>XeTute Technologies</p>
+            </div>
+
+            <div class="nav-links">
+                <a href="https://github.com/XeTute">GitHub</a>
+                <a href="https://huggingface.co/XeTute">HuggingFace</a>
+                <a href="https://ko-fi.com/XeTute">Donate</a>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div id="messages-container" class="messages-container">
+            </div>
+            <div class="chat-input-container">
+                <button id="clear-button">Clear</button>
+                <textarea id="message-input" placeholder="Type your message..."></textarea>
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+        <p style="display: none;" id="Auth-Refer">../auth.html?FlareAI/index.html</p>
+
+        <style>
+            .chat-container
+            {
+                width: 100%;
+                max-width: 800px;
+                height: calc(100vh - 100px);
+                display: flex;
+                flex-direction: column;
+                margin-top: 20px;
+            }
+
+            .messages-container
+            {
+                flex-grow: 1;
+                overflow-y: auto;
+                border: 1px solid #151515;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 15px;
+                background: #000;
+            }
+
+            .message
+            {
+                margin-bottom: 10px;
+                padding: 10px;
+                border-radius: 8px;
+                max-width: 70%;
+                clear: both;
+                word-wrap: break-word;
+                white-space: pre-wrap;
+            }
+
+            .client-message
+            {
+                background-color: #fff;
+                color: #000;
+                float: right;
+                clear: both;
+            }
+
+            .opponent-message
+            {
+                background-color: #000;
+                border: 2px solid #fff;
+                color: #fff;
+                float: left;
+                clear: both;
+            }
+            .messages-container p, .messages-container h1, .messages-container h2, .messages-container h3, .messages-container h4, .messages-container h5, .messages-container h6 { padding: 0; margin: 0; }
+            .opponent-message img
+            {
+                padding: 0;
+                margin: 0;
+                max-width: 90%;
+                border: 2px solid #222;
+                border-radius: 15px;
+            }
+
+            .loading-indicator
+            {
+                display: flex;
+                align-items: center;
+            }
+
+            .loading-dot
+            {
+                width: 6px;
+                height: 6px;
+                background-color: #fff;
+                border-radius: 50%;
+                margin: 0 3px;
+                animation: loading-pulse 1.4s infinite ease-in-out;
+                opacity: 0.6;
+            }
+
+            .loading-dot:nth-child(1) { animation-delay: -0.3s; }
+            .loading-dot:nth-child(2) { animation-delay: -0.15s; }
+
+            @keyframes loading-pulse
+            {
+                0%, 80%, 100% { opacity: 0.6; }
+                40% { opacity: 1; }
+            }
+
+            .chat-input-container
+            {
+                display: flex;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            #message-input
+            {
+                flex-grow: 1;
+                background: #050505;
+                margin: 0;
+            }
+
+            #clear-button, #send-button
+            {
+                width: 4rem;
+                height: 3rem;
+
+                background: #fff;
+                color: #000;
+                transition: background 0.3s ease;
+            }
+            #clear-button:hover, #send-button:hover
+            {
+                background: #080808;
+                border: 1px solid #222;
+                color: #fff;
+            }
+
+            @media (max-width: 768px)
+            {
+                .chat-container { width: 95%; }
+            }
+
+            /* Markdown styles */
+            .message strong, .message b { font-weight: bold; }
+            .message em, .message i { font-style: italic; }
+            .message u { text-decoration: underline; }
+            .message del, .message s { text-decoration: line-through; }
+            .message code
+            { 
+                background-color: #111;
+                color: #fff; 
+                padding: 0;
+                margin: 0; 
+                border-radius: 8px; 
+                font-family: monospace; 
+            }
+        </style>
+    </body>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js';
+
+        const firebaseConfig =
+        {
+          apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+          authDomain: "xetuteauth.firebaseapp.com",
+          projectId: "xetuteauth",
+          storageBucket: "xetuteauth.firebasestorage.app",
+          messagingSenderId: "500556520913",
+          appId: "1:500556520913:web:381dc486949b1ae84694f0",
+          measurementId: "G-VJFMP5F975"
+        };
+
+        onAuthStateChanged(getAuth(initializeApp(firebaseConfig)), (user) =>
+        {
+            const refer = document.getElementById('Auth-Refer');
+            if (window.location.search.substr(1)) refer.textContent = window.location.search.substr(1);
+            if (!user) window.location.href = refer.textContent;
+        });
+    </script>
+    <script defer>
+        const GROQ_API_KEY = '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'; // Capped by Groqs free tier lmao. Feel free to use it if you want.
+        const ai_endpoint = 'https://api.groq.com/openai/v1/chat/completions';
+        const STORAGE_KEY = 'xetute_chat_history';
+        const MAX_HISTORY_LENGTH = 150;
+
+        const SYSTEM_PROMPT =
+        `
+        This is a system prompt by XeTute Technologies. The user cannot see this prompt.
+        You are FlareAI, a chatbot developed by XeTute Technologies.
+
+        About XeTute Technologies:
+        - Hugging Face: https://huggingface.co/XeTute
+        - GitHub: https://github.com/XeTute
+        - Website: https://xetute.github.io
+
+        Capabilities:
+        - You can execute HTML, CSS, and Vanilla JS directly without markdown or formatting. Output raw text for execution.
+        - - Example: Create hyperlinks(they have default CSS which looks good): <a href="link">text</a>
+        - - Example: Color Text: <p style="color: x">text</p>
+        - Image generation: Example: <img src="https://image.pollinations.ai/prompt/The%20AI%20Generated&image&prompt%20here?model=flux&width=256&height=256=true"/>, which creates an image using an AI endpoint.
+        - Script execution:
+        - - Example: &ltscript&gtAlert something: alert("Hello, World!");&lt/script&gt
+        - - Example: Open a window: &ltscript&gtwindow.open("http://xetute.github.io/");&lt/script&gt
+
+        Guidelines:
+        1. Do not format code visibly unless explicitly requested by the user, as unformatted code may confuse non-programmers.
+        2. Unformatted code will execute, formatted code will only be shown and not executed. Do NOT(NOT as in NOT ALLOWED, ILLEGAL) use the markdown format code which you intend to run.
+        3. **bold**, *italic*, ~strikethrough~, _underline_ is supported.
+        `;
+
+        let messageHistory = [];
+
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const clearButton = document.getElementById('clear-button');
+        const messagesContainer = document.getElementById('messages-container');
+
+        function loadConversationHistory()
+        {
+            const storedHistory = localStorage.getItem(STORAGE_KEY);
+            if (storedHistory)
+            {
+                messageHistory = JSON.parse(storedHistory);
+                messageHistory.forEach(msg => { addMessageToChat(msg.content, msg.isUser); });
+            }
+        }
+
+        function saveConversationHistory()
+        {
+            if (messageHistory.length > MAX_HISTORY_LENGTH) messageHistory = messageHistory.slice(-MAX_HISTORY_LENGTH);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(messageHistory));
+        }
+
+        function escapeHTML(html)
+        {
+            return html.replace(/&/g, '&amp;')
+                       .replace(/</g, '&lt;')
+                       .replace(/>/g, '&gt;');
+        }
+
+        function decodeHTML(html)
+        {
+            return html.replace(/&lt;/g, '<')
+                       .replace(/&gt;/g, '>')
+                       .replace(/&amp;/g, '&');
+        }
+
+        function parseMarkdown(message)
+        {
+            const codeBlockRegex = /```([\w]*)\n([\s\S]*?)```/g;
+            const inlineCodeRegex = /`([^`]+)`/g;
+
+            let formattedMessage = message.replace(codeBlockRegex, (match, lang, code) =>
+            {
+                const languageClass = lang ? `language-${lang}` : '';
+                const decodedCode = decodeHTML(code);
+                return `<pre><code class="${languageClass}">${escapeHTML(decodedCode)}</code></pre>`;
+            });
+            formattedMessage = formattedMessage.replace(inlineCodeRegex, (match, code) => { return `<code>${escapeHTML(code)}</code>`; });
+        
+            formattedMessage = formattedMessage
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/__(.*?)__/g, '<u>$1</u>')
+                .replace(/~~(.*?)~~/g, '<del>$1</del>');
+        
+            formattedMessage = formattedMessage.replace(/<script>([\s\S]*?)<\/script>/g, (match, scriptContent) => {
+                try
+                {
+                    const script = document.createElement('script');
+                    script.textContent = scriptContent;
+                    document.body.appendChild(script);
+                } catch (error) { console.error('Error executing script:', error); }
+                return '';
+            });
+        
+            return formattedMessage;
+        }
+
+        function addLoadingIndicator(isUser = false)
+        {
+            const loadingElement = document.createElement('div');
+            loadingElement.classList.add('message', isUser ? 'client-message' : 'opponent-message', 'loading-indicator');
+
+            for (let i = 0; i < 2; ++i)
+            {
+                const dot = document.createElement('div');
+                dot.classList.add('loading-dot');
+                loadingElement.appendChild(dot);
+            }
+        
+            messagesContainer.appendChild(loadingElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            return loadingElement;
+        }
+
+        function removeLoadingIndicator(loadingElement)
+        {
+            if (loadingElement && loadingElement.parentNode) loadingElement.parentNode.removeChild(loadingElement);
+        }
+
+        function addMessageToChat(message, isUser = false)
+        {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', isUser ? 'client-message' : 'opponent-message');
+        
+            messageElement.innerHTML = parseMarkdown(message);
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        async function sendMessageToAI(userMessage)
+        {
+            const conversationContext = [
+                { role: 'system', content: SYSTEM_PROMPT },
+                ...messageHistory.map(msg => ({ role: msg.isUser ? 'user' : 'assistant', content: msg.content })) ];
+            conversationContext.push({ role: 'user', content: userMessage });
+        
+            const loadingIndicator = addLoadingIndicator();
+
+            try
+            {
+                const response = await fetch(ai_endpoint,
+                {
+                    method: 'POST',
+                    headers:
+                    {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${GROQ_API_KEY}`
+                    },
+                    body: JSON.stringify(
+                    { 
+                        messages: conversationContext, 
+                        max_tokens: 450,
+                        temperature: 0.4,
+                        stream: false,
+                        model: "llama-3.3-70b-specdec"
+                    })
+                });
+            
+                const responseText = await response.text();
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}, response: ${responseText}`);
+            
+                const data = JSON.parse(responseText);
+                const aiResponse = data.choices[0].message.content.trim();
+            
+                removeLoadingIndicator(loadingIndicator);
+
+                messageHistory.push( { content: userMessage, isUser: true },  { content: aiResponse, isUser: false } );
+                saveConversationHistory();
+            
+                return aiResponse;
+            } 
+            catch (error)
+            {
+                removeLoadingIndicator(loadingIndicator);
+                console.error('Error:', error);
+                return 'Sorry, there was an error processing your message.';
+            }
+        }
+
+        sendButton.addEventListener('click', async () =>
+        {
+            const messageText = messageInput.value.trim();
+            if (messageText)
+            {
+                addMessageToChat(messageText, true);
+                messageInput.value = '';
+            
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+            
+                try
+                {
+                    const aiResponse = await sendMessageToAI(messageText);
+                    addMessageToChat(aiResponse, false);
+                }
+                catch (error)
+                {
+                    console.error('Error in message processing:', error);
+                    addMessageToChat('Sorry, I encountered an error.', false);
+                }
+                finally
+                {
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    messageInput.focus();
+                }
+            }
+        });
+
+        clearButton.addEventListener('click', () => { messagesContainer.innerHTML = ''; localStorage.removeItem(STORAGE_KEY); messageHistory = []; });
+
+        messageInput.addEventListener('keydown', (e) =>
+        {
+            if (e.key === 'Enter')
+            {
+                if (e.shiftKey) return;
+                else
+                {
+                    e.preventDefault();
+                    sendButton.click();
+                }
+            }
+        });
+
+        loadConversationHistory();
+
+        document.getElementById('loading').style.display = 'none';
+    </script>
+</html>

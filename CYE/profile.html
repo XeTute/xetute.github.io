@@ -45,6 +45,16 @@
         </style>
     </head>
     <body>
+        <div class="loading" id="loading">
+            <div class="loading-text">
+                <span class="loading-text-words">X</span>
+                <span class="loading-text-words">E</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">U</span>
+                <span class="loading-text-words">T</span>
+                <span class="loading-text-words">E</span>
+            </div>
+        </div>
         <header>
             <div>
                 <h1 style="margin: 0;">CYE</h1>
@@ -60,9 +70,9 @@
         <h1>Hello, Friend.</h1>
         <p style="width: 500px; max-width: 50%;">
             This page won't be built anytime soon. Our local servers are not working, and they won't be working anytime soon. Any post which will be uploaded 
-            till our local servers work again will only be posted anonymously, and they will be deleted when our server do work again. Therefore, the liking s
-            ystem may not be fully accurate. We expect them to be online starting from 2027 or maybe even 2026. The current infrastructure is hosted on Google
-             Firebase.
+            till our local servers work again will only be posted anonymously, and they will be deleted when our server do work again. Therefore, the liking 
+            system may not be fully accurate. We expect them to be online starting from 2027 or maybe even 2026. The current infrastructure is hosted on Google
+            Firebase.
         </p>
     </body>
     <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
@@ -86,5 +96,7 @@
         {
             if (!user) window.location.href = '../auth.html?CYE/feed.html';
         });
+
+        document.getElementById('loading').style.display = 'none';
     </script>
 </html>
