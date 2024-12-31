@@ -4,13 +4,15 @@
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, FlareAI, AI, Hello Friend"/>
-        <meta name="description" content="Follow your Curiosity — Lead Humanity forward"/>
+        <meta name="description" content="Follow your Curiosity — Lead Humanity Forward"/>
 
         <title>Hello, Friend \\ XeTute Technologies</title>
 
         <link rel="stylesheet" href="basic.css"/>
         <link rel="icon" href="logo.jpg"/>
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+        <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
     </head>
     <style>
         .section
@@ -22,6 +24,23 @@
             align-items: center;
         }
         .margin { margin: 20px; }
+
+        .scrollDown
+        {
+            border-radius: 25px;
+            font-size: 40px;
+
+            width: 50px;
+            height: 50px;
+
+            position: absolute;
+            bottom: 10px;
+
+            padding: 20px;
+
+            transition: 0.2s ease-in-out;
+        }
+        .scrollDown:hover { background: rgba(127, 127, 127, 0.75); }
 
         @media (max-width: 412px)
         {
@@ -40,8 +59,9 @@
             <h1 style="font-size: 5rem; margin-top: 2rem;">Hello, Friend.</h1>
             <p style="font-size: 1.25rem;">
                 Follow your Curiosity<br>
-                Lead Humanity forward
+                Lead Humanity Forward
             </p>
+            <a class="sb scrollDown" onclick="document.getElementById('links').scrollIntoView({ behavior: 'smooth' });"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
         </div>
 
         <!--LINKS-->
@@ -59,9 +79,8 @@
                 <a class="sb" href="https://huggingface.co/XeTute"><span>HuggingFace</span></a>
             </div>
         </div>
-
-        <!--FOOTER-LIKE-THINGY-->
-
-
     </body>
+    <script>
+
+    </script>
 </html>
