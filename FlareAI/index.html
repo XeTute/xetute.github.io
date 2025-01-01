@@ -192,7 +192,6 @@
             }
         }
 
-        let _data;
         function addChunk()
         {
             const chunk = document.getElementById('newChunk').value;
@@ -249,15 +248,14 @@
             (
                 data => 
                 {
-                    _data = data;
                     document.getElementById('aiw').outerHTML = '';
                     storyUI.innerHTML += 
                     `
                     <div class="card">
                         <em>${data.choices[0].message.content}</em>
                     </div>
-                    <div class="card" id="addChunk">
-                        <textarea placeholder="Add a bit to the story..." class="si ifc"></textarea>
+                    <div class="card">
+                        <textarea placeholder="Add a bit to the story..." class="si ifc" id="addChunk"></textarea>
                         <button onclick="addChunk()" class="sb">Add</button>
                     </div>
                     `;
