@@ -14,16 +14,16 @@ body, html
 
     background: url('wallpaper.jpg') no-repeat center center fixed;
     background-size: cover;
-    filter: brightness(90%);
+    filter: brightness(75%);
     color: #fff;
     font-family: 'PT Sans';
 
-    transition: 0.3s ease-in-out;
+    transition: 0.4s ease-in-out;
 
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
-body:hover, html:hover { filter: brightness(100%); }
+body:hover, body:focus, html:hover, html:focus { filter: brightness(100%); }
 
 h1, h2, h3, h4, h5, h6, p, a, button, em { padding: 0; margin: 0; } 
 p, a, button, em { font-size: 17px; }
