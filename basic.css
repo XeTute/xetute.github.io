@@ -1,3 +1,8 @@
+:root
+{
+    --material-theme: #000;
+}
+
 body, html
 {
     width: 100%;
@@ -12,8 +17,7 @@ body, html
     align-items: center;
     text-align: center;
 
-    background: url('wallpaper.jpg') no-repeat center center fixed;
-    background-size: cover;
+    background: #000;
     filter: brightness(75%);
     color: #fff;
     font-family: 'PT Sans';
@@ -25,6 +29,28 @@ body, html
 }
 body:hover, body:focus, html:hover, html:focus { filter: brightness(100%); }
 
+/* Wallpaper */
+@media screen and (orientation:portrait)
+{
+    body, html
+    {
+        background: url('wallpaper/mobile.jpeg') no-repeat center center fixed;
+        background-size: cover;
+    }
+    :root { --material-theme: #90caf9; }
+}
+
+@media screen and (orientation:landscape)
+{
+    body, html
+    {
+        background: url('wallpaper/desktop.jpeg') no-repeat center center fixed;
+        background-size: cover;
+    }
+    :root { --material-theme: #1a237e; }
+}
+
+/* Text */
 h1, h2, h3, h4, h5, h6, p, a, button, em { padding: 0; margin: 0; } 
 p, a, button, em { font-size: 17px; }
 div { display: flex; flex-direction: column; }

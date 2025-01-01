@@ -38,16 +38,16 @@
 
             padding: 20px;
 
-            transition: 0.2s ease-in-out;
+            transition: 0.3s ease-in-out;
         }
-        .scrollDown:hover, .scrollDown:focus { background: rgba(170, 127, 170, 0.8); }
+        .scrollDown:hover, .scrollDown:focus { background: var(--material-theme); }
 
-        @media (max-width: 412px)
+        @media screen and (orientation:portrait)
         {
             #links { flex-direction: column; }
             #linksline { width: 60%; height: 3px; }
         }
-        @media (min-width: 413px)
+        @media screen and (orientation:landscape)
         {
             #links { flex-direction: row; }
             #linksline { width: 3px; height: 60%; }
