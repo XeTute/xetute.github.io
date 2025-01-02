@@ -194,13 +194,20 @@
             }
         }
 
+        function scrollToRight()
+        {
+            storyUI.innerHTML += "<p style='font-size: 0;' id='slider'>.</p>";
+            document.getElementById('slider').scrollIntoView({ behavior: "smooth" });
+            document.getElementById('slider').outerHTML = '';
+        }
+
         function addChunk()
         {
             const chunk = document.getElementById('newChunk').value;
             story.push(chunk);
 
-            try { document.getElementById('firstCard').outerHTML = ''; }
-            catch { document.getElementById('addChunk').outerHTML = ''; }
+            try { document.getElementById('addChunk').outerHTML = ''; }
+            catch { document.getElementById('firstCard').outerHTML = ''; }
 
             storyUI.innerHTML += 
             `
@@ -220,6 +227,7 @@
             --- PERSONA END ---
             Another thing worth noting is that you are not allowed to write as user(${setting.name}). You are only allowed to react to the user's actions by describing the actions of other people in the story or describing the enviroment. Have fun!
             `;
+            
             let context = [ { role: 'system', content: sys } ];
             for (let i = 0; i < story.length; ++i)
             {
@@ -234,12 +242,12 @@
                     headers:
                     {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer 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`
+                        'Authorization': `Bearer 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`
                     },
                     body: JSON.stringify
                     (
                         {
-                          "model": "llama-3.1-8b-instant",
+                          "model": "llama-3.3-70b-versatile",
                           "messages": context
                         }
                     )
@@ -260,9 +268,25 @@
                     `;
                     story.push(data.choices[0].message.content);
                     localStorage.setItem('story', JSON.stringify(story));
+
+                    scrollToRight();
                 }
             )
-            .catch(error => console.error('Error:', error));
+            .catch
+            (
+                error => 
+                {
+                    document.getElementById('alw').outHTML = '';
+                    storyUI.innerHTML +=
+                    `
+                    <div class="card">
+                        <em style="color:rgb(250, 150, 200);">Failed to process =(</em>
+                    </div>
+                    `;
+
+                    scrollToRight();
+                }
+            );
         }
 
         function sharePage()

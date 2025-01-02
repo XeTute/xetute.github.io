@@ -34,20 +34,20 @@ body:hover, body:focus, html:hover, html:focus { filter: brightness(100%); }
 {
     body, html
     {
-        background: url('wallpaper/mobile.jpeg') no-repeat center center fixed;
+        background: url('wallpaper/0.jpeg') no-repeat center center fixed;
         background-size: cover;
     }
-    :root { --material-theme: #90caf9; }
+    :root { --material-theme: #888; }
 }
 
 @media screen and (orientation:landscape)
 {
     body, html
     {
-        background: url('wallpaper/desktop.jpeg') no-repeat center center fixed;
+        background: url('wallpaper/1.jpeg') no-repeat center center fixed;
         background-size: cover;
     }
-    :root { --material-theme: #1a237e; }
+    :root { --material-theme: #757575; }
 }
 
 /* Text */
@@ -95,6 +95,7 @@ div { display: flex; flex-direction: column; }
 /* Styled input */
 .si
 {
+    font-family: 'PT Sans';
     text-align: center;
     text-decoration: none;
     color: #fff;
