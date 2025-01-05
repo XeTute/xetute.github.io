@@ -46,11 +46,37 @@
         {
             #links { flex-direction: column; }
             #linksline { width: 60%; height: 3px; }
+
+            .cards
+            {
+                display: flex;
+                flex-direction: column;
+
+                justify-content: flex-start;
+                align-items: center;
+
+                justify-self: center;
+                align-items: center;
+
+                overflow-y: auto;
+            }
         }
         @media screen and (orientation:landscape)
         {
             #links { flex-direction: row; }
             #linksline { width: 3px; height: 60%; }
+
+            .cards
+            {
+                max-height: 60vh;
+                max-width: 95%;
+
+                display: grid;
+                grid-template-columns: auto auto;
+                grid-template-rows: auto auto;
+
+                gap: 20px;
+            }
         }
     </style>
     <body>
@@ -65,23 +91,65 @@
         </div>
 
         <!-- LINKS -->
-        <div class="section" style="height: 65vh;" id="links">
-            <div class="margin" style="width: 100%; overflow: hidden;">
+        <div class="section" style="justify-content: flex-start;" id="links">
+            <!-- APPS -->
+            <div class="margin">
                 <h1 style="margin-bottom: 10px;">Our Apps</h1>
-                <div class="card">
-                    <h2>FlareAI</h2>
-                    <p>FlareAI is a "game" where you can explore a personalized story written by you and an AI model on the fly.</p>
-                    <a class="sb" href="FlareAI/"><span>Visit Playground</span></a>
+                <div class="cards">
+                    <div class="card">
+                        <h2>FlareAI</h2>
+                        <p>FlareAI is a "game" where you can explore a personalized story written by you and an AI model on the fly.</p>
+                        <a class="sb" href="FlareAI/"><span>Visit Playground</span></a>
+                    </div>
+    
+                    <div class="card">
+                        <h2>Authentication</h2>
+                        <p>Our Authentication Services allow you to create an account, which can be used to access pages which require an account.</p>
+                        <a class="sb" href="auth/?../" id="auth-href"><span>Authenticate</span></a>
+                    </div>
+
+                    <!--<div class="card">
+                        <h2>AsiaHub</h2>
+                        <p>Currently in development, AsiaHub is a Social Media Platform(SMP) for developers, academics, founders, innovators, et cetera.</p>
+                        <a class="sb" href="AsiaHub/" id="AsiaHub-href"><span>Request Membership</span></a>
+                    </div> -->
                 </div>
             </div>
             <div class="line" id="linksline"></div>
-            <div class="margin" style="width: 100%; overflow: hidden;">
+            <!-- SOCIALS -->
+            <div class="margin" style="width: 40%; align-items: center;">
                 <h1 style="margin-bottom: 10px;">Our Socials</h1>
-                <a class="sb" href="https://www.youtube.com/@XeTuteTechnologies"><span>YouTube</span></a>
-                <a class="sb" href="https://bsky.app/profile/xetute.bsky.social"><span>Bluesky</span></a>
-                <a class="sb" href="https://github.com/XeTute"><span>GitHub</span></a>
-                <a class="sb" href="https://huggingface.co/XeTute"><span>HuggingFace</span></a>
+
+                <div class="card"><a class="sb" href="https://www.youtube.com/@XeTuteTechnologies"><span>YouTube    </span></a></div>
+                <div class="card"><a class="sb" href="https://bsky.app/profile/xetute.bsky.social"><span>Bluesky    </span></a></div>
+                <div class="card"><a class="sb" href="https://github.com/XeTute">                  <span>GitHub     </span></a></div>
+                <div class="card"><a class="sb" href="https://huggingface.co/XeTute">              <span>HuggingFace</span></a></div>
+                <div class="card"><a class="sb" href="https://ko-fi.com/XeTute">                   <span>Ko-Fi      </span></a></div>
             </div>
         </div>
     </body>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script defer>
+        const firebaseApp = firebase.initializeApp
+        ({
+            apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+            authDomain: "xetuteauth.firebaseapp.com",
+            projectId: "xetuteauth",
+            storageBucket: "xetuteauth.firebasestorage.app",
+            messagingSenderId: "500556520913",
+            appId: "1:500556520913:web:381dc486949b1ae84694f0",
+            measurementId: "G-VJFMP5F975"
+        });
+        const db = firebaseApp.firestore();
+        const auth = firebaseApp.auth();
+
+        auth.onAuthStateChanged((user) =>
+        {
+            const t = document.getElementById('auth-href'); // tag
+            t.href = 'javascript: void(0);';
+            t.textContent = 'Authenticated';
+        });
+    </script>
 </html>

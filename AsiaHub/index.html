@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, AsiaHub, Asia, Media, Social, Social Media, Platform"/>
+        <meta name="description" content="Follow your Curiosity — Lead Humanity Forward"/>
+
+        <title>AsiaHub \\ XeTute Technologies</title>
+
+        <link rel="stylesheet" href="../basic.css"/>
+        <link rel="icon" href="../logo.jpg"/>
+        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+        <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
+    </head>
+    <style>
+
+    </style>
+    <body>
+
+    </body>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script defer>
+        const firebaseApp = firebase.initializeApp
+        ({
+            apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+            authDomain: "xetuteauth.firebaseapp.com",
+            projectId: "xetuteauth",
+            storageBucket: "xetuteauth.firebasestorage.app",
+            messagingSenderId: "500556520913",
+            appId: "1:500556520913:web:381dc486949b1ae84694f0",
+            measurementId: "G-VJFMP5F975"
+        });
+        const db = firebaseApp.firestore();
+        const auth = firebaseApp.auth();
+
+        auth.onAuthStateChanged((user) =>
+        {
+            console.log('Authenticated');
+        });
+    </script>
+</html>

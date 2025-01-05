@@ -9,32 +9,12 @@
         <title>FlareAI \\ XeTute Technologies</title>
 
         <link rel="stylesheet" href="../basic.css"/>
-        <link rel="icon" href="../logo.jpg"/>
+        <link rel="icon" href="logo.jpg"/>
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
         <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
     </head>
     <style>
-        .shareBtn
-        {
-            border: 2px solid #fff;
-            border-radius: 8px;
-
-            position: absolute;
-            left: 8px;
-            bottom: 8px;
-
-            padding: 6px;
-            margin: 0;
-
-            color: #fff;
-            background: transparent;
-
-            transition: 0.3s ease-in-out;
-            flex-direction: row;
-        }
-        .shareBtn:hover, .shareBtn:focus { border-radius: 50%; }
-
         .storyContainer
         {
             overflow-x: auto;
@@ -74,6 +54,17 @@
             font-size: 18px;
             font-weight: 100;
         }
+
+        .links
+        {
+            display: flex;
+            flex-direction: row;
+
+            position: absolute;
+            bottom: 8px;
+
+            max-height: 50px;
+        }
     </style>
     <body style="overflow: hidden;">
         <h1 style="margin-top: 20px; font-weight: 200;" id="welcomeTxt">Welcome, Anonymous.</h1>
@@ -97,8 +88,11 @@
             <button onclick="localStorage.removeItem('story'); window.location.href = '';" class="sb">Clear Story</button>
         </div>
 
-        <button onclick="sharePage()" class="shareBtn"><i class="fa fa-share" aria-hidden="true"></i></button>
-        <button onclick="displaySettings()" class="sb" id="settingsBtn"><span>Personalize</span></button>
+        <div class="links">
+            <a href="../index.html" class="sb"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
+            <button onclick="sharePage()" class="sb"><i class="fa fa-share" aria-hidden="true"></i></button>
+            <button onclick="displaySettings()" class="sb" id="settingsBtn"><span>Personalize</span></button>
+        </div>
     </body>
     <script defer>
         const storyUI = document.getElementById('storyContainer');
@@ -224,7 +218,7 @@
                     headers:
                     {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer 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`
+                        'Authorization': `Bearer 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`
                     },
                     body: JSON.stringify
                     (

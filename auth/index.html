@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, AI, Auth, Authentication"/>
+        <meta name="description" content="Follow your Curiosity — Lead Humanity Forward"/>
+
+        <title>Authentication \\ XeTute Technologies</title>
+
+        <link rel="stylesheet" href="../basic.css"/>
+        <link rel="icon" href="../logo.jpg"/>
+        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    </head>
+    <style>
+        .si, .sn { font-size: 18px; } 
+        h2 { font-weight: 200; }
+
+        .header
+        {
+            display: flex;
+            flex-direction: row;
+
+            width: 25%;
+            justify-content: center;
+            align-items: center;
+
+            position: absolute;
+            top: 10px;
+        }
+        .header > img
+        {
+            max-width: 48px;
+            max-height: 48px;
+
+            border-radius: 50%;
+            margin: 10px;
+        }
+
+        #form-signin, #form-signup
+        {
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+            align-items: center;
+
+            justify-self: center;
+            align-self: center;
+        }
+        #form-signup { display: none; }
+
+        .inp { width: 80%; max-width: 50px; }
+    </style>
+    <body>
+        <a class="header card sb" href="../index.html">
+            <img src="../logo.jpg"/>
+            <p style="margin: 0;">XeTute Technologies</p>
+        </a>
+
+        <div style="display: flex; flex-direction: column; width: 100%; height: 100vh; justify-content: center; align-items: center;">
+            <div id="form-signin" class="card">
+                <h2>Sign-In</h2>
+    
+                <div class="inp">
+                    <input class="si" placeholder="E-Mail"   type="email"    id="signin-email"/>
+                    <input class="si" placeholder="Password" type="password" id="signin-password"/>
+                    <strong class="sb" style="color: rgb(255, 150, 150);" id="signin-error"></strong>
+                </div>
+                
+                <button onclick="signIn()" class="sb">Sign In</button>
+            </div>
+    
+            <div id="form-signup" class="card">
+                <h2>Sign-Up</h2>
+    
+                <div class="inp">
+                    <input class="si" placeholder="E-Mail"           type="email"    id="signup-email"/>
+                    <input class="si" placeholder="Password"         type="password" id="signup-password0"/>
+                    <input class="si" placeholder="Confrm. Password" type="password" id="signup-password1"/>
+                    <strong class="sb" style="color: rgb(255, 150, 150);" id="signup-error"></strong>
+                </div>
+                
+                <button onclick="signUp()" class="sb">Sign Up</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <em>or</em>
+            <button class="sb" id="cfBtn" onclick="changeForm()"><span>Create an Account</span></button>
+        </div>
+    </body>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script defer>
+        const firebaseApp = firebase.initializeApp
+        ({
+            apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
+            authDomain: "xetuteauth.firebaseapp.com",
+            projectId: "xetuteauth",
+            storageBucket: "xetuteauth.firebasestorage.app",
+            messagingSenderId: "500556520913",
+            appId: "1:500556520913:web:381dc486949b1ae84694f0",
+            measurementId: "G-VJFMP5F975"
+        });
+        const db = firebaseApp.firestore();
+        const auth = firebaseApp.auth();
+
+        auth.onAuthStateChanged((user) => { window.location.href = window.location.search.substr(1); })
+
+        const fsi = document.getElementById('form-signin'); // form sign in
+        const fsu = document.getElementById('form-signup'); // form sign up
+        const fcb = document.getElementById('cfBtn'); // form change button
+
+        const sie = document.getElementById('signin-email');
+        const sip = document.getElementById('signin-password');
+        const sue = document.getElementById('signup-email');
+        const sup = [ document.getElementById('signup-password0'), document.getElementById('signup-password1') ];
+
+        async function signIn()
+        {
+            firebase.auth().signInWithEmailAndPassword(sie.value, sip.value)
+            .then((cred) => { window.location.href = window.location.search.substr(1); })
+            .catch((e) => { document.getElementById('signin-error').textContent = e.code; })
+        }
+
+        async function signUp()
+        {
+            if (sup[0].value !== sup[1].value)
+            {
+                document.getElementById('signup-error').textContent = 'Passwords don\'t match';
+                return;
+            }
+
+            firebase.auth().createUserWithEmailAndPassword(sue.value, sup[0].value)
+            .then((cred) => { window.location.href = window.location.search.substr(1); })
+            .catch((e) => { document.getElementById('signup-error').textContent = e.code; })
+        }
+
+        function changeForm()
+        {
+            if (!fsi.style.display) fsi.style.display = 'flex';
+            if (fsi.style.display === 'flex')
+            {
+                fsi.style.display = 'none';
+                fsu.style.display = 'flex';
+                fcb.innerHTML = '<span>I already have an Account</span>';
+            }
+            else
+            {
+                fsi.style.display = 'flex';
+                fsu.style.display = 'none';
+                fcb.innerHTML = '<span>Create an Account</span>';
+            }
+        }
+    </script>
+</html>
