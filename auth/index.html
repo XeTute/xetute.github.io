@@ -107,7 +107,7 @@
         const db = firebaseApp.firestore();
         const auth = firebaseApp.auth();
 
-        auth.onAuthStateChanged((user) => { window.location.href = window.location.search.substr(1); })
+        auth.onAuthStateChanged((user) => { if (user) { window.location.href = window.location.search.substr(1); } })
 
         const fsi = document.getElementById('form-signin'); // form sign in
         const fsu = document.getElementById('form-signup'); // form sign up
