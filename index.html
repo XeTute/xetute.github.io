@@ -147,9 +147,12 @@
 
         auth.onAuthStateChanged((user) =>
         {
-            const t = document.getElementById('auth-href'); // tag
-            t.href = 'javascript: void(0);';
-            t.textContent = 'Authenticated';
+            if (user)
+            {
+                const t = document.getElementById('auth-href'); // tag
+                t.href = 'javascript: void(0);';
+                t.textContent = 'Authenticated';
+            }
         });
     </script>
 </html>
