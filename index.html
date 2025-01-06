@@ -18,8 +18,11 @@
     <style>
         .section
         {
+            margin-top: 110vh;
+
             width: 100%;
             min-height: 100vh;
+            max-height: 101vh;
 
             justify-content: center;
             align-items: center;
@@ -31,17 +34,28 @@
             border-radius: 25px;
             font-size: 40px;
 
-            width: 50px;
-            height: 50px;
+            min-width: 50px;
+            min-height: 50px;
 
-            position: absolute;
-            bottom: 10px;
+            max-width: 51px;
+            max-height: 51px;
 
             padding: 20px;
 
             transition: 0.3s ease-in-out;
         }
         .scrollDown:hover, .scrollDown:focus { background: var(--material-theme); }
+
+        .EVA-vid
+        {
+            margin: 20px;
+            border-radius: 25px;
+            align-self: center;
+
+            box-shadow:         0px 0px 25px 8px rgba(127, 127, 127, 0.4);
+            -webkit-box-shadow: 0px 0px 25px 8px rgba(127, 127, 127, 0.4);
+            -moz-box-shadow:    0px 0px 25px 8px rgba(127, 127, 127, 0.4);
+        }
 
         @media screen and (orientation:portrait)
         {
@@ -61,6 +75,9 @@
 
                 overflow-y: auto;
             }
+
+            .textblock { max-width: 80%; }
+            .EVA-vid { max-width: 95vw; }
         }
         @media screen and (orientation:landscape)
         {
@@ -78,17 +95,20 @@
 
                 gap: 20px;
             }
+
+            .textblock { max-width: 50%; }
+            .EVA-vid { max-width: 50%; }
         }
     </style>
     <body id="main" style="display: none;">
         <!-- HEADING -->
-        <div class="section">
-            <h1 style="font-size: 4rem; font-family: 'Orbitron'">HELLO, FRIEND.</h1>
+        <div class="section" style="margin-top: 0;">
+            <h1 style="font-size: 4rem;">HELLO, FRIEND.</h1>
             <p style="font-size: 1.25rem;">
                 Follow your Curiosity<br>
                 Lead Humanity Forward
             </p>
-            <a class="sb scrollDown" onclick="document.getElementById('links').scrollIntoView({ behavior: 'smooth' });"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
+            <a class="sb scrollDown" style="position: absolute; bottom: 10px;" onclick="document.getElementById('links').scrollIntoView({ behavior: 'smooth' });"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
         </div>
 
         <!-- LINKS -->
@@ -108,12 +128,6 @@
                         <p>Our Authentication Services allow you to create an account, which can be used to access pages which require an account.</p>
                         <a class="sb" href="auth/?../" id="auth-href"><span>Authenticate</span></a>
                     </div>
-
-                    <!--<div class="card">
-                        <h2>EnviSphereAsia</h2>
-                        <p>Currently in development, EnviSphereAsia is a Social Media Platform(SMP) for developers, academics, founders, innovators, et cetera.</p>
-                        <a class="sb" href="EnviSphereAsia/" id="EnviSphereAsia-href"><span>Request Membership</span></a>
-                    </div> -->
                 </div>
             </div>
             <div class="line" id="linksline"></div>
@@ -127,6 +141,18 @@
                 <div class="card"><a class="sb" href="https://huggingface.co/XeTute">              <span>HuggingFace</span></a></div>
                 <div class="card"><a class="sb" href="https://ko-fi.com/XeTute">                   <span>Ko-Fi      </span></a></div>
             </div>
+            <a class="sb scrollDown" onclick="document.getElementById('EVA').scrollIntoView({ behavior: 'smooth' });"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
+        </div>
+
+        <div class="section" id="EVA">
+            <div class="margin">
+                <h1>Introducing ESAsia</h1>
+                <video src="https://www.pexels.com/download/video/15668864/?fps=30.0&h=1080&w=1920" alt="decorative video" class="EVA-vid" muted autoplay loop></video>
+                <p class="textblock" style="align-self: center; text-align: justify;">
+                    Envisioning Asia through EnviSphereAsia (ESAsia) by giving Asian Innovators, Academics, Startups, Companies, et cetera an exclusive platform to collaborate.
+                </p>
+            </div>
+            <a class="sb"><span>Currently in Development</span></a>
         </div>
     </body>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
