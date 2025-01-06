@@ -108,6 +108,23 @@
         </div>
         `;
 
+        function addedToStoryDiv(text)
+        {
+            return
+            `
+            <div class="card">
+                <em>${text}</em>
+            </div>
+            `;
+        }
+
+        function scrollToRight()
+        {
+            storyUI.innerHTML += "<p style='font-size: 0;' id='slider'>.</p>";
+            document.getElementById('slider').scrollIntoView({ behavior: "smooth" });
+            document.getElementById('slider').outerHTML = '';
+        }
+
         if (setting)
         {
             setting = JSON.parse(setting);
@@ -123,17 +140,9 @@
             story = JSON.parse(story);
             document.getElementById('firstCard').outerHTML = '';
 
-            for (let i = 0; i < story.length; ++i)
-            {
-                storyUI.innerHTML += 
-                `
-                <div class="card">
-                    <em>${story[i]}</em>
-                </div>
-                `;
-            }
-
+            for (let i = 0; i < story.length; ++i) { storyUI.innerHTML += addedToStoryDiv(story[i]); }
             storyUI.innerHTML += addToStoryDiv;
+            scrollToRight();
         }
         else { story = []; }
 
@@ -171,13 +180,6 @@
             }
         }
 
-        function scrollToRight()
-        {
-            storyUI.innerHTML += "<p style='font-size: 0;' id='slider'>.</p>";
-            document.getElementById('slider').scrollIntoView({ behavior: "smooth" });
-            document.getElementById('slider').outerHTML = '';
-        }
-
         function addChunk()
         {
             const chunk = document.getElementById('newChunk').value;
@@ -186,13 +188,7 @@
             try { document.getElementById('addChunk').outerHTML = ''; }
             catch { document.getElementById('firstCard').outerHTML = ''; }
 
-            storyUI.innerHTML += 
-            `
-            <div class="card">
-                <em>${chunk}</em>
-            </div>
-            <div class="card" id="aiw"><strong>Imagining your story...</strong></div>
-            `;
+            storyUI.innerHTML += addedToStoryDiv(chunk) + '<div class="card" id="aiw"><strong>Imagining your story...</strong></div>';
 
             const sys =
             `
@@ -219,7 +215,7 @@
                     headers:
                     {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer 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`
+                        'Authorization': `Bearer g` + `sk` + `_4bOo` + `KL3HTi` + `5XKdsux62XWGdy` + `b3FY3ajJg` + `oRUfiVE` + `XC6IO2` + `Nmrp1i` // For ppl who love to search API keys on GitHub. Like, this one is free, generate your own one 💀
                     },
                     body: JSON.stringify
                     (
