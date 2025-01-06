@@ -86,7 +86,7 @@
             </div>
             <button onclick="applySettings(); displaySettings();" class="sb">Apply & Close</button>
             <button onclick="displaySettings()" class="sb">Close w/out saving</button>
-            <button onclick="localStorage.removeItem('story'); window.location.href = '';" class="sb">Clear Story</button>
+            <button onclick="localStorage.removeItem('PhantasiaAI-story'); window.location.href = '';" class="sb">Clear Story</button>
         </div>
 
         <div class="links">
@@ -97,8 +97,8 @@
     </body>
     <script defer>
         const storyUI = document.getElementById('storyContainer');
-        let setting = localStorage.getItem('setting');
-        let story = localStorage.getItem('story');
+        let setting = localStorage.getItem('PhantasiaAI-setting');
+        let story = localStorage.getItem('PhantasiaAI-story');
 
         const addToStoryDiv =
         `
@@ -151,7 +151,7 @@
         {
             setting.name = document.getElementById('username').value;
             setting.persona = document.getElementById('persona').value;
-            localStorage.setItem('setting', JSON.stringify(setting));
+            localStorage.setItem('PhantasiaAI-setting', JSON.stringify(setting));
 
             document.getElementById('welcomeTxt').textContent = "Welcome back, " + setting.name + ".";
             document.getElementById('username').value = setting.name;
@@ -242,7 +242,7 @@
                     ${addToStoryDiv}
                     `;
                     story.push(data.choices[0].message.content);
-                    localStorage.setItem('story', JSON.stringify(story));
+                    localStorage.setItem('PhantasiaAI-story', JSON.stringify(story));
 
                     scrollToRight();
                 }
