@@ -267,13 +267,14 @@
 
         function sharePage()
         {
+            const link = window.location.href;
             if (navigator.share)
             {
                 navigator.share
                 ({
                     title: 'PhantasiaAI by XeTute Technologies.',
                     text: 'Visit the PhantasiaAI Playground by XeTute Technologies on ',
-                    url: window.location.href
+                    url: link
                 }).then(() => { console.log('Shared'); }).catch((e) => console.log(e));
             }
             else { navigator.clipboard.writeText(link).then(() => { alert('Copied link to Clipboard.'); }); }
