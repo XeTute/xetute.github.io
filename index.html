@@ -66,7 +66,7 @@
             }
 
             .textblock { max-width: 80%; }
-            .EVA-vid { max-width: 95vw; }
+            .Intra-vid { max-width: 95vw; }
         }
         @media screen and (orientation:landscape)
         {
@@ -86,7 +86,7 @@
             }
 
             .textblock { max-width: 50%; }
-            .EVA-vid { max-width: 50%; }
+            .Intra-vid { max-width: 50%; }
         }
     </style>
     <body id="main" style="display: none;">
@@ -130,24 +130,62 @@
                 <div class="card"><a class="sb" href="https://huggingface.co/XeTute">              <span>HuggingFace</span></a></div>
                 <div class="card"><a class="sb" href="https://ko-fi.com/XeTute">                   <span>Ko-Fi      </span></a></div>
             </div>
-            <a class="sb scrollDown" onclick="document.getElementById('EVA').scrollIntoView({ behavior: 'smooth' });"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
+            <a class="sb scrollDown" onclick="document.getElementById('Intra').scrollIntoView({ behavior: 'smooth' });"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
         </div>
 
-        <div class="section" id="EVA">
+        <div class="section" id="Intra">
             <div class="margin">
-                <h1>Introducing ESAsia</h1>
-                <video src="https://www.pexels.com/download/video/15668864/?fps=30.0&h=1080&w=1920" alt="decorative video" class="EVA-vid box-shadow" style="align-self: center; border-radius: 25px; margin: 20px;" muted autoplay loop></video>
-                <p class="textblock" style="align-self: center; text-align: center;">
-                    Empowering Asia's Innovators, Academics, Startups, Companies, et cetera with an Exclusive Platform for Collaboration and Visionary Growth.
-                </p>
+                <h1>Introducing Intra</h1>
+                <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+                    <h3 id="intra-semi-slogan"></h3>
+                    <h3>, Together.</h3>
+                </div>
+                <video src="Intra.mp4" alt="decorative video" class="Intra-vid box-shadow" style="align-self: center; border-radius: 25px; margin: 20px;" muted autoplay loop></video>
             </div>
-            <a class="sb"><span>Currently in Development</span></a>
+            <a class="sb" href="Intra/"><span>Visit UI-Demo</span></a>
         </div>
     </body>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
     <script defer>
+        // Semi-slogan anim
+        function IntraSemiSlogan(newText, delay = 3000, speed = 100)
+        {
+            return new Promise((resolve) =>
+            {
+                const semislogan = document.getElementById('intra-semi-slogan');
+                if (!semislogan) return resolve();
+            
+                setTimeout(() =>
+                {
+                    const currentText = semislogan.textContent;
+                    const totalFrames = Math.max(currentText.length, newText.length);
+                    let frame = 0;
+                
+                    function updateText()
+                    {
+                        if (frame >= totalFrames) return resolve();
+                        semislogan.textContent = newText.substring(0, frame + 1) + currentText.substring(frame + 1);
+                        ++frame;
+                        setTimeout(updateText, speed);
+                    }
+                
+                    updateText();
+                }, delay);
+            });
+        }
+        async function changeText()
+        {
+            const texts = ['Envision', 'Build', 'Dream', 'Advance'];
+            while (true)
+            {
+                for (const text of texts)
+                    await IntraSemiSlogan(text);
+            }
+        }
+        changeText();
+
         const firebaseApp = firebase.initializeApp
         ({
             apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
