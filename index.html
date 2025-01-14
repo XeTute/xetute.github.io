@@ -12,149 +12,188 @@
         <link rel="icon" href="logo.jpg"/>
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-
         <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
-    </head>
-    <style>
-        .section
-        {
-            margin-top: 110vh;
-
-            width: 100%;
-            min-height: 100vh;
-            max-height: 101vh;
-
-            justify-content: center;
-            align-items: center;
-        }
-        .margin { margin: 20px; }
-
-        .scrollDown
-        {
-            border-radius: 25px;
-            font-size: 40px;
-
-            min-width: 50px;
-            min-height: 50px;
-
-            max-width: 51px;
-            max-height: 51px;
-
-            padding: 20px;
-
-            transition: 0.3s ease-in-out;
-        }
-        .scrollDown:hover, .scrollDown:focus { background: var(--material-theme); }
-
-        @media screen and (orientation:portrait)
-        {
-            #links { flex-direction: column; }
-            #linksline { width: 60%; height: 3px; }
-
-            .cards
+        
+        <style>
+            .section
             {
                 display: flex;
                 flex-direction: column;
-
-                justify-content: flex-start;
+                justify-content: center;
                 align-items: center;
-
-                justify-self: center;
-                align-items: center;
-
-                overflow-y: auto;
+                min-height: 100vh;
+                width: 100%;
+                position: relative;
+                padding: 2rem 0;
             }
 
-            .textblock { max-width: 80%; }
-            .Intra-vid { max-width: 95vw; }
-        }
-        @media screen and (orientation:landscape)
-        {
-            #links { flex-direction: row; }
-            #linksline { width: 3px; height: 60%; }
-
-            .cards
+            .hero-title
             {
-                max-height: 60vh;
-                max-width: 95%;
-
-                display: grid;
-                grid-template-columns: auto auto;
-                grid-template-rows: auto auto;
-
-                gap: 20px;
+                font-size: 4.5rem;
+                margin-bottom: 1rem;
             }
 
-            .textblock { max-width: 50%; }
-            .Intra-vid { max-width: 50%; }
-        }
-    </style>
+            .hero-subtitle
+            {
+                font-size: 1.2rem;
+                line-height: 1.6;
+                margin-bottom: 2rem;
+                max-width: 85%;
+            }
+
+            .social-links
+            {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1rem;
+                width: 90%;
+                max-width: 1000px;
+            }
+            .social-links > .card
+            {
+                width: 10rem;
+                height: 3rem;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .quick-links
+            {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+                width: 90%;
+                max-width: 1200px;
+            }
+            .quick-links > p { max-width: 5rem; }
+
+            .card
+            {
+                min-width: unset;
+                width: auto;
+            }
+
+            .feature-container
+            {
+                background: rgba(255, 255, 255, 0.03);
+                padding: 3rem;
+                border-radius: 25px;
+                max-width: 90%;
+            }
+
+            .scroll-indicator
+            {
+                width: 50px;
+                height: 50px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 25px;
+                transition: .4s;
+                margin-top: 2rem;
+            }
+            .scroll-indicator:hover
+            { 
+                transform: scale(1.1);
+                cursor: pointer;
+            }
+
+            .section-title { margin-bottom: 3rem; }
+
+            @media (max-width: 768px)
+            {
+                .hero-title { font-size: 3.5rem; }
+                .social-links { grid-template-columns: 1fr; }
+            }
+        </style>
+    </head>
     <body id="main" style="display: none;">
-        <!-- HEADING -->
-        <div class="section" style="margin-top: 0;">
-            <h1 style="font-size: 4rem;">HELLO, FRIEND.</h1>
-            <p style="font-size: 1.25rem;">
+        <!-- Hero Section -->
+        <div class="section">
+            <h1 class="hero-title">HELLO, FRIEND.</h1>
+            <p class="hero-subtitle" id="hero-sub">
                 Follow your Curiosity<br>
                 Lead Humanity Forward
             </p>
-            <a class="sb scrollDown" style="position: absolute; bottom: 10px;" onclick="document.getElementById('links').scrollIntoView({ behavior: 'smooth' });"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
+            <a class="sb scroll-indicator" onclick="document.getElementById('social').scrollIntoView({ behavior: 'smooth' });">
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </a>
         </div>
 
-        <!-- LINKS -->
-        <div class="section" style="justify-content: flex-start;" id="links">
-            <!-- APPS -->
-            <div class="margin">
-                <h1 style="margin-bottom: 10px;">Our Apps</h1>
-                <div class="cards">
-                    <div class="card">
-                        <h2>PhantasiaAI</h2>
-                        <p>PhantasiaAI is a game-like WebApp which allows you to direct the way a story goes and utilize AI to make it immersive.</p>
-                        <a class="sb" href="PhantasiaAI/"><span>Visit Playground</span></a>
-                    </div>
-    
-                    <div class="card">
-                        <h2>Authentication</h2>
-                        <p>Our Authentication Services allow you to create an account, which can be used to access pages which require an account.</p>
-                        <a class="sb" href="auth/?../" id="auth-href"><span>Authenticate</span></a>
-                    </div>
+        <!-- Social Links Section -->
+        <div class="section" id="social">
+            <h1 class="section-title">Our Socials</h1>
+            <div class="social-links">
+                <div class="card">
+                    <a href="https://huggingface.co/XeTute" class="sb"><span>HuggingFace</span></a>
+                </div>
+                <div class="card">
+                    <a href="https://github.com/XeTute" class="sb"><span>GitHub</span></a>
+                </div>
+                <div class="card">
+                    <a href="https://bsky.app/XeTute" class="sb"><span>BlueSky</span></a>
+                </div>
+                <div class="card">
+                    <a href="https://youtube.com/@XeTuteTechnologies" class="sb"><span>YouTube</span></a>
+                </div>
+                <div class="card">
+                    <a href="https://https://ko-fi.com/XeTute" class="sb"><span>Ko-Fi</span></a>
+                </div>
+                <div class="card">
+                    <a class="sb">Coming soon</a>
                 </div>
             </div>
-            <div class="line" id="linksline"></div>
-            <!-- SOCIALS -->
-            <div class="margin" style="width: 40%; align-items: center;">
-                <h1 style="margin-bottom: 10px;">Our Socials</h1>
-
-                <div class="card"><a class="sb" href="https://www.youtube.com/@XeTuteTechnologies"><span>YouTube    </span></a></div>
-                <div class="card"><a class="sb" href="https://bsky.app/profile/xetute.bsky.social"><span>Bluesky    </span></a></div>
-                <div class="card"><a class="sb" href="https://github.com/XeTute">                  <span>GitHub     </span></a></div>
-                <div class="card"><a class="sb" href="https://huggingface.co/XeTute">              <span>HuggingFace</span></a></div>
-                <div class="card"><a class="sb" href="https://ko-fi.com/XeTute">                   <span>Ko-Fi      </span></a></div>
-            </div>
-            <a class="sb scrollDown" onclick="document.getElementById('Intra').scrollIntoView({ behavior: 'smooth' });"><i class="fa fa-arrow-down" aria-hidden="true"></i></a>
+            <a class="sb scroll-indicator" onclick="document.getElementById('links').scrollIntoView({ behavior: 'smooth' });">
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </a>
         </div>
 
-        <div class="section" id="Intra">
-            <div class="margin">
-                <h1>Introducing Intra</h1>
-                <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
-                    <h3 id="intra-semi-slogan"></h3>
-                    <h3>, Together.</h3>
+        <!-- Quick Links Section -->
+        <div class="section" id="links">
+            <h1 class="section-title">Our Apps</h1>
+            <div class="quick-links">
+                <div class="card">
+                    <a href="./PhantasiaAI/" class="sb"><span>PhantasiaAI</span></a>
+                    <p>PhantasiaAI is waiting to immerse you in your very own story! It's free, make sure to try it out—You might love it.</p>
                 </div>
-                <video src="Intra.mp4" alt="decorative video" class="Intra-vid box-shadow" style="align-self: center; border-radius: 25px; margin: 20px;" muted autoplay loop></video>
+                <div class="card">
+                    <a href="./auth/?../" class="sb" id="auth-href"><span>Authentication</span></a>
+                    <p>Our Authentication services exclusive to us. Being authenticated allows you to access certain services.</p>
+                </div>
+                <div class="card">
+                    <a href="./Intra" class="sb"><span>Intra</span></a>
+                    <p>Still in development, we aim to make Intra a space to connect with (other) Innovators, Academics, et cetera.</p>
+                </div>
             </div>
-            <a class="sb" href="Intra/"><span>Visit UI-Demo</span></a>
+            <a class="sb scroll-indicator" onclick="document.getElementById('intra').scrollIntoView({ behavior: 'smooth' });">
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <!-- Intra Section -->
+        <div class="section" id="intra">
+            <div class="feature-container box-shadow">
+                <div style="margin-bottom: 2rem;">
+                    <h1 style="margin-bottom: 1.5rem;">Introducing Intra</h1>
+                    <div style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+                        <h3 id="intra-semi-slogan">Embrace Peace</h3>
+                        <h3>, Together.</h3>
+                    </div>
+                </div>
+                <a class="sb" href="Intra/"><span>Visit UI-Demo</span></a>
+            </div>
         </div>
     </body>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
     <script defer>
-        // Semi-slogan anim
-        function IntraSemiSlogan(newText, delay = 3000, speed = 100)
+        // Intra semi-slogan animation
+        function textAnim(elemid, newText, delay = 2000, speed = 50)
         {
             return new Promise((resolve) =>
             {
-                const semislogan = document.getElementById('intra-semi-slogan');
+                const semislogan = document.getElementById(elemid);
                 if (!semislogan) return resolve();
             
                 setTimeout(() =>
@@ -166,7 +205,7 @@
                     function updateText()
                     {
                         if (frame >= totalFrames) return resolve();
-                        semislogan.textContent = newText.substring(0, frame + 1) + currentText.substring(frame + 1);
+                        semislogan.innerHTML = newText.substring(0, frame + 1) + currentText.substring(frame + 1);
                         ++frame;
                         setTimeout(updateText, speed);
                     }
@@ -175,19 +214,20 @@
                 }, delay);
             });
         }
-        async function changeText()
+        
+        async function changeText(texts, elemid)
         {
-            const texts = ['Envision', 'Build', 'Dream', 'Advance'];
             while (true)
             {
                 for (const text of texts)
-                    await IntraSemiSlogan(text);
+                    await textAnim(elemid, text);
             }
         }
-        changeText();
+        changeText(['Envision', 'Build', 'Dream', 'Advance', 'Embrace Peace'], 'intra-semi-slogan');
+        changeText(['Reach the end of the story<br>—in your own way', 'Follow your Curiosity<br>Lead Humanity Forward'], 'hero-sub')
 
-        const firebaseApp = firebase.initializeApp
-        ({
+        const firebaseApp = firebase.initializeApp(
+        {
             apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
             authDomain: "xetuteauth.firebaseapp.com",
             projectId: "xetuteauth",
@@ -199,15 +239,14 @@
         const db = firebaseApp.firestore();
         const auth = firebaseApp.auth();
 
-        auth.onAuthStateChanged((user) =>
-        {
-            if (user)
-            {
-                const t = document.getElementById('auth-href'); // tag
-                t.href = 'javascript: void(0);';
-                t.textContent = 'Authenticated';
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const authLink = document.getElementById('auth-href');
+                authLink.href = 'javascript: void(0);';
+                authLink.innerHTML = '<span>Authenticated</span>';
             }
         });
+
         document.getElementById('main').style.display = 'flex';
     </script>
 </html>
