@@ -83,6 +83,8 @@ div { display: flex; flex-direction: column; }
 .sb:hover span { padding-right: 25px; }
 .sb:hover span:after { opacity: 1; right: 0; }
 
+.ib { color: white; text-decoration: underline; } /* Inline Button */
+
 /* Styled input */
 .si
 {
