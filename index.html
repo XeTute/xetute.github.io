@@ -170,7 +170,7 @@
             <h1 class="section-title">Research</h1>
             <div class="card">
                 <p>
-                    At XeTute Technologies, we actively research the Deep Learning field, especially for <a href="https://github.com/XeTute/HANNA" class="ib"><span>HANNA</span></a>.<br>
+                    At XeTute Technologies, we actively research the Deep Learning field, especially for <a href="https://github.com/XeTute/HANNA" class="ib">HANNA</a>.<br>
                     <em>We're currently working on the Research Page, and it'll be available as soon as it's deployed.</em>
                 </p>
             </div>
@@ -185,15 +185,16 @@
             <div class="card">
                 <p>
                     <h2>Hello, Friend.</h2>
-                    <em>We're XeTute Technologies, and we hope you're having a good day.</em>
+                    <em>We're XeTute Technologies, and we hope you're having a <em id="about-semislogan">good</em> day.</em>
                     <em style="max-width: 800px;">
-                        It's not actually a 'we', the person behind XeTute is me, Hamzah. I'm a pakistani Student with a passion for C++ and low-level development, hence <a href="https://github.com/XeTute/HANNA" class="ib">HANNA</a>.<br>
-                        I also like role-playing & reading, though not in a format like Character.AI, that's why I created <a href="./PhantasiaAI/" class="ib">PhantasiaAI</a>.<br>
-                        I believe that, in order to achieve great, you have to do great, so I try my best to do great with my online presence, and I give it the formal, professional yet polite touch with the Alias 'XeTute Technologies'.<br>
-                        If you want to support me, you can leave comments on my <a href="https://youtube.com/@XeTuteTechnologies" class="ib">YouTube</a> Videos, on my <a href="https://huggingface.co/XeTute" class="ib">HuggingFace</a> models, or enable material resources through <a href="https://ko-fi.com/XeTute" class="ib">Ko-Fi</a>.
+                        The individual behind XeTute is, in fact, me—Hamzah, a Pakistani student with a deep passion for C++ and low-level development, which led to the creation of <a href="https://github.com/XeTute/HANNA" class="ib">HANNA</a>.<br>
+                        In addition to programming, I enjoy role-playing and reading, though not in formats like Character.AI. This inspired me to develop <a href="./PhantasiaAI/" class="ib">PhantasiaAI</a>.<br>
+                        I firmly believe that achieving greatness requires striving for excellence, and I endeavor to embody this principle through my online presence. To maintain a professional, polished, and courteous approach, I operate under the alias 'XeTute Technologies.'<br>
+                        If you would like to support my work, I would greatly appreciate your engagement through comments on my <a href="https://youtube.com/@XeTuteTechnologies" class="ib">YouTube</a> videos, feedback on my <a href="https://huggingface.co/XeTute" class="ib">HuggingFace</a> models, or contributions via <a href="https://ko-fi.com/XeTute" class="ib">Ko-Fi</a>.<br>
                     </em>
                 </p>
             </div>
+            <p id="about-goodbye"></p>
         </div>
     </body>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
@@ -236,6 +237,8 @@
             }
         }
         changeText(['Reach the end of the story<br>—in your own way', 'Follow your Curiosity<br>Lead Humanity Forward'], 'hero-sub')
+        changeText(['wonderful', 'great', 'good'], 'about-semislogan');
+        changeText(['Goodbye, Friend!', 'اللہ حافظ دوستو'], 'about-goodbye')
 
         const firebaseApp = firebase.initializeApp(
         {
