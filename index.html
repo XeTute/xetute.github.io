@@ -115,6 +115,24 @@
                 Follow your Curiosity<br>
                 Lead Humanity Forward
             </p>
+            <a class="sb scroll-indicator" onclick="document.getElementById('links').scrollIntoView({ behavior: 'smooth' });">
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <!-- Quick Links Section -->
+        <div class="section" id="links">
+            <h1 class="section-title">Our Apps</h1>
+            <div class="quick-links">
+                <div class="card">
+                    <a href="./PhantasiaAI/" class="sb"><span>PhantasiaAI</span></a>
+                    <p>PhantasiaAI is waiting to immerse you in your very own story! It's free, make sure to try it out—You might love it.</p>
+                </div>
+                <div class="card">
+                    <a href="./auth/?../" class="sb" id="auth-href"><span>Authentication</span></a>
+                    <p>Our Authentication services exclusive to us. Being authenticated allows you to access certain services.</p>
+                </div>
+            </div>
             <a class="sb scroll-indicator" onclick="document.getElementById('social').scrollIntoView({ behavior: 'smooth' });">
                 <i class="fa fa-arrow-down" aria-hidden="true"></i>
             </a>
@@ -143,32 +161,39 @@
                     <a class="sb">Coming soon</a>
                 </div>
             </div>
-            <a class="sb scroll-indicator" onclick="document.getElementById('links').scrollIntoView({ behavior: 'smooth' });">
+            <a class="sb scroll-indicator" onclick="document.getElementById('research').scrollIntoView({ behavior: 'smooth' });">
                 <i class="fa fa-arrow-down" aria-hidden="true"></i>
             </a>
         </div>
-
-        <!-- Quick Links Section -->
-        <div class="section" id="links">
-            <h1 class="section-title">Our Apps</h1>
-            <div class="quick-links">
-                <div class="card">
-                    <a href="./PhantasiaAI/" class="sb"><span>PhantasiaAI</span></a>
-                    <p>PhantasiaAI is waiting to immerse you in your very own story! It's free, make sure to try it out—You might love it.</p>
-                </div>
-                <div class="card">
-                    <a href="./auth/?../" class="sb" id="auth-href"><span>Authentication</span></a>
-                    <p>Our Authentication services exclusive to us. Being authenticated allows you to access certain services.</p>
-                </div>
-            </div>
-            <a class="sb scroll-indicator" onclick="document.getElementById('intra').scrollIntoView({ behavior: 'smooth' });">
-                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </a>
-        </div>
-
-        <div class="section">
+        
+        <div class="section" id="research">
             <h1 class="section-title">Research</h1>
-            
+            <div class="card">
+                <p>
+                    At XeTute Technologies, we actively research the Deep Learning field, especially for <a href="https://github.com/XeTute/HANNA" class="ib"><span>HANNA</span></a>.<br>
+                    <em>We're currently working on the Research Page, and it'll be available as soon as it's deployed.</em>
+                </p>
+            </div>
+
+            <a class="sb scroll-indicator" onclick="document.getElementById('about').scrollIntoView({ behavior: 'smooth' });">
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="section" id="about">
+            <h1 class="section-title">About</h1>
+            <div class="card">
+                <p>
+                    <h2>Hello, Friend.</h2>
+                    <em>We're XeTute Technologies, and we hope you're having a good day.</em>
+                    <em style="max-width: 800px;">
+                        It's not actually a 'we', the person behind XeTute is me, Hamzah. I'm a pakistani Student with a passion for C++ and low-level development, hence <a href="https://github.com/XeTute/HANNA" class="ib">HANNA</a>.<br>
+                        I also like role-playing & reading, though not in a format like Character.AI, that's why I created <a href="./PhantasiaAI/" class="ib">PhantasiaAI</a>.<br>
+                        I believe that, in order to achieve great, you have to do great, so I try my best to do great with my online presence, and I give it the formal, professional yet polite touch with the Alias 'XeTute Technologies'.<br>
+                        If you want to support me, you can leave comments on my <a href="https://youtube.com/@XeTuteTechnologies" class="ib">YouTube</a> Videos, on my <a href="https://huggingface.co/XeTute" class="ib">HuggingFace</a> models, or enable material resources through <a href="https://ko-fi.com/XeTute" class="ib">Ko-Fi</a>.
+                    </em>
+                </p>
+            </div>
         </div>
     </body>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
