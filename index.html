@@ -13,8 +13,13 @@
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
         <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
-        
         <style>
+            html[lang="ur"]
+            {
+                direction: rtl;
+                text-align: right;
+            }
+
             .section
             {
                 display: flex;
@@ -110,11 +115,8 @@
     <body id="main" style="display: none;">
         <!-- Hero Section -->
         <div class="section">
-            <h1 class="hero-title">HELLO, FRIEND.</h1>
-            <p class="hero-subtitle" id="hero-sub">
-                Follow your Curiosity<br>
-                Lead Humanity Forward
-            </p>
+            <h1 class="hero-title" id="hero-title"></h1>
+            <p class="hero-subtitle" id="hero-sub"></p>
             <a class="sb scroll-indicator" onclick="document.getElementById('links').scrollIntoView({ behavior: 'smooth' });">
                 <i class="fa fa-arrow-down" aria-hidden="true"></i>
             </a>
@@ -122,144 +124,109 @@
 
         <!-- Quick Links Section -->
         <div class="section" id="links">
-            <h1 class="section-title">Our Apps</h1>
+            <h1 class="section-title" id="links-title"></h1>
             <div class="quick-links">
                 <div class="card">
-                    <a href="./PhantasiaAI/" class="sb"><span>PhantasiaAI</span></a>
-                    <p>PhantasiaAI is waiting to immerse you in your very own story! It's free, make sure to try it out—You might love it.</p>
+                    <a href="./PhantasiaAI/" class="sb"><span id="app1-name"></span></a>
+                    <p id="app1-desc"></p>
                 </div>
                 <div class="card">
-                    <a href="./auth/?../" class="sb" id="auth-href"><span>Authentication</span></a>
-                    <p>Our Authentication services exclusive to us. Being authenticated allows you to access certain services.</p>
+                    <a href="./auth/?../" class="sb" id="auth-href"><span id="auth-title"></span></a>
+                    <p id="auth-desc"></p>
                 </div>
             </div>
-            <a class="sb scroll-indicator" onclick="document.getElementById('social').scrollIntoView({ behavior: 'smooth' });">
-                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </a>
         </div>
 
-        <!-- Social Links Section -->
-        <div class="section" id="social">
-            <h1 class="section-title">Our Socials</h1>
-            <div class="social-links">
-                <div class="card">
-                    <a href="https://huggingface.co/XeTute" class="sb"><span>HuggingFace</span></a>
-                </div>
-                <div class="card">
-                    <a href="https://github.com/XeTute" class="sb"><span>GitHub</span></a>
-                </div>
-                <div class="card">
-                    <a href="https://bsky.app/XeTute" class="sb"><span>BlueSky</span></a>
-                </div>
-                <div class="card">
-                    <a href="https://youtube.com/@XeTuteTechnologies" class="sb"><span>YouTube</span></a>
-                </div>
-                <div class="card">
-                    <a href="https://ko-fi.com/XeTute" class="sb"><span>Ko-Fi</span></a>
-                </div>
-                <div class="card">
-                    <a class="sb">Coming soon</a>
-                </div>
-            </div>
-            <a class="sb scroll-indicator" onclick="document.getElementById('research').scrollIntoView({ behavior: 'smooth' });">
-                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </a>
-        </div>
-        
-        <div class="section" id="research">
-            <h1 class="section-title">Research</h1>
-            <div class="card">
-                <p>
-                    At XeTute Technologies, we actively research the Deep Learning field, especially for <a href="https://github.com/XeTute/HANNA" class="ib">HANNA</a>.<br>
-                    <em>We're currently working on the Research Page, and it'll be available as soon as it's deployed.</em>
-                </p>
-            </div>
-
-            <a class="sb scroll-indicator" onclick="document.getElementById('about').scrollIntoView({ behavior: 'smooth' });">
-                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </a>
-        </div>
-
-        <div class="section" id="about">
-            <h1 class="section-title">About</h1>
-            <div class="card">
-                <p>
-                    <h2>Hello, Friend.</h2>
-                    <p style="text-align: left;">We're XeTute Technologies, and we hope you're having a good day.</p>
-                    <p style="max-width: 800px; text-align: left;">
-                        The individual behind XeTute is, in fact, me—Hamzah, a Pakistani student with a passion for C++ and low-level development, which led to the creation of <a href="https://github.com/XeTute/HANNA" class="ib">HANNA</a>.
-                        In addition to programming, I enjoy role-playing and reading, though not in formats like Character.AI. Since other services were either slow or had a sub-expectation / bloated UI, this inspired me to develop <a href="./PhantasiaAI/" class="ib">PhantasiaAI</a>.
-                        I firmly believe that achieving greatness requires striving for excellence, and I endeavor to embody this principle through my online presence. To maintain a professional, polished, and courteous approach, I operate under the alias 'XeTute Technologies.'
-                        If you would like to support my work, I would greatly appreciate your engagement through comments on my <a href="https://youtube.com/@XeTuteTechnologies" class="ib">YouTube</a> videos, feedback on my <a href="https://huggingface.co/XeTute" class="ib">HuggingFace</a> models, or contributions via <a href="https://ko-fi.com/XeTute" class="ib">Ko-Fi</a>.
-                    </p>
-                </p>
-            </div>
-            <p id="about-goodbye"></p>
-        </div>
-    </body>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
-    <script defer>
-        // Intra semi-slogan animation
-        function textAnim(elemid, newText, delay = 2000, speed = 50)
-        {
-            return new Promise((resolve) =>
+        <script defer>
+            // Browser translations for en, zh and ur
+            const translations =
             {
-                const semislogan = document.getElementById(elemid);
-                if (!semislogan) return resolve();
-            
-                setTimeout(() =>
+                en:
                 {
-                    const currentText = semislogan.textContent;
-                    const totalFrames = Math.max(currentText.length, newText.length);
-                    let frame = 0;
-                
-                    function updateText()
-                    {
-                        if (frame >= totalFrames) return resolve();
-                        semislogan.innerHTML = newText.substring(0, frame + 1) + currentText.substring(frame + 1);
-                        ++frame;
-                        setTimeout(updateText, speed);
-                    }
-                
-                    updateText();
-                }, delay);
-            });
-        }
-        
-        async function changeText(texts, elemid)
-        {
-            while (true)
+                    heroTitle: "HELLO, FRIEND.",
+                    heroSubtitle0: "Follow your Curiosity<br>Lead Humanity Forward",
+                    heroSubtitle1: "Reach the end of the Story in your own way.",
+                    linksTitle: "Our Apps",
+                    app1Name: "PhantasiaAI",
+                    app1Desc: "PhantasiaAI is waiting to immerse you in your very own story! It's free, make sure to try it out—You might love it.",
+                    authTitle: "Authentication",
+                    authDesc: "Our Authentication services exclusive to us. Being authenticated allows you to access certain services."
+                },
+                zh:
+                {
+                    heroTitle: "你好，朋友。",
+                    heroSubtitle0: "跟随你的好奇心<br>引领人类向前",
+                    heroSubtitle1: "以你自己的方式到达故事的结尾。",
+                    linksTitle: "我们的应用",
+                    app1Name: "PhantasiaAI",
+                    app1Desc: "PhantasiaAI 正在等待将您沉浸在您自己的故事中！免费尝试一下，你可能会喜欢。",
+                    authTitle: "认证",
+                    authDesc: "我们的认证服务是专属的。通过认证可以访问特定服务。"
+                },
+                ur:
+                {
+                    heroTitle: "ہیلو، دوست۔",
+                    heroSubtitle0: "اپنے تجسس کی پیروی کریں<br>انسانیت کو آگے لے جائیں",
+                    heroSubtitle1: "اپنی طریقے سے کہانی کے اختتام تک پہنچیں۔",
+                    linksTitle: "ہماری ایپس",
+                    app1Name: "PhantasiaAI",
+                    app1Desc: "PhantasiaAI آپ کو اپنی کہانی میں غرق کرنے کے لیے تیار ہے! یہ مفت ہے، اسے آزمائیں—آپ کو یہ پسند آسکتا ہے۔",
+                    authTitle: "تصدیق",
+                    authDesc: "ہماری توثیقی خدمات منفرد ہیں۔ تصدیق شدہ ہونے سے آپ مخصوص خدمات تک رسائی حاصل کر سکتے ہیں۔"
+                }
+            };
+
+            const userLang = navigator.language.slice(0, 2); // en, zh, ur
+            const lang = translations[userLang] ? userLang : 'en';
+            const trns = translations[lang];
+
+            document.getElementById('hero-title').innerHTML  = trns.heroTitle;
+            document.getElementById('links-title').innerHTML = trns.linksTitle;
+            document.getElementById('app1-name').innerHTML   = trns.app1Name;
+            document.getElementById('app1-desc').innerHTML   = trns.app1Desc;
+            document.getElementById('auth-title').innerHTML  = trns.authTitle;
+            document.getElementById('auth-desc').innerHTML   = trns.authDesc;
+
+            document.documentElement.lang = lang;
+
+            // Text Animations
+            function textAnim(elemid, newText, delay = 2000, speed = 50)
             {
-                for (const text of texts)
-                    await textAnim(elemid, text);
+                return new Promise((resolve) =>
+                {
+                    const semislogan = document.getElementById(elemid);
+                    if (!semislogan) return resolve();
+                
+                    setTimeout(() =>
+                    {
+                        const currentText = semislogan.textContent;
+                        const totalFrames = Math.max(currentText.length, newText.length);
+                        let frame = 0;
+                    
+                        function updateText()
+                        {
+                            if (frame >= totalFrames) return resolve();
+                            semislogan.innerHTML = newText.substring(0, frame + 1) + currentText.substring(frame + 1);
+                            ++frame;
+                            setTimeout(updateText, speed);
+                        }
+                    
+                        updateText();
+                    }, delay);
+                });
             }
-        }
-        changeText(['Reach the end of the story<br>—in your own way', 'Follow your Curiosity<br>Lead Humanity Forward'], 'hero-sub')
-        changeText(['Goodbye, Friend!', '!للہ حافظ دوستو'], 'about-goodbye')
 
-        const firebaseApp = firebase.initializeApp(
-        {
-            apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
-            authDomain: "xetuteauth.firebaseapp.com",
-            projectId: "xetuteauth",
-            storageBucket: "xetuteauth.firebasestorage.app",
-            messagingSenderId: "500556520913",
-            appId: "1:500556520913:web:381dc486949b1ae84694f0",
-            measurementId: "G-VJFMP5F975"
-        });
-        const db = firebaseApp.firestore();
-        const auth = firebaseApp.auth();
-
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                const authLink = document.getElementById('auth-href');
-                authLink.href = 'javascript: void(0);';
-                authLink.innerHTML = '<span>Authenticated</span>';
+            async function changeText(texts, elemid)
+            {
+                while (true)
+                {
+                    for (const text of texts)
+                        await textAnim(elemid, text);
+                }
             }
-        });
+            changeText([trns.heroSubtitle0, trns.heroSubtitle1], 'hero-sub');
 
-        document.getElementById('main').style.display = 'flex';
-    </script>
+            document.getElementById('main').style.display = 'flex';
+        </script>
+    </body>
 </html>

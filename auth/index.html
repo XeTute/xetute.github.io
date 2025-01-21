@@ -56,12 +56,12 @@
     <body id="main" style="display: none;">
         <a class="header card sb" href="../index.html">
             <img src="../logo.jpg"/>
-            <p style="margin: 0;">XeTute Technologies</p>
+            <p id="header-text" style="margin: 0;">XeTute Technologies</p>
         </a>
 
         <div style="display: flex; flex-direction: column; width: 100%; height: 100vh; justify-content: center; align-items: center;">
             <div id="form-signin" class="card">
-                <h2>Sign-In</h2>
+                <h2 id="signin-title">Sign-In</h2>
     
                 <div class="inp">
                     <input class="si" placeholder="E-Mail"   type="email"    id="signin-email"/>
@@ -69,11 +69,11 @@
                     <strong class="sb" style="color: rgb(255, 150, 150);" id="signin-error"></strong>
                 </div>
                 
-                <button onclick="signIn()" class="sb">Sign In</button>
+                <button onclick="signIn()" class="sb" id="signin-btn">Sign In</button>
             </div>
     
             <div id="form-signup" class="card">
-                <h2>Sign-Up</h2>
+                <h2 id="signup-title">Sign-Up</h2>
     
                 <div class="inp">
                     <input class="si" placeholder="E-Mail"           type="email"    id="signup-email"/>
@@ -82,13 +82,13 @@
                     <strong class="sb" style="color: rgb(255, 150, 150);" id="signup-error"></strong>
                 </div>
                 
-                <button onclick="signUp()" class="sb">Sign Up</button>
+                <button onclick="signUp()" class="sb" id="signup-btn">Sign Up</button>
             </div>
         </div>
 
         <div class="card">
-            <em>or</em>
-            <button class="sb" id="cfBtn" onclick="changeForm()"><span>Create an Account</span></button>
+            <em id="or-text">or</em>
+            <button class="sb" id="cfBtn" onclick="changeForm()"><span id="cfBtn-text">Create an Account</span></button>
         </div>
     </body>
     <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
@@ -114,6 +114,7 @@
         const fsi = document.getElementById('form-signin'); // form sign in
         const fsu = document.getElementById('form-signup'); // form sign up
         const fcb = document.getElementById('cfBtn'); // form change button
+        const fcbt = document.getElementById('cfBtn-text');
 
         const sie = document.getElementById('signin-email');
         const sip = document.getElementById('signin-password');
@@ -140,6 +141,76 @@
             .catch((e) => { document.getElementById('signup-error').textContent = e.code; })
         }
 
+        // Translation ur zh en
+        const translations =
+        {
+            en:
+            {
+                headerText: "XeTute Technologies",
+                signinTitle: "Sign-In",
+                signinBtn: "Sign In",
+                signupTitle: "Sign-Up",
+                signupBtn: "Sign Up",
+                orText: "or",
+                cfBtnTextCreate: "Create an Account",
+                cfBtnTextExisting: "I already have an Account",
+                signinEmailPlaceholder: "E-Mail",
+                signinPasswordPlaceholder: "Password",
+                signupEmailPlaceholder: "E-Mail",
+                signupPasswordPlaceholder: "Password",
+                signupConfirmPasswordPlaceholder: "Confirm Password"
+            },
+            zh:
+            {
+                headerText: "XeTute 技术公司",
+                signinTitle: "登录",
+                signinBtn: "登录",
+                signupTitle: "注册",
+                signupBtn: "注册",
+                orText: "或者",
+                cfBtnTextCreate: "创建账户",
+                cfBtnTextExisting: "我已有账户",
+                signinEmailPlaceholder: "电子邮件",
+                signinPasswordPlaceholder: "密码",
+                signupEmailPlaceholder: "电子邮件",
+                signupPasswordPlaceholder: "密码",
+                signupConfirmPasswordPlaceholder: "确认密码"
+            },
+            ur:
+            {
+                headerText: "زے ٹیوٹ ٹیکنالوجیز",
+                signinTitle: "سائن ان کریں",
+                signinBtn: "سائن ان کریں",
+                signupTitle: "سائن اپ کریں",
+                signupBtn: "سائن اپ کریں",
+                orText: "یا",
+                cfBtnTextCreate: "اکاؤنٹ بنائیں",
+                cfBtnTextExisting: "میرے پاس پہلے سے اکاؤنٹ ہے",
+                signinEmailPlaceholder: "ای میل",
+                signinPasswordPlaceholder: "پاس ورڈ",
+                signupEmailPlaceholder: "ای میل",
+                signupPasswordPlaceholder: "پاس ورڈ",
+                signupConfirmPasswordPlaceholder: "پاس ورڈ کی تصدیق کریں"
+            }
+        };
+
+        const userLang = navigator.language.slice(0, 2);
+        const lang = translations[userLang] ? userLang : 'en';
+        const trns = translations[lang];
+
+        document.getElementById('header-text').textContent = trns.headerText;
+        document.getElementById('signin-title').textContent = trns.signinTitle;
+        document.getElementById('signin-btn').textContent = trns.signinBtn;
+        document.getElementById('signup-title').textContent = trns.signupTitle;
+        document.getElementById('signup-btn').textContent = trns.signupBtn;
+        document.getElementById('or-text').textContent = trns.orText;
+        fcbt.textContent = trns.cfBtnTextCreate;
+        document.getElementById('signin-email').placeholder = trns.signinEmailPlaceholder;
+        document.getElementById('signin-password').placeholder = trns.signinPasswordPlaceholder;
+        document.getElementById('signup-email').placeholder = trns.signupEmailPlaceholder;
+        document.getElementById('signup-password0').placeholder = trns.signupPasswordPlaceholder;
+        document.getElementById('signup-password1').placeholder = trns.signupConfirmPasswordPlaceholder;
+
         function changeForm()
         {
             if (!fsi.style.display) fsi.style.display = 'flex';
@@ -147,13 +218,13 @@
             {
                 fsi.style.display = 'none';
                 fsu.style.display = 'flex';
-                fcb.innerHTML = '<span>I already have an Account</span>';
+                fcbt.innerHTML = trns.cfBtnTextExisting;
             }
             else
             {
                 fsi.style.display = 'flex';
                 fsu.style.display = 'none';
-                fcb.innerHTML = '<span>Create an Account</span>';
+                fcbt.innerHTML = trns.cfBtnTextCreate;
             }
         }
     </script>
