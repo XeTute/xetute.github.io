@@ -266,12 +266,12 @@
 
             const sys =
             `
-            Roleplay with the user. Keep your answers short yet detailed, but the shorter the better.
-            You're writing with ${setting.name}, who's persona is
-            --- persona ---
+            Roleplay with the user, ${setting.name}. Keep your answers short yet detailed, but the shorter the better.
+            ---
+            ${setting.name}:
             ${setting.persona}
-            --- persona end ---
-            Don't write as ${setting.name} and accept any role you play in the 'roleplay' with ${setting.name}.
+            ---
+            Don't write as ${setting.name} and accept any role you play in the 'roleplay'.
             `;
 
             let context = [{ role: 'system', content: sys }];
