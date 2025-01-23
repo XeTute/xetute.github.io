@@ -32,6 +32,19 @@
                 padding: 2rem 0;
             }
 
+            .allcenter
+            {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .fullsize
+            {
+                width: 100%;
+                height: 100%;
+            }
+
             .hero-title
             {
                 font-size: 4.5rem;
@@ -44,38 +57,6 @@
                 line-height: 1.6;
                 margin-bottom: 2rem;
                 max-width: 85%;
-            }
-
-            .social-links
-            {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 1rem;
-                width: 90%;
-                max-width: 1000px;
-            }
-            .social-links > .card
-            {
-                width: 10rem;
-                height: 3rem;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .quick-links
-            {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                gap: 1.5rem;
-                width: 90%;
-                max-width: 1200px;
-            }
-            .quick-links > p { max-width: 5rem; }
-
-            .card
-            {
-                min-width: unset;
-                width: auto;
             }
 
             .feature-container
@@ -102,94 +83,54 @@
                 transform: scale(1.1);
                 cursor: pointer;
             }
-
             .section-title { margin-bottom: 3rem; }
+
+            .paiintro
+            {
+                display: flex;
+                flex-direction: row;
+                width: 100%;
+            }
 
             @media (max-width: 768px)
             {
                 .hero-title { font-size: 3.5rem; }
-                .social-links { grid-template-columns: 1fr; }
+                .paiintro { flex-direction: column; }
             }
         </style>
     </head>
     <body id="main" style="display: none;">
         <!-- Hero Section -->
         <div class="section">
-            <h1 class="hero-title" id="hero-title"></h1>
-            <p class="hero-subtitle" id="hero-sub"></p>
-            <a class="sb scroll-indicator" onclick="document.getElementById('links').scrollIntoView({ behavior: 'smooth' });">
+            <h1 class="hero-title" id="herotitle"></h1>
+            <p class="hero-subtitle" id="herosub">—</p>
+            <a class="sb scroll-indicator" onclick="document.getElementById('pai').scrollIntoView({ behavior: 'smooth' })">
                 <i class="fa fa-arrow-down" aria-hidden="true"></i>
             </a>
         </div>
 
-        <!-- Quick Links Section -->
-        <div class="section" id="links">
-            <h1 class="section-title" id="links-title"></h1>
-            <div class="quick-links">
-                <div class="card">
-                    <a href="./PhantasiaAI/" class="sb"><span id="app1-name"></span></a>
-                    <p id="app1-desc"></p>
+        <!-- Apps -->
+        <div class="section" id="pai">
+            <div class="paiintro fullsize allcenter" style="margin-bottom: 0; padding-bottom: 0;">
+                <div class="allcenter fullsize" style="margin: 20px; padding: 15px;">
+                    <h1 class="hero-title" style="scale: 0.75;">Introducing PhantasiaAI</h1>
+                    <p class="hero-subtitle" id="paisub">—</p>
                 </div>
-                <div class="card">
-                    <a href="./auth/?../" class="sb" id="auth-href"><span id="auth-title"></span></a>
-                    <p id="auth-desc"></p>
+                <div class="allcenter fullsize" style="margin: 20px; padding: 15px;">
+                    <video src="pai-deco.mp4" class="box-shadow" alt="decorative video" style="border-radius: 25px; max-width: 80%; margin: 20px;" muted loop autoplay></video>
+                    <a href="PhantasiaAI/" class="sb"><span id="paiinvitation">Envision Now</span></a>
                 </div>
             </div>
+            <a class="sb scroll-indicator" onclick="document.getElementById('future').scrollIntoView({ behavior: 'smooth' })">
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="section fullsize allcenter">
+            <h1 class="hero-title" style="scale: 0.75;" id="future"></h1>
         </div>
 
         <script defer>
-            // Browser translations for en, zh and ur
-            const translations =
-            {
-                en:
-                {
-                    heroTitle: "HELLO, FRIEND.",
-                    heroSubtitle0: "Follow your Curiosity<br>Lead Humanity Forward",
-                    heroSubtitle1: "Reach the end of the Story in your own way.",
-                    linksTitle: "Our Apps",
-                    app1Name: "PhantasiaAI",
-                    app1Desc: "PhantasiaAI is waiting to immerse you in your very own story! It's free, make sure to try it out—You might love it.",
-                    authTitle: "Authentication",
-                    authDesc: "Our Authentication services exclusive to us. Being authenticated allows you to access certain services."
-                },
-                zh:
-                {
-                    heroTitle: "你好，朋友。",
-                    heroSubtitle0: "跟随你的好奇心<br>引领人类向前",
-                    heroSubtitle1: "以你自己的方式到达故事的结尾。",
-                    linksTitle: "我们的应用",
-                    app1Name: "PhantasiaAI",
-                    app1Desc: "PhantasiaAI 正在等待将您沉浸在您自己的故事中！免费尝试一下，你可能会喜欢。",
-                    authTitle: "认证",
-                    authDesc: "我们的认证服务是专属的。通过认证可以访问特定服务。"
-                },
-                ur:
-                {
-                    heroTitle: "ہیلو، دوست۔",
-                    heroSubtitle0: "اپنے تجسس کی پیروی کریں<br>انسانیت کو آگے لے جائیں",
-                    heroSubtitle1: "اپنی طریقے سے کہانی کے اختتام تک پہنچیں۔",
-                    linksTitle: "ہماری ایپس",
-                    app1Name: "PhantasiaAI",
-                    app1Desc: "PhantasiaAI آپ کو اپنی کہانی میں غرق کرنے کے لیے تیار ہے! یہ مفت ہے، اسے آزمائیں—آپ کو یہ پسند آسکتا ہے۔",
-                    authTitle: "تصدیق",
-                    authDesc: "ہماری توثیقی خدمات منفرد ہیں۔ تصدیق شدہ ہونے سے آپ مخصوص خدمات تک رسائی حاصل کر سکتے ہیں۔"
-                }
-            };
-
-            const userLang = navigator.language.slice(0, 2); // en, zh, ur
-            const lang = translations[userLang] ? userLang : 'en';
-            const trns = translations[lang];
-
-            document.getElementById('hero-title').innerHTML  = trns.heroTitle;
-            document.getElementById('links-title').innerHTML = trns.linksTitle;
-            document.getElementById('app1-name').innerHTML   = trns.app1Name;
-            document.getElementById('app1-desc').innerHTML   = trns.app1Desc;
-            document.getElementById('auth-title').innerHTML  = trns.authTitle;
-            document.getElementById('auth-desc').innerHTML   = trns.authDesc;
-
-            document.documentElement.lang = lang;
-
-            // Text Animations
             function textAnim(elemid, newText, delay = 2000, speed = 50)
             {
                 return new Promise((resolve) =>
@@ -224,7 +165,61 @@
                         await textAnim(elemid, text);
                 }
             }
-            changeText([trns.heroSubtitle0, trns.heroSubtitle1], 'hero-sub');
+
+            // Browser translations for en, zh and ur
+            const translations =
+            {
+                en:
+                {
+                    herotitle: "HELLO, FRIEND.",
+                    herosub0: "Follow your Curiosity<br>Lead Humanity Forward",
+                    herosub1: "Reach the end of the Story in your own way.",
+                    
+                    paisub0: "Immerse in your very own digital realm.",
+                    paisub1: "Socialize with artificial beings, safely and privately.",
+                    paiinvitation: "Envision Now",
+
+                    future: "More coming soon."
+                },
+                zh:
+                {
+                    herotitle: "你好，朋友。",
+                    herosub0: "追随你的好奇心<br>引领人类向前",
+                    herosub1: "以你自己的方式到达故事的尽头。",
+                    
+                    paisub0: "沉浸在你自己的数字领域中。",
+                    paisub1: "与人工智能安全、私密地社交。",
+                    paiinvitation: "现在想象",
+
+                    future: "更多内容即将推出。"
+                },
+                ur:
+                {
+                    herotitle: "ہیلو، دوست۔",
+                    herosub0: "اپنی تجسس کی پیروی کریں<br>انسانیت کو آگے بڑھائیں",
+                    herosub1: "کہانی کے آخر تک اپنے طریقے سے پہنچیں۔",
+                    
+                    paisub0: "اپنی ذاتی ڈیجیٹل دنیا میں غوطہ زن ہوں۔",
+                    paisub1: "مصنوعی مخلوق کے ساتھ محفوظ اور نجی طور پر ملیں۔",
+                    paiinvitation: "اب تصور کریں",
+
+                    future: "زیادہ جلد آ رہا ہے۔"
+                }
+            };
+
+            const userLang = navigator.language.slice(0, 2); // en, zh, ur
+            const lang = translations[userLang] ? userLang : 'en';
+            const trns = translations[lang];
+            document.documentElement.lang = lang;
+
+            for (let key in trns)
+            {
+                try { document.getElementById(key).innerHTML = trns[key]; }
+                catch {}
+            }
+
+            changeText([trns.herosub0, trns.herosub1], 'herosub');
+            changeText([trns.paisub0, trns.paisub1], 'paisub');
 
             document.getElementById('main').style.display = 'flex';
         </script>
