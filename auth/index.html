@@ -64,7 +64,7 @@
                 <h2 id="signin-title">Sign-In</h2>
     
                 <div class="inp">
-                    <input class="si" placeholder="E-Mail"   type="email"    id="signin-email"/>
+                    <input class="si" placeholder="E-Mail"   type="email"    id="signin-email" autocomplete="off"/>
                     <input class="si" placeholder="Password" type="password" id="signin-password"/>
                     <strong class="sb" style="color: rgb(255, 150, 150);" id="signin-error"></strong>
                 </div>
@@ -76,7 +76,7 @@
                 <h2 id="signup-title">Sign-Up</h2>
     
                 <div class="inp">
-                    <input class="si" placeholder="E-Mail"           type="email"    id="signup-email"/>
+                    <input class="si" placeholder="E-Mail"           type="email"    id="signup-email" autocomplete="off"/>
                     <input class="si" placeholder="Password"         type="password" id="signup-password0"/>
                     <input class="si" placeholder="Confrm. Password" type="password" id="signup-password1"/>
                     <strong class="sb" style="color: rgb(255, 150, 150);" id="signup-error"></strong>
@@ -91,26 +91,22 @@
             <button class="sb" id="cfBtn" onclick="changeForm()"><span id="cfBtn-text">Create an Account</span></button>
         </div>
     </body>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+    <script src="../pocketbase.umd.js"></script>
     <script defer>
-        const firebaseApp = firebase.initializeApp
-        ({
-            apiKey: "AIzaSyBDz4iOz98Us7RaNgOTAZ6PGsemBFW7k_A",
-            authDomain: "xetuteauth.firebaseapp.com",
-            projectId: "xetuteauth",
-            storageBucket: "xetuteauth.firebasestorage.app",
-            messagingSenderId: "500556520913",
-            appId: "1:500556520913:web:381dc486949b1ae84694f0",
-            measurementId: "G-VJFMP5F975"
-        });
-        const db = firebaseApp.firestore();
-        const auth = firebaseApp.auth();
+        const pb = new PocketBase('https://db.xetute.com');
+        let auth = undefined;
 
-        auth.onAuthStateChanged((user) => { if (user) { window.location.href = window.location.search.substr(1); } })
-        document.getElementById('main').style.display = 'flex';
-
+        async function autoAuth()
+        {
+            try
+            {
+                auth = await pb.collection('accounts').authRefresh();
+                window.location.href = window.location.search.substr(1);
+            }
+            catch { document.getElementById('main').style.display = 'flex'; }
+        }
+        autoAuth();
+        
         const fsi = document.getElementById('form-signin'); // form sign in
         const fsu = document.getElementById('form-signup'); // form sign up
         const fcb = document.getElementById('cfBtn'); // form change button
@@ -123,22 +119,46 @@
 
         async function signIn()
         {
-            firebase.auth().signInWithEmailAndPassword(sie.value, sip.value)
-            .then((cred) => { window.location.href = window.location.search.substr(1); })
-            .catch((e) => { document.getElementById('signin-error').textContent = e.code; })
+            try
+            {
+                await pb.collection('accounts').authWithPassword(sie.value, sip.value);
+
+                const link = window.location.search.substr(1);
+                if (link) { window.location.href = link; }
+                else { window.location.href = '../'; }
+            }
+            catch { document.getElementById('signin-error').textContent = 'An unexpected error occurred. We\'re sorry.'; }
         }
 
         async function signUp()
         {
-            if (sup[0].value !== sup[1].value)
+            const txtnotif = document.getElementById('signup-error');
+            try
             {
-                document.getElementById('signup-error').textContent = 'Passwords don\'t match';
-                return;
-            }
+                const record = await pb.collection('accounts').create
+                ({
+                    "email": sue.value,
+                    "password": sup[0].value,
+                    "passwordConfirm": sup[1].value
+                });
+                try { await pb.collection('accounts').requestVerification(sue.value); }
+                catch
+                {
+                    txtnotif.textContent = `Failed to sent instructions to ${sue.value}. We're sorry.`;
+                    await pb.collection('accounts').delete(record.id);
+                }
 
-            firebase.auth().createUserWithEmailAndPassword(sue.value, sup[0].value)
-            .then((cred) => { window.location.href = window.location.search.substr(1); })
-            .catch((e) => { document.getElementById('signup-error').textContent = e.code; })
+                try
+                {
+                    const link = window.location.search.substr(1);
+                    if (!link) link = '../'; // Browsers are very different with JS lmao
+                }
+                catch { link = '../'; }
+
+                txtnotif.innerHTML = `<p style="color: green;">Further instructions sent to ${sue.value}. After completion, please <a class="sb" style="border: 0; background: transparent; padding: 0;" href="${link}">click here</a>.</p>`;
+            }
+            catch { txtnotif.textContent = 'An unexpected error occurred. We\'re sorry.'; }
+            txtnotif.style.color = 'red';
         }
 
         // Translation ur zh en
