@@ -3,335 +3,249 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, PhantasiaAI, AI, Storywriting, Game"/>
-        <meta name="description" content="PhantasiaAI by XeTute Technologies"/>
+        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, AI, Auth, Authentication"/>
+        <meta name="description" content="Authentication Services for & by XeTute Technologies"/>
 
-        <title>PhantasiaAI \\ XeTute Technologies</title>
+        <title>Authentication \\ XeTute Technologies</title>
 
         <link rel="stylesheet" href="../basic.css"/>
-        <link rel="icon" href="logo.jpg"/>
+        <link rel="icon" href="../logo.jpg"/>
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-
-        <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
     </head>
     <style>
-        .storyContainer
-        {
-            overflow-x: auto;
-            width: 100%;
-            height: 100%;
+        .si, .sn { font-size: 18px; } 
+        h2 { font-weight: 200; }
 
+        .header
+        {
             display: flex;
             flex-direction: row;
 
-            justify-content: flex-start;
+            width: 25%;
+            justify-content: center;
             align-items: center;
+
+            position: absolute;
+            top: 10px;
+        }
+        .header > img
+        {
+            max-width: 48px;
+            max-height: 48px;
+
+            border-radius: 50%;
+            margin: 10px;
         }
 
-        .content
+        #form-signin, #form-signup
         {
             display: flex;
+            flex-direction: column;
 
             justify-content: center;
             align-items: center;
+
+            justify-self: center;
+            align-self: center;
         }
+        #form-signup { display: none; }
 
-        @media screen and (orientation:portrait)
-        {
-            .content { flex-direction: column; }
-        }
-
-        @media screen and (orientation:landscape)
-        {
-            .content { flex-direction: row; }
-        }
-
-        .ifc /* Input for Card */
-        {
-            width: 90%;
-            height: 100px;
-
-            font-size: 18px;
-            font-weight: 100;
-        }
-
-        .links
-        {
-            display: flex;
-            flex-direction: row;
-
-            position: absolute;
-            bottom: 8px;
-
-            max-height: 50px;
-        }
+        .inp { width: 80%; max-width: 50px; }
     </style>
-    <body style="overflow: hidden; display: none;" id="main">
-        <h1 style="margin-top: 20px; font-weight: 200;" id="welcomeTxt"></h1>
+    <body id="main" style="display: none;">
+        <a class="header card sb" href="../index.html">
+            <img src="../logo.jpg"/>
+            <p id="header-text" style="margin: 0;">XeTute Technologies</p>
+        </a>
 
-        <div class="storyContainer" id="storyContainer">
-            <div class="card" id="firstCard">
-                <em id="firstCardText"></em>
-                <textarea id="newChunk" class="si ifc"></textarea>
-                <button onclick="addChunk()" class="sb" id="startButton"></button>
+        <div style="display: flex; flex-direction: column; width: 100%; height: 100vh; justify-content: center; align-items: center;">
+            <div id="form-signin" class="card">
+                <h2 id="signin-title">Sign-In</h2>
+    
+                <div class="inp">
+                    <input class="si" placeholder="E-Mail"   type="email"    id="signin-email" autocomplete="off"/>
+                    <input class="si" placeholder="Password" type="password" id="signin-password"/>
+                    <strong class="sb" style="color: rgb(255, 150, 150);" id="signin-error"></strong>
+                </div>
+                
+                <button onclick="signIn()" class="sb" id="signin-btn">Sign In</button>
+            </div>
+    
+            <div id="form-signup" class="card">
+                <h2 id="signup-title">Sign-Up</h2>
+    
+                <div class="inp">
+                    <input class="si" placeholder="E-Mail"           type="email"    id="signup-email" autocomplete="off"/>
+                    <input class="si" placeholder="Password"         type="password" id="signup-password0"/>
+                    <input class="si" placeholder="Confrm. Password" type="password" id="signup-password1"/>
+                    <strong class="sb" style="color: rgb(255, 150, 150);" id="signup-error"></strong>
+                </div>
+                
+                <button onclick="signUp()" class="sb" id="signup-btn">Sign Up</button>
             </div>
         </div>
 
-        <div class="card" style="display: none;" id="settings">
-            <h2 style="font-weight: 200; margin: 20px;" id="settingsTitle"></h2>
-            <div class="content">
-                <input class="si idc" id="username"/>
-                <textarea class="si idc" id="persona"></textarea>
-            </div>
-            <button onclick="applySettings(); displaySettings();" class="sb" id="applyCloseButton"></button>
-            <button onclick="displaySettings()" class="sb" id="closeWithoutSavingButton"></button>
-            <button onclick="localStorage.removeItem('PhantasiaAI-story'); window.location.href = '';" class="sb" id="clearStoryButton"></button>
-        </div>
-
-        <div class="links">
-            <a href="../index.html" class="sb" id="backLink"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
-            <button onclick="sharePage()" class="sb" id="shareButton"><i class="fa fa-share" aria-hidden="true"></i></button>
-            <button onclick="displaySettings()" class="sb" id="settingsBtn"><span id="personalizeText"></span></button>
+        <div class="card">
+            <em id="or-text">or</em>
+            <button class="sb" id="cfBtn" onclick="changeForm()"><span id="cfBtn-text">Create an Account</span></button>
         </div>
     </body>
+    <script src="../pocketbase.umd.js"></script>
     <script defer>
-        // Browser translations for en, zh, and ur
+        const pb = new PocketBase('https://db.xetute.com');
+        let auth = undefined;
+
+        async function autoAuth()
+        {
+            try
+            {
+                auth = await pb.collection('accounts').authRefresh();
+                window.location.href = window.location.search.substr(1);
+            }
+            catch { document.getElementById('main').style.display = 'flex'; }
+        }
+        autoAuth();
+        
+        const fsi = document.getElementById('form-signin'); // form sign in
+        const fsu = document.getElementById('form-signup'); // form sign up
+        const fcb = document.getElementById('cfBtn'); // form change button
+        const fcbt = document.getElementById('cfBtn-text');
+
+        const sie = document.getElementById('signin-email');
+        const sip = document.getElementById('signin-password');
+        const sue = document.getElementById('signup-email');
+        const sup = [ document.getElementById('signup-password0'), document.getElementById('signup-password1') ];
+
+        async function signIn()
+        {
+            try
+            {
+                await pb.collection('accounts').authWithPassword(sie.value, sip.value);
+
+                const link = window.location.search.substr(1);
+                if (link) { window.location.href = link; }
+                else { window.location.href = '../'; }
+            }
+            catch { document.getElementById('signin-error').textContent = 'An unexpected error occurred. We\'re sorry.'; }
+        }
+
+        async function signUp()
+        {
+            const txtnotif = document.getElementById('signup-error');
+            try
+            {
+                const record = await pb.collection('accounts').create
+                ({
+                    "email": sue.value,
+                    "password": sup[0].value,
+                    "passwordConfirm": sup[1].value
+                });
+                try { await pb.collection('accounts').requestVerification(sue.value); }
+                catch
+                {
+                    txtnotif.textContent = `Failed to sent instructions to ${sue.value}. We're sorry.`;
+                    await pb.collection('accounts').delete(record.id);
+                }
+
+                try
+                {
+                    const link = window.location.search.substr(1);
+                    if (!link) link = '../'; // Browsers are very different with JS lmao
+                }
+                catch { link = '../'; }
+
+                txtnotif.innerHTML = `<p style="color: green;">Further instructions sent to ${sue.value}. After completion, please <a class="sb" style="border: 0; background: transparent; padding: 0;" href="${link}">click here</a>.</p>`;
+            }
+            catch { txtnotif.textContent = 'An unexpected error occurred. We\'re sorry.'; }
+            txtnotif.style.color = 'red';
+        }
+
+        // Translation ur zh en
         const translations =
         {
             en:
             {
-                welcome: "Welcome, Anonymous.",
-                firstCardText: "The Beginning...",
-                newChunkPlaceholder: "Write the first chunk of YOUR story...",
-                startButton: "Start the Story",
-                settingsTitle: "Settings",
-                usernamePlaceholder: "Your Username...",
-                personaPlaceholder: "Your Persona...",
-                applyCloseButton: "Apply & Close",
-                closeWithoutSavingButton: "Close w/out saving",
-                clearStoryButton: "Clear Story",
-                backLink: "Back",
-                shareButton: "Share",
-                personalizeText: "Personalize"
+                headerText: "XeTute Technologies",
+                signinTitle: "Sign-In",
+                signinBtn: "Sign In",
+                signupTitle: "Sign-Up",
+                signupBtn: "Sign Up",
+                orText: "or",
+                cfBtnTextCreate: "Create an Account",
+                cfBtnTextExisting: "I already have an Account",
+                signinEmailPlaceholder: "E-Mail",
+                signinPasswordPlaceholder: "Password",
+                signupEmailPlaceholder: "E-Mail",
+                signupPasswordPlaceholder: "Password",
+                signupConfirmPasswordPlaceholder: "Confirm Password"
             },
             zh:
             {
-                welcome: "欢迎, 匿名用户。",
-                firstCardText: "开始...",
-                newChunkPlaceholder: "写下您的故事的第一部分...",
-                startButton: "开始故事",
-                settingsTitle: "设置",
-                usernamePlaceholder: "您的用户名...",
-                personaPlaceholder: "您的角色...",
-                applyCloseButton: "应用并关闭",
-                closeWithoutSavingButton: "关闭且不保存",
-                clearStoryButton: "清除故事",
-                backLink: "返回",
-                shareButton: "分享",
-                personalizeText: "个性化"
+                headerText: "XeTute 技术公司",
+                signinTitle: "登录",
+                signinBtn: "登录",
+                signupTitle: "注册",
+                signupBtn: "注册",
+                orText: "或者",
+                cfBtnTextCreate: "创建账户",
+                cfBtnTextExisting: "我已有账户",
+                signinEmailPlaceholder: "电子邮件",
+                signinPasswordPlaceholder: "密码",
+                signupEmailPlaceholder: "电子邮件",
+                signupPasswordPlaceholder: "密码",
+                signupConfirmPasswordPlaceholder: "确认密码"
             },
             ur:
             {
-                welcome: "خوش آمدید، نامعلوم۔",
-                firstCardText: "آغاز...",
-                newChunkPlaceholder: "اپنی کہانی کا پہلا حصہ لکھیں...",
-                startButton: "کہانی شروع کریں",
-                settingsTitle: "ترتیبات",
-                usernamePlaceholder: "آپ کا صارف نام...",
-                personaPlaceholder: "آپ کی شخصیت...",
-                applyCloseButton: "لاگو کریں اور بند کریں",
-                closeWithoutSavingButton: "بند کریں بغیر محفوظ کیے",
-                clearStoryButton: "کہانی صاف کریں",
-                backLink: "واپس جائیں",
-                shareButton: "شئیر کریں",
-                personalizeText: "ذاتی بنائیں"
+                headerText: "زے ٹیوٹ ٹیکنالوجیز",
+                signinTitle: "سائن ان کریں",
+                signinBtn: "سائن ان کریں",
+                signupTitle: "سائن اپ کریں",
+                signupBtn: "سائن اپ کریں",
+                orText: "یا",
+                cfBtnTextCreate: "اکاؤنٹ بنائیں",
+                cfBtnTextExisting: "میرے پاس پہلے سے اکاؤنٹ ہے",
+                signinEmailPlaceholder: "ای میل",
+                signinPasswordPlaceholder: "پاس ورڈ",
+                signupEmailPlaceholder: "ای میل",
+                signupPasswordPlaceholder: "پاس ورڈ",
+                signupConfirmPasswordPlaceholder: "پاس ورڈ کی تصدیق کریں"
             }
         };
 
-        const userLang = navigator.language.slice(0, 2); // en, zh, ur
+        const userLang = navigator.language.slice(0, 2);
         const lang = translations[userLang] ? userLang : 'en';
         const trns = translations[lang];
 
-        document.getElementById('welcomeTxt').textContent = trns.welcome;
-        document.getElementById('firstCardText').textContent = trns.firstCardText;
-        document.getElementById('newChunk').placeholder = trns.newChunkPlaceholder;
-        document.getElementById('startButton').textContent = trns.startButton;
-        document.getElementById('settingsTitle').textContent = trns.settingsTitle;
-        document.getElementById('username').placeholder = trns.usernamePlaceholder;
-        document.getElementById('persona').placeholder = trns.personaPlaceholder;
-        document.getElementById('applyCloseButton').textContent = trns.applyCloseButton;
-        document.getElementById('closeWithoutSavingButton').textContent = trns.closeWithoutSavingButton;
-        document.getElementById('clearStoryButton').textContent = trns.clearStoryButton;
-        document.getElementById('personalizeText').textContent = trns.personalizeText;
+        document.getElementById('header-text').textContent = trns.headerText;
+        document.getElementById('signin-title').textContent = trns.signinTitle;
+        document.getElementById('signin-btn').textContent = trns.signinBtn;
+        document.getElementById('signup-title').textContent = trns.signupTitle;
+        document.getElementById('signup-btn').textContent = trns.signupBtn;
+        document.getElementById('or-text').textContent = trns.orText;
+        fcbt.textContent = trns.cfBtnTextCreate;
+        document.getElementById('signin-email').placeholder = trns.signinEmailPlaceholder;
+        document.getElementById('signin-password').placeholder = trns.signinPasswordPlaceholder;
+        document.getElementById('signup-email').placeholder = trns.signupEmailPlaceholder;
+        document.getElementById('signup-password0').placeholder = trns.signupPasswordPlaceholder;
+        document.getElementById('signup-password1').placeholder = trns.signupConfirmPasswordPlaceholder;
 
-        document.documentElement.lang = lang;
-
-        const storyUI = document.getElementById('storyContainer');
-        let setting = localStorage.getItem('PhantasiaAI-setting');
-        let story = localStorage.getItem('PhantasiaAI-story');
-
-        const addToStoryDiv =
-        `
-        <div class="card" id="addChunk">
-            <textarea placeholder="${trns.newChunkPlaceholder}" class="si ifc" id="newChunk"></textarea>
-            <button onclick="addChunk()" class="sb">${trns.startButton}</button>
-        </div>
-        `;
-
-        function addedToStoryDiv(text)
+        function changeForm()
         {
-            let str =
-            `
-            <div class="card">
-                <em>${text}</em>
-            </div>
-            `;
-            return str;
-        }
-
-        function scrollToRight()
-        {
-            storyUI.innerHTML += "<p style='font-size: 0;' id='slider'>.</p>";
-            document.getElementById('slider').scrollIntoView({ behavior: "smooth" });
-            document.getElementById('slider').outerHTML = '';
-        }
-
-        if (setting)
-        {
-            setting = JSON.parse(setting);
-            document.getElementById('welcomeTxt').textContent = `${trns.welcome.split(',')[0]}, ${setting.name}.`;
-            document.getElementById('username').value = setting.name;
-            document.getElementById('persona').value = setting.persona;
-        } else { setting = { name: "Anonymous", persona: "" }; }
-
-        if (story)
-        {
-            story = JSON.parse(story);
-            document.getElementById('firstCard').outerHTML = '';
-
-            for (let i = 0; i < story.length; ++i)
+            if (!fsi.style.display) fsi.style.display = 'flex';
+            if (fsi.style.display === 'flex')
             {
-                storyUI.innerHTML += addedToStoryDiv(story[i]);
-            }
-            storyUI.innerHTML += addToStoryDiv;
-            scrollToRight();
-        } else { story = []; }
-        document.getElementById('main').style.display = 'flex';
-
-        function applySettings()
-        {
-            setting.name = document.getElementById('username').value;
-            setting.persona = document.getElementById('persona').value;
-            localStorage.setItem('PhantasiaAI-setting', JSON.stringify(setting));
-
-            document.getElementById('welcomeTxt').textContent = `${trns.welcome.split(',')[0]}, ${setting.name}.`;
-            document.getElementById('username').value = setting.name;
-            document.getElementById('persona').value = setting.persona;
-        }
-
-        function displaySettings()
-        {
-            if (!storyUI.style.display)
-            {
-                storyUI.style.display = 'flex';
-                document.getElementById('settings').style.display = 'none';
-                document.getElementById('settingsBtn').style.display = 'flex';
-            }
-
-            if (storyUI.style.display === 'flex')
-            {
-                storyUI.style.display = 'none';
-                document.getElementById('settings').style.display = 'flex';
-                document.getElementById('settingsBtn').style.display = 'none';
+                fsi.style.display = 'none';
+                fsu.style.display = 'flex';
+                fcbt.innerHTML = trns.cfBtnTextExisting;
             }
             else
             {
-                storyUI.style.display = 'flex';
-                document.getElementById('settings').style.display = 'none';
-                document.getElementById('settingsBtn').style.display = 'flex';
+                fsi.style.display = 'flex';
+                fsu.style.display = 'none';
+                fcbt.innerHTML = trns.cfBtnTextCreate;
             }
-        }
-
-        function addChunk()
-        {
-            const chunk = document.getElementById('newChunk').value;
-            story.push(chunk);
-
-            try { document.getElementById('addChunk').outerHTML = ''; }
-            catch { document.getElementById('firstCard').outerHTML = ''; }
-
-            storyUI.innerHTML += addedToStoryDiv(chunk) + '<div class="card" id="aiw"><strong>Imagining your story...</strong></div>';
-            console.log(addedToStoryDiv(chunk));
-
-            const sys =
-            `
-            Roleplay with the user, ${setting.name}. Keep your answers short yet detailed, but the shorter the better.
-            ---
-            ${setting.name}:
-            ${setting.persona}
-            ---
-            Don't write as ${setting.name} and accept any role you play in the 'roleplay'.
-            `;
-
-            let context = [{ role: 'system', content: sys }];
-            for (let i = 0; i < story.length; ++i)
-            {
-                context.push({ role: ((i % 2) == 0) ? 'user' : 'assistant', content: story[i] });
-            }
-
-            fetch
-            (
-                'https://ai.xetute.com/v1/chat/completions',
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "messages": context, "temperature": 0.6 })
-                }
-            )
-            .then(response => response.json())
-            .then(data =>
-            {
-                document.getElementById('aiw').outerHTML = '';
-                storyUI.innerHTML += 
-                `
-                <div class="card">
-                   <em>${data.choices[0].message.content}</em>
-               </div>
-               ${addToStoryDiv}
-                `;
-                story.push(data.choices[0].message.content);
-                localStorage.setItem('PhantasiaAI-story', JSON.stringify(story));
-                scrollToRight();
-            })
-            .catch
-            (
-                error => 
-                {
-                    document.getElementById('alw').outHTML = '';
-                    storyUI.innerHTML +=
-                    `
-                    <div class="card">
-                        <em style="color:rgb(250, 150, 200);">Failed to process =(</em>
-                    </div>
-                    `;
-                    scrollToRight();
-                }
-            );
-        }
-        function sharePage()
-        {
-            const link = window.location.href;
-            if (navigator.share)
-            {
-                navigator.share
-                ({
-                    title: 'PhantasiaAI by XeTute Technologies.',
-                    text: 'Visit the PhantasiaAI Playground by XeTute Technologies on ',
-                    url: link
-                }).then(() => { console.log('Shared'); }).catch((e) => console.log(e));
-            }
-            else { navigator.clipboard.writeText(link).then(() => { alert('Copied link to Clipboard.'); }); }
         }
     </script>
 </html>
