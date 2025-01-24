@@ -35,6 +35,15 @@
         <h1 id="greeting"></h1>
 
         <div class="card">
+            <em id="username0" class="selfcenter"></em>
+            <div class="row">
+                <p id="username1"></p>
+                <p id="username2"></p>
+            </div>
+            <button onclick="updateUsername()" class="sb"><span id="updateusername"></span></button>
+        </div>
+
+        <div class="card">
             <em id="email0" class="selfcenter"></em>
             <em id="updatingemail" class="selfcenter"></em>
             <div class="row">
@@ -87,6 +96,13 @@
                 {
                     greeting: `Hello, ${auth.record.data.username}.`,
                     
+                    username0: 'Username',
+                    username1: 'Username:',
+                    username2: auth.record.data.username,
+                    updateusername: 'Update Username',
+                    newusername: 'Please type in your desired Username here',
+                    failedtoupdateusername: 'Failed to update username. We\'re sorry.',
+
                     email0: 'E-Mail',
                     updatingemail: 'By updating your E-Mail, you\'ll have to verify the new one and re-authorize into your account.',
                     email1: 'E-Mail:',
@@ -115,6 +131,13 @@
                 {
                     greeting: `你好, ${auth.record.data.username}.`,
 
+                    username0: '使用者名稱',
+                    username1: '使用者名稱:',
+                    username2: auth.record.data.username,
+                    updateusername: '更新使用者名稱',
+                    newusername: '請在此輸入您想要的用戶名',
+                    failedtoupdateusername: '無法更新使用者名稱。我們很抱歉。',
+
                     email0: '电子邮件',
                     updatingemail: '更新您的电子邮件后，您需要验证新电子邮件并重新授权登录您的账户。',
                     email1: '电子邮件:',
@@ -142,6 +165,13 @@
                 ur:
                 {
                     greeting: `سلام، ${auth.record.data.username}.`,
+
+                    username0: 'صارف نام',
+                    username1: 'صارف نام:',
+                    username2: auth.record.data.username,
+                    updateusername: 'صارف نام کو اپ ڈیٹ کریں۔',
+                    newusername: 'براہ کرم یہاں اپنا مطلوبہ صارف نام ٹائپ کریں۔',
+                    failedtoupdateusername: 'صارف نام کو اپ ڈیٹ کرنے میں ناکام۔ ہمیں افسوس ہے۔',
 
                     email0: 'ای میل',
                     updatingemail: 'اپنی ای میل اپڈیٹ کرنے کے بعد، آپ کو نئی ای میل کی تصدیق کرنی ہوگی اور دوبارہ اپنے اکاؤنٹ میں اجازت لینی ہوگی۔',
@@ -176,12 +206,19 @@
             for (let key in trns)
             {
                 try { document.getElementById(key).innerHTML = trns[key]; }
-                catch {}
+                catch { }
             }
 
             document.documentElement.lang = lang;
         }
         autoTranslate();
+
+        async function updateUsername()
+        {
+            auth.record.data.username = prompt(trns.newusername);
+            try { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } ); window.location.href = './index.html?profile.html'; }
+            catch { alert(trns.failedtoupdateusername); }
+        }
 
         async function updateMail()
         {
