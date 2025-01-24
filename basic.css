@@ -3,6 +3,12 @@
     --material-theme: #000;
 }
 
+html[lang="ur"]
+{
+    direction: rtl;
+    text-align: right;
+}
+
 body, html
 {
     width: 100%;

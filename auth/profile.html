@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="description" content="View, Delete & Update your XeTute Technologies Authorisation Profile."/>
+
+        <title>Your Profile \\ XeTute Technologies</title>
+
+        <link rel="stylesheet" href="../basic.css"/>
+        <link rel="icon" href="../logo.jpg"/>
+        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+
+        <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
+    </head>
+    <style>
+        .row
+        {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            justify-self: center;
+            align-self: center;
+
+            width: unset;
+            height: unset;
+
+            flex-direction: row;
+        }
+
+        .selfcenter { justify-self: center; }
+    </style>
+    <body style="overflow-x: hidden; display: none; padding: 20px;" id="main">
+        <h1 id="greeting"></h1>
+
+        <div class="card">
+            <em id="email0" class="selfcenter"></em>
+            <em id="updatingemail" class="selfcenter"></em>
+            <div class="row">
+                <p id="email1"></p>
+                <p id="email2"></p>
+            </div>
+            <button onclick="updateMail()" class="sb"><span id="updatemail"></span></button>
+        </div>
+
+        <div class="card">
+            <em id="password" class="selfcenter"></em>
+            <em id="updatingpassword" class="selfcenter"></em>
+            <button onclick="updatePassword()" class="sb"><span id="updatepassword"></span></button>
+        </div>
+
+        <div class="card">
+            <em id="authorisation" class="selfcenter"></em>
+            <button onclick="logOut()" class="sb"><span id="logout"></span></button>
+            <button onclick="removeAccount()" class="sb" style="color: rgba(255, 105, 105);"><span id="removeaccount"></span></button>
+        </div>
+    </body>
+    <script src="../pocketbase.umd.js"></script>
+    <script defer>
+        const pb = new PocketBase('https://db.xetute.com');
+        let auth = undefined;
+
+        async function autoAuth()
+        {
+            try { auth = await pb.collection('accounts').authRefresh(); }
+            catch { window.location.href = `./index.html?profile.html`; }
+
+            if ((!auth.record.data) || auth.record.data === null)
+            {
+                auth.record.data = { "username": 'Friend' };
+                await pb.collection('accounts').update(auth.record.id, { data: auth.record.data } );
+            }
+        }
+
+        // Browser translations for en, zh, and ur
+        let userLang;
+        let lang;
+        let trns;
+
+        async function autoTranslate()
+        {
+            await autoAuth();
+            const translations =
+            {
+                en:
+                {
+                    greeting: `Hello, ${auth.record.data.username}.`,
+                    
+                    email0: 'E-Mail',
+                    updatingemail: 'By updating your E-Mail, you\'ll have to verify the new one and re-authorize into your account.',
+                    email1: 'E-Mail:',
+                    email2: auth.record.email,
+                    updatemail: 'Update E-Mail',
+
+                    password: 'Password',
+                    updatingpassword: 'By updating your Password, you\'ll have to re-authorize into your account.',
+                    updatepassword: 'Update Password',
+
+                    authorisation: 'Authorisation',
+                    logout: 'Log Out',
+                    removeaccount: 'Remove Account',
+
+                    typenewmail: 'Please type in your new E-Mail here',
+                    checknewmail: 'Please check the E-Mail address you provided. You may have to re-authorize afterwards. We\'re sorry for the inconvenience.',
+                    failednewmail: 'Failed to sent an E-Mail to the one you provided. We\'re sorry.',
+
+                    sentupdatepasswordemail: `We\'ve sent you an E-Mail for changing your password to ${auth.record.email}. You may have to re-authorize afterwards. We\'re sorry for the inconvenience.`,
+                    failedupdatedpasswordemail: `Failed to send you an E-Mail for changing your password. We\'re sorry.`,
+
+                    removeaccountconfirm: 'By removing your account, all media you\'ve uploaded to the public won\'t be automatically deleted. Deleting your account cannot be undone. Continue?',
+                    removaccountfailed: 'Failed to remove your account. We\'re sorry.'
+                },
+                zh:
+                {
+                    greeting: `你好, ${auth.record.data.username}.`,
+
+                    email0: '电子邮件',
+                    updatingemail: '更新您的电子邮件后，您需要验证新电子邮件并重新授权登录您的账户。',
+                    email1: '电子邮件:',
+                    email2: auth.record.email,
+                    updatemail: '更新电子邮件',
+
+                    password: '密码',
+                    updatingpassword: '更新您的密码后，您需要重新授权登录您的账户。',
+                    updatepassword: '更新密码',
+
+                    authorisation: '授权',
+                    logout: '登出',
+                    removeaccount: '删除账户',
+
+                    typenewmail: '请在此输入您的新电子邮件地址',
+                    checknewmail: '请检查您提供的电子邮件地址。之后您可能需要重新授权登录。对给您带来的不便，我们深感抱歉。',
+                    failednewmail: '未能发送电子邮件至您提供的地址。我们深感抱歉。',
+
+                    sentupdatepasswordemail: `我们已发送电子邮件至 ${auth.record.email}，用于更改您的密码。之后您可能需要重新授权登录。对给您带来的不便，我们深感抱歉。`,
+                    failedupdatedpasswordemail: `未能发送电子邮件用于更改您的密码。我们深感抱歉。`,
+
+                    removeaccountconfirm: '删除您的账户后，您上传至公共平台的所有媒体将不会自动删除。删除账户不可撤销。继续吗？',
+                    removaccountfailed: '删除账户失败。我们深感抱歉。'
+                },
+                ur:
+                {
+                    greeting: `سلام، ${auth.record.data.username}.`,
+
+                    email0: 'ای میل',
+                    updatingemail: 'اپنی ای میل اپڈیٹ کرنے کے بعد، آپ کو نئی ای میل کی تصدیق کرنی ہوگی اور دوبارہ اپنے اکاؤنٹ میں اجازت لینی ہوگی۔',
+                    email1: 'ای میل:',
+                    email2: auth.record.email,
+                    updatemail: 'ای میل اپڈیٹ کریں',
+
+                    password: 'پاس ورڈ',
+                    updatingpassword: 'اپنا پاس ورڈ اپڈیٹ کرنے کے بعد، آپ کو دوبارہ اپنے اکاؤنٹ میں اجازت لینی ہوگی۔',
+                    updatepassword: 'پاس ورڈ اپڈیٹ کریں',
+
+                    authorisation: 'اجازت',
+                    logout: 'لاگ آؤٹ',
+                    removeaccount: 'اکاؤنٹ حذف کریں',
+
+                    typenewmail: 'براہ کرم یہاں اپنی نئی ای میل درج کریں',
+                    checknewmail: 'براہ کرم آپ کے فراہم کردہ ای میل پتے کو چیک کریں۔ اس کے بعد آپ کو دوبارہ اجازت لینے کی ضرورت پڑ سکتی ہے۔ ہمیں آپ کو پریشانی دینے کے لیے معذرت ہے۔',
+                    failednewmail: 'ہم آپ کے فراہم کردہ ای میل پتے پر ای میل بھیجنے میں ناکام رہے۔ ہمیں معذرت ہے۔',
+
+                    sentupdatepasswordemail: `ہم نے آپ کے پاس ورڈ کو تبدیل کرنے کے لیے ${auth.record.email} پر ایک ای میل بھیجی ہے۔ اس کے بعد آپ کو دوبارہ اجازت لینے کی ضرورت پڑ سکتی ہے۔ ہمیں پریشانی دینے کے لیے معذرت ہے۔`,
+                    failedupdatedpasswordemail: `ہم آپ کے پاس ورڈ کو تبدیل کرنے کے لیے ای میل بھیجنے میں ناکام رہے۔ ہمیں معذرت ہے۔`,
+
+                    removeaccountconfirm: 'اپنا اکاؤنٹ حذف کرنے کے بعد، عوام میں اپ لوڈ کی گئی تمام میڈیا خودبخود حذف نہیں ہوں گی۔ اکاؤنٹ حذف کرنا ناقابل واپسی عمل ہے۔ کیا آپ جاری رکھنا چاہتے ہیں؟',
+                    removaccountfailed: 'آپ کا اکاؤنٹ حذف کرنے میں ناکامی ہوئی۔ ہمیں معذرت ہے۔'
+                }
+            };
+
+            userLang = navigator.language.slice(0, 2); // en, zh, ur
+            lang = translations[userLang] ? userLang : 'en';
+            trns = translations[lang];
+
+            for (let key in trns)
+            {
+                try { document.getElementById(key).innerHTML = trns[key]; }
+                catch {}
+            }
+
+            document.documentElement.lang = lang;
+        }
+        autoTranslate();
+
+        async function updateMail()
+        {
+            const newmail = prompt(trns.typenewmail);
+            try
+            {
+                await pb.collection('accounts').requestEmailChange(newmail);
+                alert(trns.checknewmail);
+            }
+            catch { alert(failednewmail); }
+        }
+
+        async function updatePassword()
+        {
+            try
+            {
+                await pb.collection('accounts').requestPasswordReset(auth.record.email);
+                alert(trns.sentupdatepasswordemail);
+            }
+            catch { alert(trns.failedupdatedpasswordemail); }
+        }
+
+        async function logOut() { await pb.authStore.clear(); window.location.href = './index.html?profile.html'; }
+        async function removeAccount()
+        {
+            if (confirm(trns.removeaccountconfirm))
+            {
+                try { await pb.collection('accounts').delete(auth.record.id); window.location.href = './index.html?profile.html'; }
+                catch { alert(trns.removaccountfailed); }
+            }
+        }
+
+        document.getElementById('main').style.display = 'flex';
+    </script>
+</html>
