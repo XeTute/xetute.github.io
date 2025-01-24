@@ -38,6 +38,15 @@
             margin: 10px;
         }
 
+        .formcontainer
+        {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
         #form-signin, #form-signup
         {
             display: flex;
@@ -59,7 +68,7 @@
             <p id="header-text" style="margin: 0;">XeTute Technologies</p>
         </a>
 
-        <div style="display: flex; flex-direction: column; width: 100%; height: 100vh; justify-content: center; align-items: center;">
+        <div class="formcontainer">
             <div id="form-signin" class="card">
                 <h2 id="signin-title">Sign-In</h2>
     
@@ -105,7 +114,7 @@
             catch { document.getElementById('main').style.display = 'flex'; }
         }
         autoAuth();
-        
+
         const fsi = document.getElementById('form-signin'); // form sign in
         const fsu = document.getElementById('form-signup'); // form sign up
         const fcb = document.getElementById('cfBtn'); // form change button
@@ -115,6 +124,23 @@
         const sip = document.getElementById('signin-password');
         const sue = document.getElementById('signup-email');
         const sup = [ document.getElementById('signup-password0'), document.getElementById('signup-password1') ];
+
+        function changeForm()
+        {
+            if (!fsi.style.display) fsi.style.display = 'flex';
+            if (fsi.style.display === 'flex')
+            {
+                fsi.style.display = 'none';
+                fsu.style.display = 'flex';
+                fcbt.innerHTML = trns.cfBtnTextExisting;
+            }
+            else
+            {
+                fsi.style.display = 'flex';
+                fsu.style.display = 'none';
+                fcbt.innerHTML = trns.cfBtnTextCreate;
+            }
+        }
 
         async function signIn()
         {
@@ -230,22 +256,5 @@
         document.getElementById('signup-email').placeholder = trns.signupEmailPlaceholder;
         document.getElementById('signup-password0').placeholder = trns.signupPasswordPlaceholder;
         document.getElementById('signup-password1').placeholder = trns.signupConfirmPasswordPlaceholder;
-
-        function changeForm()
-        {
-            if (!fsi.style.display) fsi.style.display = 'flex';
-            if (fsi.style.display === 'flex')
-            {
-                fsi.style.display = 'none';
-                fsu.style.display = 'flex';
-                fcbt.innerHTML = trns.cfBtnTextExisting;
-            }
-            else
-            {
-                fsi.style.display = 'flex';
-                fsu.style.display = 'none';
-                fcbt.innerHTML = trns.cfBtnTextCreate;
-            }
-        }
     </script>
 </html>
