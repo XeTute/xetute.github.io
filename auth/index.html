@@ -174,14 +174,19 @@
                     await pb.collection('accounts').delete(record.id);
                 }
 
+                let link;
                 try
                 {
-                    const link = window.location.search.substr(1);
+                    link = window.location.search.substr(1);
                     if (!link) link = '../'; // Browsers are very different with JS lmao
                 }
                 catch { link = '../'; }
 
-                txtnotif.innerHTML = `<p style="color: green;">Further instructions sent to ${sue.value}. After completion, please <a class="sb" style="border: 0; background: transparent; padding: 0;" href="${link}">click here</a>.</p>`;
+                try
+                {
+                    txtnotif.innerHTML = `<p style="color: green;">Further instructions sent to ${sue.value}. After completion, please <a class="sb" style="border: 0; background: transparent; padding: 0;" href="${link}">click here</a>.</p>`;
+                }
+                catch { alert(`Further instructions sent to ${sue.value}. After completion, please reload this page to automatically refer.`); }
             }
             catch { txtnotif.textContent = 'An unexpected error occurred. We\'re sorry.'; }
             txtnotif.style.color = 'red';
