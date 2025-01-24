@@ -14,12 +14,6 @@
         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
         <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
         <style>
-            html[lang="ur"]
-            {
-                direction: rtl;
-                text-align: right;
-            }
-
             .section
             {
                 display: flex;
@@ -85,24 +79,27 @@
             }
             .section-title { margin-bottom: 3rem; }
 
-            .paiintro
+            .prodpage
             {
                 display: flex;
                 flex-direction: row;
                 width: 100%;
             }
+            .nobottom { margin-bottom: 0; padding-bottom: 0; }
+            .dist { margin: 20px; padding: 15px; }
+            .decovid { border-radius: 25px; max-width: 80%; margin: 20px; }
 
             @media (max-width: 768px)
             {
                 .hero-title { font-size: 3.5rem; }
-                .paiintro { flex-direction: column; }
+                .prodpage { flex-direction: column-reverse; }
             }
         </style>
     </head>
-    <body id="main" style="display: none;">
+    <body id="main" style="display: none; overflow-x: hidden;">
         <!-- Hero Section -->
         <div class="section">
-            <h1 class="hero-title" id="herotitle"></h1>
+            <h1 class="hero-title" id="herotitle">—</h1>
             <p class="hero-subtitle" id="herosub">—</p>
             <a class="sb scroll-indicator" onclick="document.getElementById('pai').scrollIntoView({ behavior: 'smooth' })">
                 <i class="fa fa-arrow-down" aria-hidden="true"></i>
@@ -111,23 +108,32 @@
 
         <!-- Apps -->
         <div class="section" id="pai">
-            <div class="paiintro fullsize allcenter" style="margin-bottom: 0; padding-bottom: 0;">
-                <div class="allcenter fullsize" style="margin: 20px; padding: 15px;">
-                    <h1 class="hero-title" style="scale: 0.75;">Introducing PhantasiaAI</h1>
+            <div class="prodpage fullsize allcenter nobottom">
+                <div class="allcenter fullsize dist">
+                    <video src="pai-deco.mp4" class="box-shadow decovid" alt="decorative video" muted loop autoplay></video>
+                    <a href="PhantasiaAI/" class="sb"><span id="paiinvitation">—</span></a>
+                </div>
+                <div class="allcenter fullsize dist">
+                    <h1 class="hero-title" style="scale: 0.75;" id="introducingpai">—</h1>
                     <p class="hero-subtitle" id="paisub">—</p>
                 </div>
-                <div class="allcenter fullsize" style="margin: 20px; padding: 15px;">
-                    <video src="pai-deco.mp4" class="box-shadow" alt="decorative video" style="border-radius: 25px; max-width: 80%; margin: 20px;" muted loop autoplay></video>
-                    <a href="PhantasiaAI/" class="sb"><span id="paiinvitation">Envision Now</span></a>
-                </div>
             </div>
-            <a class="sb scroll-indicator" onclick="document.getElementById('future').scrollIntoView({ behavior: 'smooth' })">
+            <a class="sb scroll-indicator" onclick="document.getElementById('auth').scrollIntoView({ behavior: 'smooth' })">
                 <i class="fa fa-arrow-down" aria-hidden="true"></i>
             </a>
         </div>
 
-        <div class="section fullsize allcenter">
-            <h1 class="hero-title" style="scale: 0.75;" id="future"></h1>
+        <div class="section fullsize allcenter" id="auth">
+            <div class="prodpage fullsize allcenter nobottom">
+                <div class="allcenter fullsize dist">
+                    <video src="auth-deco.mp4" class="box-shadow decovid" alt="decorative video" muted loop autoplay></video>
+                    <a href="auth/profile.html" class="sb"><span id="checkauthstat"></span></a>
+                </div>
+                <div class="allcenter fullsize dist">
+                    <h1 class="hero-title" style="scale: 0.75;" id="authyourself">—</h1>
+                    <p class="hero-subtitle" id="authsub">—</p>
+                </div>
+            </div>
         </div>
 
         <script defer>
@@ -174,36 +180,48 @@
                     herotitle: "HELLO, FRIEND.",
                     herosub0: "Follow your Curiosity<br>Lead Humanity Forward",
                     herosub1: "Reach the end of the Story in your own way.",
-                    
+
+                    introducingpai: "Introducing PhantasiaAI",
                     paisub0: "Immerse in your very own digital realm.",
                     paisub1: "Socialize with artificial beings, safely and privately.",
                     paiinvitation: "Envision Now",
-
-                    future: "More coming soon."
+                
+                    checkauthstat: "Check Authorisation Status",
+                    authyourself: "Our Authorisation Services.",
+                    authsub0: "Connect with a community fostering knowledge.",
+                    authsub1: "We may end up as your metaphorical second family =)"
                 },
                 zh:
                 {
                     herotitle: "你好，朋友。",
                     herosub0: "追随你的好奇心<br>引领人类向前",
                     herosub1: "以你自己的方式到达故事的尽头。",
-                    
+
+                    introducingpai: "介绍 PhantasiaAI",
                     paisub0: "沉浸在你自己的数字领域中。",
                     paisub1: "与人工智能安全、私密地社交。",
                     paiinvitation: "现在想象",
-
-                    future: "更多内容即将推出。"
+                
+                    checkauthstat: "检查授权状态",
+                    authyourself: "我们的授权服务。",
+                    authsub0: "与一个促进知识的社区联系。",
+                    authsub1: "我们可能会成为你隐喻的第二个家庭 =)"
                 },
                 ur:
                 {
                     herotitle: "ہیلو، دوست۔",
                     herosub0: "اپنی تجسس کی پیروی کریں<br>انسانیت کو آگے بڑھائیں",
                     herosub1: "کہانی کے آخر تک اپنے طریقے سے پہنچیں۔",
-                    
+
+                    introducingpai: "فینٹاسیا اے آئی کا تعارف",
                     paisub0: "اپنی ذاتی ڈیجیٹل دنیا میں غوطہ زن ہوں۔",
                     paisub1: "مصنوعی مخلوق کے ساتھ محفوظ اور نجی طور پر ملیں۔",
                     paiinvitation: "اب تصور کریں",
-
-                    future: "زیادہ جلد آ رہا ہے۔"
+                
+                    checkauthstat: "اجازت کی حالت چیک کریں",
+                    authyourself: "ہماری اجازت کی خدمات۔",
+                    authsub0: "علم کو فروغ دینے والے ایک کمیونٹی سے جڑیں۔",
+                    authsub1: "ہم آپ کے مجازی دوسرے خاندان بن سکتے ہیں =)"
                 }
             };
 
@@ -220,6 +238,7 @@
 
             changeText([trns.herosub0, trns.herosub1], 'herosub');
             changeText([trns.paisub0, trns.paisub1], 'paisub');
+            changeText([trns.authsub0, trns.authsub1], 'authsub');
 
             document.getElementById('main').style.display = 'flex';
         </script>
