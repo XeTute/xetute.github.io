@@ -43,7 +43,7 @@
         <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
 
         <em id="newestpersonas"></em>
-        <input id="searchpersona" class="si"/>
+        <input id="searchpersona" class="si" onchange="applySearch()"/>
         <div class="personas" id="personas"></div>
     </body>
     <script src="../pocketbase.umd.js"></script>
@@ -150,6 +150,7 @@
         {
             const list = await pb.collection('PhantasiaAI_Characters').getList(currentchunk, (currentchunk += 25), { fields: 'firstname,lastname,id,profile' });
             const personas = document.getElementById('personas');
+            personas.innerHTML = '';
             let loadmore = undefined;
 
             try { loadmore = document.getElementById('loadmore'); }
@@ -171,5 +172,20 @@
             document.getElementById('main').style.display = 'flex';
         }
         popPersonasFirstTime();
+
+        async function applySearch()
+        {
+            const val = document.getElementById('searchpersona').value;
+            if (val.length === 0) { currentchunk = 0; popPersonas(); return; }
+            const list = await pb.collection('PhantasiaAI_Characters').getFullList({ fields: "firstname,lastname,id,profile", filter: `(firstname?~'${val}' || lastname?~'${val}')` });
+            const personas = document.getElementById('personas');
+
+            personas.innerHTML = '';
+            for (let i = 0; i < list.length; ++i)
+            {
+                const item = list[i];
+                personas.innerHTML += personadiv(item.firstname + ' ' + item.lastname, item.id, item.profile);
+            }
+        }
     </script>
 </html>
