@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, PhantasiaAI, AI, Storywriting, Game"/>
+        <meta name="description" content="PhantasiaAI by XeTute Technologies"/>
+
+        <title>PhantasiaAI \\ XeTute Technologies</title>
+
+        <link rel="stylesheet" href="../basic.css"/>
+        <link rel="stylesheet" href="basic.css"/>
+        <link rel="icon" href="logo.jpg"/>
+        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+
+        <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
+    </head>
+    <style>
+        .messagescontainer
+        {
+            display: flex;
+
+            flex-direction: column;
+            justify-content: flex-start;
+
+            width: 90%;
+            max-width: 500px;
+            max-height: 80%;
+
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            position: absolute;
+            bottom: 10%;
+        }
+
+        .message
+        {
+            display: flex;
+            max-width: 65%;
+            padding: 5px;
+            margin: 5px;
+            background: #050505;
+            border-radius: 5px;
+        }
+
+        .aimessage
+        {
+            align-self: flex-start;
+            border: 3px solid #333;
+            text-align: left;
+        }
+
+        .usermessage
+        {
+            align-self: flex-end;
+            border: 3px solid #222;
+            text-align: right;
+        }
+    </style>
+    <body style="display: none; overflow: hidden;" id="main">
+        <div class="card row chat" style="z-index: 1; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+            <img id="personapp" class="chatpp"/>
+            <p id="personaname"></p>
+        </div>
+
+        <div class="messagescontainer" id="messagescontainer">
+            <div style="margin: 6.3%"></div>
+        </div>
+
+        <div style="display: flex; flex-direction: row; position: absolute; bottom: 0;">
+            <textarea id="message" class="si"></textarea>
+            <button class="sb" onclick="sendCM()" id="sendbtn">
+                <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+            </button>
+        </div>
+    </body>
+    <script src="../pocketbase.umd.js"></script>
+    <script defer>
+        const recid = window.location.search.substr(1);
+        if (recid.length === 0) { window.location.href = './'; }
+        const pb = new PocketBase('https://db.xetute.com/');
+
+        let auth = undefined;
+        let rec = undefined;
+        let fullname = undefined;
+        let generatingmessage = false;
+
+        async function autoAuth()
+        {
+            try { auth = await pb.collection('accounts').authRefresh(); }
+            catch { window.location.href = `../auth/index.html?${window.location.href}`; }
+        }
+
+        function getImageURL(_collectionID, _recID, _filename) { return `https://db.xetute.com/api/files/${_collectionID}/${_recID}/${_filename}`; }
+        async function loadrec()
+        {
+            await autoAuth();
+            try
+            {
+                rec = await pb.collection('PhantasiaAI_Characters').getOne(recid, { fields: 'creatorid,firstname,lastname,persona,profile'});
+                auth.record.data.PhantasiaAI.chat.lastchat = recid;
+                await pb.collection('accounts').update(auth.record.id,  { "data": auth.record.data } );
+            }
+            catch
+            {
+                alert('Failed to load. Will go to the dashboard. We\'re sorry.');
+                window.location.href = './';
+            }
+
+            fullname = rec.firstname + ' ' + rec.lastname;
+            document.getElementById('personapp').src = getImageURL("PhantasiaAI_Characters", recid, rec.profile);
+            document.getElementById('personapp').alt = `${fullname}'s Profile Picture.`;
+            document.getElementById('personaname').textContent = fullname;
+
+            document.getElementById('main').style.display = 'flex';
+        }
+
+        async function autoTranslate()
+        {
+            await loadrec();
+            const translations =
+            {
+                en:
+                {
+                    message: '"Saying", *action*',
+                },
+                zh:
+                {
+                },
+                ur:
+                {
+                }
+            };
+
+            const userLang = navigator.language.slice(0, 2); // en, zh, ur
+            const lang = translations[userLang] ? userLang : 'en';
+            const trns = translations[lang];
+
+            for (let key in trns)
+            {
+                if (key !== 'message')
+                {
+                    try { document.getElementById(key).innerHTML = trns[key]; }
+                    catch { }
+                }
+            }
+
+            document.documentElement.lang = lang;
+
+            document.getElementById('message').placeholder = trns.message;
+        }
+
+        function sanitized(str)
+        {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function messagediv(id, userornot, message)
+        {
+            const val =
+            `
+            <div class="message ${userornot ? 'usermessage' : 'aimessage'}" id="message${id}">
+                <p>${sanitized(message)}</p>
+            </div>
+            `;
+            return val;
+        }
+
+        let latestmessageid = 0;
+        async function popMessages()
+        {
+            await autoTranslate();
+
+            let user = true;
+            const n = auth.record.data.PhantasiaAI.chat[recid].messages.length;
+            for (let i = 0; i < n; ++i)
+            {
+                document.getElementById('messagescontainer').innerHTML += 
+                messagediv(latestmessageid, user, auth.record.data.PhantasiaAI.chat[recid].messages[i].content);
+                user = (!user);
+                ++latestmessageid;
+            }
+
+            document.getElementById('main').style.display = 'flex';
+        }
+        popMessages();
+
+        async function sendCM()
+        {
+            const message = document.getElementById('message').value;
+            let resp = undefined;
+            let failed = false;
+            document.getElementById('message').value = '';
+
+            document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, true, message);
+            ++latestmessageid;
+
+            if (!auth.record.data.PhantasiaAI.chat[recid] || auth.record.data.PhantasiaAI.chat[recid] === null)
+            { Object.assign(auth.record.data.PhantasiaAI.chat, { [recid]: { messages: [{ role: "user", content: message }] } } ); }
+            else
+            { auth.record.data.PhantasiaAI.chat[recid].messages.push({ role: "user", content: message }); }
+
+            await fetch
+            (
+                "https://ai.xetute.com/v1/chat/completions",
+                {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ "messages": auth.record.data.PhantasiaAI.chat[recid].messages, "temperature": 0.6 })
+                }
+            ).then(response => response.json())
+            .then( data => { resp = data; } )
+            .catch(e => 
+            { 
+                alert('Failed to process your message. We\'re sorry.');
+                document.getElementById('message').value = message;
+                failed = true;
+            });
+
+            if (!failed)
+            {
+                auth.record.data.PhantasiaAI.chat[recid].messages.push({ role: "assistant", content: resp.choices[0].message.content });
+                try { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } ); }
+                catch { alert('failed to sync messages to our cloud. We\'re sorry.'); }
+
+                document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, false, resp.choices[0].message.content);
+                ++latestmessageid;
+            }
+        }
+    </script>
+</html>

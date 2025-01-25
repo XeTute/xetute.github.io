@@ -9,6 +9,7 @@
         <title>PhantasiaAI \\ XeTute Technologies</title>
 
         <link rel="stylesheet" href="../basic.css"/>
+        <link rel="stylesheet" href="basic.css"/>
         <link rel="icon" href="logo.jpg"/>
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
@@ -16,322 +17,159 @@
         <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
     </head>
     <style>
-        .storyContainer
+        .personas
         {
-            overflow-x: auto;
-            width: 100%;
-            height: 100%;
-
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
 
             justify-content: flex-start;
             align-items: center;
-        }
 
-        .content
-        {
-            display: flex;
-
-            justify-content: center;
-            align-items: center;
-        }
-
-        @media screen and (orientation:portrait)
-        {
-            .content { flex-direction: column; }
-        }
-
-        @media screen and (orientation:landscape)
-        {
-            .content { flex-direction: row; }
-        }
-
-        .ifc /* Input for Card */
-        {
-            width: 90%;
-            height: 100px;
-
-            font-size: 18px;
-            font-weight: 100;
-        }
-
-        .links
-        {
-            display: flex;
-            flex-direction: row;
-
-            position: absolute;
-            bottom: 8px;
-
-            max-height: 50px;
+            max-width: 80%;
+            max-height: 80%;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
     </style>
     <body style="overflow: hidden; display: none;" id="main">
-        <h1 style="margin-top: 20px; font-weight: 200;" id="welcomeTxt"></h1>
+        <h1 id="greeting" style="margin: 20px;"></h1>
 
-        <div class="storyContainer" id="storyContainer">
-            <div class="card" id="firstCard">
-                <em id="firstCardText"></em>
-                <textarea id="newChunk" class="si ifc"></textarea>
-                <button onclick="addChunk()" class="sb" id="startButton"></button>
-            </div>
+        <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
+        <em id="lastchat"></em>
+        <div class="card row chat" id="lastchatdiv">
+            <img alt="profile image of your last chat" class="box-shadow chatpp" id="lastchatimg"/>
+            <em id="lastchatname"></em>
         </div>
+        <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
 
-        <div class="card" style="display: none;" id="settings">
-            <h2 style="font-weight: 200; margin: 20px;" id="settingsTitle"></h2>
-            <div class="content">
-                <input class="si idc" id="username"/>
-                <textarea class="si idc" id="persona"></textarea>
-            </div>
-            <button onclick="applySettings(); displaySettings();" class="sb" id="applyCloseButton"></button>
-            <button onclick="displaySettings()" class="sb" id="closeWithoutSavingButton"></button>
-            <button onclick="localStorage.removeItem('PhantasiaAI-story'); window.location.href = '';" class="sb" id="clearStoryButton"></button>
-        </div>
-
-        <div class="links">
-            <a href="../index.html" class="sb" id="backLink"><i class="fa fa-chevron-left" aria-hidden="true"></i></a>
-            <button onclick="sharePage()" class="sb" id="shareButton"><i class="fa fa-share" aria-hidden="true"></i></button>
-            <button onclick="displaySettings()" class="sb" id="settingsBtn"><span id="personalizeText"></span></button>
-        </div>
+        <em id="newestpersonas"></em>
+        <input id="searchpersona" class="si"/>
+        <div class="personas" id="personas"></div>
     </body>
+    <script src="../pocketbase.umd.js"></script>
     <script defer>
-        // Browser translations for en, zh, and ur
-        const translations =
-        {
-            en:
-            {
-                welcome: "Welcome, Anonymous.",
-                firstCardText: "The Beginning...",
-                newChunkPlaceholder: "Write the first chunk of YOUR story...",
-                startButton: "Start the Story",
-                settingsTitle: "Settings",
-                usernamePlaceholder: "Your Username...",
-                personaPlaceholder: "Your Persona...",
-                applyCloseButton: "Apply & Close",
-                closeWithoutSavingButton: "Close w/out saving",
-                clearStoryButton: "Clear Story",
-                backLink: "Back",
-                shareButton: "Share",
-                personalizeText: "Personalize"
-            },
-            zh:
-            {
-                welcome: "欢迎, 匿名用户。",
-                firstCardText: "开始...",
-                newChunkPlaceholder: "写下您的故事的第一部分...",
-                startButton: "开始故事",
-                settingsTitle: "设置",
-                usernamePlaceholder: "您的用户名...",
-                personaPlaceholder: "您的角色...",
-                applyCloseButton: "应用并关闭",
-                closeWithoutSavingButton: "关闭且不保存",
-                clearStoryButton: "清除故事",
-                backLink: "返回",
-                shareButton: "分享",
-                personalizeText: "个性化"
-            },
-            ur:
-            {
-                welcome: "خوش آمدید، نامعلوم۔",
-                firstCardText: "آغاز...",
-                newChunkPlaceholder: "اپنی کہانی کا پہلا حصہ لکھیں...",
-                startButton: "کہانی شروع کریں",
-                settingsTitle: "ترتیبات",
-                usernamePlaceholder: "آپ کا صارف نام...",
-                personaPlaceholder: "آپ کی شخصیت...",
-                applyCloseButton: "لاگو کریں اور بند کریں",
-                closeWithoutSavingButton: "بند کریں بغیر محفوظ کیے",
-                clearStoryButton: "کہانی صاف کریں",
-                backLink: "واپس جائیں",
-                shareButton: "شئیر کریں",
-                personalizeText: "ذاتی بنائیں"
-            }
-        };
-
-        const userLang = navigator.language.slice(0, 2); // en, zh, ur
-        const lang = translations[userLang] ? userLang : 'en';
-        const trns = translations[lang];
-
-        document.getElementById('welcomeTxt').textContent = trns.welcome;
-        document.getElementById('firstCardText').textContent = trns.firstCardText;
-        document.getElementById('newChunk').placeholder = trns.newChunkPlaceholder;
-        document.getElementById('startButton').textContent = trns.startButton;
-        document.getElementById('settingsTitle').textContent = trns.settingsTitle;
-        document.getElementById('username').placeholder = trns.usernamePlaceholder;
-        document.getElementById('persona').placeholder = trns.personaPlaceholder;
-        document.getElementById('applyCloseButton').textContent = trns.applyCloseButton;
-        document.getElementById('closeWithoutSavingButton').textContent = trns.closeWithoutSavingButton;
-        document.getElementById('clearStoryButton').textContent = trns.clearStoryButton;
-        document.getElementById('personalizeText').textContent = trns.personalizeText;
-
-        document.documentElement.lang = lang;
-
-        const storyUI = document.getElementById('storyContainer');
-        let setting = localStorage.getItem('PhantasiaAI-setting');
-        let story = localStorage.getItem('PhantasiaAI-story');
-
-        const addToStoryDiv =
-        `
-        <div class="card" id="addChunk">
-            <textarea placeholder="${trns.newChunkPlaceholder}" class="si ifc" id="newChunk"></textarea>
-            <button onclick="addChunk()" class="sb">${trns.startButton}</button>
-        </div>
-        `;
-
-        function addedToStoryDiv(text)
-        {
-            let str =
-            `
-            <div class="card">
-                <em>${text}</em>
-            </div>
-            `;
-            return str;
-        }
-
-        function scrollToRight()
-        {
-            storyUI.innerHTML += "<p style='font-size: 0;' id='slider'>.</p>";
-            document.getElementById('slider').scrollIntoView({ behavior: "smooth" });
-            document.getElementById('slider').outerHTML = '';
-        }
-
-        if (setting)
-        {
-            setting = JSON.parse(setting);
-            document.getElementById('welcomeTxt').textContent = `${trns.welcome.split(',')[0]}, ${setting.name}.`;
-            document.getElementById('username').value = setting.name;
-            document.getElementById('persona').value = setting.persona;
-        } else { setting = { name: "Anonymous", persona: "" }; }
-
-        if (story)
-        {
-            story = JSON.parse(story);
-            document.getElementById('firstCard').outerHTML = '';
-
-            for (let i = 0; i < story.length; ++i)
-            {
-                storyUI.innerHTML += addedToStoryDiv(story[i]);
-            }
-            storyUI.innerHTML += addToStoryDiv;
-            scrollToRight();
-        } else { story = []; }
-        document.getElementById('main').style.display = 'flex';
-
-        function applySettings()
-        {
-            setting.name = document.getElementById('username').value;
-            setting.persona = document.getElementById('persona').value;
-            localStorage.setItem('PhantasiaAI-setting', JSON.stringify(setting));
-
-            document.getElementById('welcomeTxt').textContent = `${trns.welcome.split(',')[0]}, ${setting.name}.`;
-            document.getElementById('username').value = setting.name;
-            document.getElementById('persona').value = setting.persona;
-        }
-
-        function displaySettings()
-        {
-            if (!storyUI.style.display)
-            {
-                storyUI.style.display = 'flex';
-                document.getElementById('settings').style.display = 'none';
-                document.getElementById('settingsBtn').style.display = 'flex';
-            }
-
-            if (storyUI.style.display === 'flex')
-            {
-                storyUI.style.display = 'none';
-                document.getElementById('settings').style.display = 'flex';
-                document.getElementById('settingsBtn').style.display = 'none';
-            }
-            else
-            {
-                storyUI.style.display = 'flex';
-                document.getElementById('settings').style.display = 'none';
-                document.getElementById('settingsBtn').style.display = 'flex';
-            }
-        }
-
-        function addChunk()
-        {
-            const chunk = document.getElementById('newChunk').value;
-            story.push(chunk);
-
-            try { document.getElementById('addChunk').outerHTML = ''; }
-            catch { document.getElementById('firstCard').outerHTML = ''; }
-
-            storyUI.innerHTML += addedToStoryDiv(chunk) + '<div class="card" id="aiw"><strong>Imagining your story...</strong></div>';
-            console.log(addedToStoryDiv(chunk));
-
-            const sys =
-            `
-            Roleplay with the user, ${setting.name}. Keep your answers short yet detailed, but the shorter the better.
-            ---
-            ${setting.name}:
-            ${setting.persona}
-            ---
-            Don't write as ${setting.name} and accept any role you play in the 'roleplay'.
-            `;
-
-            let context = [{ role: 'system', content: sys }];
-            for (let i = 0; i < story.length; ++i)
-            {
-                context.push({ role: ((i % 2) == 0) ? 'user' : 'assistant', content: story[i] });
-            }
-
-            fetch
-            (
-                'https://ai.xetute.com/v1/chat/completions',
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "messages": context, "temperature": 0.6 })
-                }
-            )
-            .then(response => response.json())
-            .then(data =>
-            {
-                document.getElementById('aiw').outerHTML = '';
-                storyUI.innerHTML += 
-                `
-                <div class="card">
-                   <em>${data.choices[0].message.content}</em>
-               </div>
-               ${addToStoryDiv}
-                `;
-                story.push(data.choices[0].message.content);
-                localStorage.setItem('PhantasiaAI-story', JSON.stringify(story));
-                scrollToRight();
-            })
-            .catch
-            (
-                error => 
-                {
-                    document.getElementById('alw').outHTML = '';
-                    storyUI.innerHTML +=
-                    `
-                    <div class="card">
-                        <em style="color:rgb(250, 150, 200);">Failed to process =(</em>
-                    </div>
-                    `;
-                    scrollToRight();
-                }
-            );
-        }
-        function sharePage()
+        function sharePage(_title, _text, copied) // Sharetext = _text + url
         {
             const link = window.location.href;
             if (navigator.share)
             {
                 navigator.share
                 ({
-                    title: 'PhantasiaAI by XeTute Technologies.',
-                    text: 'Visit the PhantasiaAI Playground by XeTute Technologies on ',
+                    title: _title,
+                    text: _text,
                     url: link
-                }).then(() => { console.log('Shared'); }).catch((e) => console.log(e));
+                });
             }
-            else { navigator.clipboard.writeText(link).then(() => { alert('Copied link to Clipboard.'); }); }
+            else { navigator.clipboard.writeText(link).then(() => { alert(copied); }); }
         }
+
+        // Auth
+        const pb = new PocketBase('https://db.xetute.com');
+        let auth = undefined;
+
+        function getImageURL(collectionID, recID, filename) { return `https://db.xetute.com/api/files/${collectionID}/${recID}/${filename}`; }
+        async function autoAuth()
+        {
+            try { auth = await pb.collection('accounts').authRefresh(); }
+            catch { window.location.href = `../auth/index.html?${window.location.href}`; }
+
+            if ((!auth.record.data.PhantasiaAI) || auth.record.data.PhantasiaAI === null)
+            {
+                auth.record.data =
+                {
+                    "username": auth.record.data.username,
+                    "PhantasiaAI": { "chat": { "psa1l65k283iv9o": { "messages": [] }, "lastchat": "psa1l65k283iv9o" } }
+                };
+                await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } );
+            }
+
+            // Load last chat
+            const recid = auth.record.data.PhantasiaAI.chat.lastchat;
+            const rec = await pb.collection('PhantasiaAI_Characters').getOne(recid, { fields: 'firstname,lastname,profile' } );
+            document.getElementById('lastchatimg').src = getImageURL('PhantasiaAI_Characters', recid, rec.profile);
+            document.getElementById('lastchatname').textContent = rec.firstname + ' ' + rec.lastname;
+            document.getElementById('lastchatdiv').setAttribute('onclick', `window.location.href = './chat.html?${recid}'`);
+        }
+
+        // Browser translations for en, zh, and ur
+        async function autoTranslate()
+        {
+            await autoAuth();
+            const translations =
+            {
+                en:
+                {
+                    greeting: `Hello, ${auth.record.data.username}.`,
+                    lastchat: 'Your last Chat',
+
+                    newestpersonas: 'Newest Personas',
+                    searchpersona: 'Search Persona',
+
+                    loadmore: 'Load More',
+                },
+                zh:
+                {
+                },
+                ur:
+                {
+                }
+            };
+
+            const userLang = navigator.language.slice(0, 2); // en, zh, ur
+            const lang = translations[userLang] ? userLang : 'en';
+            const trns = translations[lang];
+
+            for (let key in trns)
+            {
+                if (key !== 'searchpersona')
+                {
+                    try { document.getElementById(key).innerHTML = trns[key]; }
+                    catch { }
+                }
+            }
+
+            document.getElementById('searchpersona').placeholder = trns.searchpersona;
+
+            document.documentElement.lang = lang;
+        }
+
+        function personadiv(chatname, id, imgname)
+        {
+            const div =
+            `
+            <div class="card row chat" onclick="window.location.href = './chat.html?${id}'">
+                 <img alt="profile image of x persona" class="box-shadow chatpp" src="${getImageURL('PhantasiaAI_Characters', id, imgname)}"/>
+                <p>${chatname}</p>
+            </div>
+            `;
+            return div;
+        }
+
+        let currentchunk = 0;
+        async function popPersonas()
+        {
+            const list = await pb.collection('PhantasiaAI_Characters').getList(currentchunk, (currentchunk += 25), { fields: 'firstname,lastname,id,profile' });
+            const personas = document.getElementById('personas');
+            let loadmore = undefined;
+
+            try { loadmore = document.getElementById('loadmore'); }
+            catch { }
+            
+            if (loadmore) { loadmore.outerHTML = ''; }
+            for (let i = 0; i < list.items.length; ++i)
+            {
+                const item = list.items[i];
+                personas.innerHTML += personadiv(item.firstname + ' ' + item.lastname, item.id, item.profile);
+            }
+            
+            if (list.items.length > 25) { personas.innerHTML += `<button class="sb" onclick="popPersonas()" id="loadmore"><span>${trns.loadmore}</span>`; }
+        }
+        async function popPersonasFirstTime()
+        {
+            await autoTranslate();
+            await popPersonas();
+            document.getElementById('main').style.display = 'flex';
+        }
+        popPersonasFirstTime();
     </script>
 </html>
