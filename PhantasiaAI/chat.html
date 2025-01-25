@@ -24,8 +24,11 @@
             flex-direction: column;
             justify-content: flex-start;
 
-            width: 90%;
-            max-width: 500px;
+            align-items: center;
+            align-self: center;
+
+            width: 100%;
+            max-width: 575px;
             max-height: 80%;
 
             overflow-x: hidden;
@@ -58,29 +61,55 @@
             border: 3px solid #222;
             text-align: right;
         }
+
+        #settingsbtn
+        {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 3;
+        }
+
+        fullscreen
+        {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+
+            display: flex;
+            flex-direction: column;
+        }
     </style>
     <body style="display: none; overflow: hidden;" id="main">
-        <div class="card row chat" style="z-index: 1; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
-            <img id="personapp" class="chatpp"/>
-            <div style="display: flex; flex-direction: column;">
-                <p id="personaname" style="margin-bottom: 0;"></p>
-                <em id="personastatus" style="margin-top: 0; scale: 0.75; display: none;"></em>
+        <button class="sb" onclick="openSettings()" id="settingsbtn">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </button>
+        <fullscreen id="chatpage">
+            <div class="card row chat" style="z-index: 1; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+                <img id="personapp" class="chatpp"/>
+                <div style="flex-direction: column;">
+                    <p id="personaname" style="margin-bottom: 0;"></p>
+                    <em id="personastatus" style="margin-top: 0; scale: 0.75; display: none;"></em>
+                </div>
             </div>
-        </div>
-
-        <div class="messagescontainer" id="messagescontainer">
-            <div style="margin: 6.3%"></div>
-        </div>
-
-        <div style="display: flex; flex-direction: row; position: absolute; bottom: 0;">
-            <button class="sb" onclick="openSettings()" id="settingsbtn">
-                <i class="fa fa-bars" aria-hidden="true"></i>
-            </button>
-            <textarea id="message" class="si"></textarea>
-            <button class="sb" onclick="sendCM()" id="sendbtn">
-                <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
-            </button>
-        </div>
+    
+            <div class="messagescontainer" id="messagescontainer">
+                <div style="margin: 6.3%"></div>
+            </div>
+    
+            <div style="flex-direction: row; position: absolute; bottom: 0; width: 100%; justify-content: center;">
+                <textarea id="message" class="si"></textarea>
+                <button class="sb" onclick="sendCM()" id="sendbtn">
+                    <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+                </button>
+            </div>
+        </fullscreen>
+        <fullscreen style="display: none; align-items: center; align-self: center; justify-content: center;" id="settingspage">
+            <button class="sb" onclick="clearChat()" id="clearchatbtn"></button>
+            <button class="sb" onclick="sharePAI()" id="sharePAI"></button>
+            <a class="sb" href="https://ko-fi.com/XeTute" target="_blank" rel="noopener" id="supportus"></a>
+        </fullscreen>
     </body>
     <script src="../pocketbase.umd.js"></script>
     <script defer>
@@ -133,6 +162,10 @@
                 {
                     message: '"Saying", *action*',
                     personastatus: 'Responding...',
+                    clearchatbtn: "Clear Chat",
+                    sharePAI: "Share PhantasiaAI!",
+                    supportus: "Support Us 🤍",
+                    copiedlink: "Copied Link!"
                 },
                 zh:
                 {
@@ -188,7 +221,8 @@
             await autoTranslate();
 
             let user = true;
-            const n = auth.record.data.PhantasiaAI.chat[recid].messages.length;
+            let n = 0;
+            try { n = auth.record.data.PhantasiaAI.chat[recid].messages.length; } catch { }
             for (let i = 0; i < n; ++i)
             {
                 document.getElementById('messagescontainer').innerHTML += 
@@ -198,7 +232,7 @@
             }
 
             document.getElementById('main').style.display = 'flex';
-            scrolltnm();
+            try { scrolltnm(); } catch { }
         }
         popMessages();
 
@@ -245,10 +279,82 @@
                 catch { alert('failed to sync messages to our cloud. We\'re sorry.'); }
 
                 document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, false, resp.choices[0].message.content);
+                scrolltnm();
                 ++latestmessageid;
             }
 
             generatingmessage = false;
+        }
+
+        function fadeout(element)
+        {
+            let op = 1;
+            let timer = setInterval(function ()
+            {
+                if (op <= 0.1)
+                {
+                    clearInterval(timer);
+                    element.style.display = 'none';
+                }
+                element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                op -= op * 0.1;
+            }, 5);
+        }
+
+        function fadein(element)
+        {
+            let op = 0.1;
+            element.style.display = 'flex';
+            var timer = setInterval(function ()
+            {
+                if (op >= 1) { clearInterval(timer); }
+                element.style.opacity = op;
+                element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                op += op * 0.1;
+            }, 5);
+        }
+
+        function openSettings()
+        {
+            const chatpage = document.getElementById('chatpage');
+            const settingspage = document.getElementById('settingspage');
+
+            if (chatpage.style.display === "none")
+            {
+                fadeout(settingspage);
+                fadein(chatpage);
+            }
+            else
+            {
+                fadeout(chatpage);
+                fadein(settingspage);
+            }
+        }
+
+        async function clearChat()
+        {
+            if (confirm(trns.clearchatbtn + '?'))
+            {
+                auth.record.data.PhantasiaAI.chat[recid] = {};
+                await pb.collection("Accounts").update(auth.record.id, { "data": auth.record.data } );
+                alert("Cleared & Synced to XeTute Technologies Cloud.");
+                window.location.href = window.location.href;
+            }
+        }
+
+        function sharePAI(_title = "PhantasiaAI by XeTute Technologies", _text = "Immerse in your very own realm on: ", copied = trns.copiedlink) // Sharetext = _text + url
+        {
+            const link = window.location.href;
+            if (navigator.share)
+            {
+                navigator.share
+                ({
+                    title: _title,
+                    text: _text,
+                    url: link
+                });
+            }
+            else { navigator.clipboard.writeText(link).then(() => { alert(copied); }); }
         }
     </script>
 </html>
