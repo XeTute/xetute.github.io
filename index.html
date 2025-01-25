@@ -134,6 +134,13 @@
                     <p class="hero-subtitle" id="authsub">—</p>
                 </div>
             </div>
+            <a class="sb scroll-indicator" onclick="document.getElementById('longlivediv').scrollIntoView({ behavior: 'smooth' })">
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="section fullsize allcenter" id="longlivediv">
+            <h2 id="longlivetxt" style="width: 90%; max-width: 550px;"></h2>
         </div>
 
         <script defer>
@@ -163,12 +170,12 @@
                 });
             }
 
-            async function changeText(texts, elemid)
+            async function changeText(texts, elemid, delay = 2000, speed = 50)
             {
                 while (true)
                 {
                     for (const text of texts)
-                        await textAnim(elemid, text);
+                        await textAnim(elemid, text, delay, speed);
                 }
             }
 
@@ -189,7 +196,9 @@
                     checkauthstat: "Check Authorisation Status",
                     authyourself: "Our Authorisation Services.",
                     authsub0: "Connect with a community fostering knowledge.",
-                    authsub1: "We may end up as your metaphorical second family =)"
+                    authsub1: "We may end up as your metaphorical second family =)",
+
+                    longlive: "Long live the Islamic Federal Republic of Pakistan.<br>Long live our alliance with the People's Republic of China, and long live the People's Republic of China."
                 },
                 zh:
                 {
@@ -205,7 +214,9 @@
                     checkauthstat: "检查授权状态",
                     authyourself: "我们的授权服务。",
                     authsub0: "与一个促进知识的社区联系。",
-                    authsub1: "我们可能会成为你隐喻的第二个家庭 =)"
+                    authsub1: "我们可能会成为你隐喻的第二个家庭 =)",
+
+                    longlive: "巴基斯坦伊斯蘭聯邦共和國萬歲。我們同中華人民共和國的聯盟萬歲，中華人民共和國萬歲。"
                 },
                 ur:
                 {
@@ -221,7 +232,9 @@
                     checkauthstat: "اجازت کی حالت چیک کریں",
                     authyourself: "ہماری اجازت کی خدمات۔",
                     authsub0: "علم کو فروغ دینے والے ایک کمیونٹی سے جڑیں۔",
-                    authsub1: "ہم آپ کے مجازی دوسرے خاندان بن سکتے ہیں =)"
+                    authsub1: "ہم آپ کے مجازی دوسرے خاندان بن سکتے ہیں =)",
+
+                    longlive: "اسلامی وفاقی جمہوریہ پاکستان زندہ باد۔<br>عوامی جمہوریہ چین کے ساتھ ہمارا اتحاد زندہ باد، اور عوامی جمہوریہ چین زندہ باد۔"
                 }
             };
 
@@ -239,6 +252,7 @@
             changeText([trns.herosub0, trns.herosub1], 'herosub');
             changeText([trns.paisub0, trns.paisub1], 'paisub');
             changeText([trns.authsub0, trns.authsub1], 'authsub');
+            changeText([translations['en'].longlive, translations['ur'].longlive, translations['zh'].longlive], 'longlivetxt', 1500, 35);
 
             document.getElementById('main').style.display = 'flex';
         </script>
