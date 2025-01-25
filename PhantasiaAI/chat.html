@@ -206,7 +206,8 @@
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+                .replace(/'/g, '&#39;')
+                .replace(/\n/g, '<br>');
         }
 
         let latestmessageid = 0;
@@ -238,7 +239,7 @@
             catch {}
         }
 
-        function scrolltnm() { document.getElementById(`message${(latestmessageid - 1)}`).scrollIntoView({ behavior: 'smooth' }); } // scoll to newest message
+        function scrolltnm() { try { document.getElementById(`message${(latestmessageid - 1)}`).scrollIntoView({ behavior: 'smooth' }); } catch { } } // scoll to newest message
         async function popMessages()
         {
             await autoTranslate();
@@ -246,7 +247,7 @@
             let user = true;
             let n = 0;
             try { n = auth.record.data.PhantasiaAI.chat[recid].messages.length; } catch { }
-            for (let i = 0; i < n; ++i)
+            for (let i = 1; i < n; ++i)
             {
                 removeLastRegen();
                 document.getElementById('messagescontainer').innerHTML += 
@@ -276,7 +277,17 @@
             document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, true, message);
 
             try { auth.record.data.PhantasiaAI.chat[recid].messages.push({ role: "user", content: message }); }
-            catch { Object.assign(auth.record.data.PhantasiaAI.chat, { [recid]: { messages: [{ role: "user", content: message }] } } ); }
+            catch { Object.assign(auth.record.data.PhantasiaAI.chat,
+            {
+                [recid]:
+                {
+                    messages:
+                    [
+                        { role: "system", content: `You're ${fullname}, and your personality is\n${rec.persona}.\nPut stuff you say in "saying" and actions in *action*.` },
+                        { role: "user", content: message }
+                    ]
+                }
+            }); ++latestmessageid; }
 
             document.getElementById('personastatus').style.display = 'flex';
             await fetch
@@ -302,7 +313,7 @@
                 try { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } ); }
                 catch { alert('Failed to sync messages to our cloud. We\'re sorry.'); }
 
-                document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, false, resp.choices[0].message.content);
+                document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, false, resp.choices[0].message.content.replace(/\n/g, '<br>'));
                 scrolltnm();
                 ++latestmessageid;
             }
