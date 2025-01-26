@@ -17,42 +17,89 @@
         <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
     </head>
     <style>
+        .personas
+        {
+            display: flex;
+            flex-direction: column;
 
+            justify-content: flex-start;
+            align-items: center;
+
+            max-width: 80%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .functioncard
+        {
+            min-width: 45%;
+        }
     </style>
-    <body>
-        <h1 id="createpersona" style="margin: 20px;"></h1>
-        <div class="card">
-            <em id="names"></em>
-            <input id="firstname" class="si" maxlength="16"/>
-            <input id="lastname" class="si" maxlength="16"/>
+    <body style="overflow: hidden; display: none;" id="main">
+        <h1 id="greeting" style="margin: 20px;"></h1>
+
+        <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
+        <em id="lastchat"></em>
+        <div class="card row chat" id="lastchatdiv" style="max-height: 6.25%;">
+            <img alt="profile image of your last chat" class="box-shadow chatpp" id="lastchatimg"/>
+            <em id="lastchatname"></em>
         </div>
-        <div class="card">
-            <em id="persona"></em>
-            <textarea id="_persona" class="si" maxlength="2048"></textarea>
+        <div class="row" style="max-width: 80%;">
+            <a href="../auth/profile.html" target="_blank" rel="noopener" class="sb card functioncard"><span id="accountsettings"></span></a>
+            <a href="create.html" rel="noopener" class="sb card functioncard"><span id="createpersona"></span></a>
         </div>
-        <div class="card">
-            <em id="profilepp"></em>
-            <label class="sb" for="profileppfile" id="profilepplabel"></label>
-            <input id="profileppfile" type="file" class="si" style="display: none;" onchange="ppselected();"/>
-        </div>
-        <div class="card">
-            <em id="submit"></em>
-            <button class="sb" onclick="submit()" id="submitbtn"></button>
-        </div>
-        <em id="privacynotice" style="margin: 20px;"></em>
+        <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
+
+        <em id="newestpersonas"></em>
+        <input id="searchpersona" class="si" onchange="applySearch()"/>
+        <div class="personas" id="personas"></div>
     </body>
     <script src="../pocketbase.umd.js"></script>
     <script defer>
-        const pb = new PocketBase('https://db.xetute.com/');
+        function sharePage(_title, _text, copied) // Sharetext = _text + url
+        {
+            const link = window.location.href;
+            if (navigator.share)
+            {
+                navigator.share
+                ({
+                    title: _title,
+                    text: _text,
+                    url: link
+                });
+            }
+            else { navigator.clipboard.writeText(link).then(() => { alert(copied); }); }
+        }
+
+        // Auth
+        const pb = new PocketBase('https://db.xetute.com');
         let auth = undefined;
 
+        function getImageURL(collectionID, recID, filename) { return `https://db.xetute.com/api/files/${collectionID}/${recID}/${filename}`; }
         async function autoAuth()
         {
             try { auth = await pb.collection('accounts').authRefresh(); }
             catch { window.location.href = `../auth/index.html?${window.location.href}`; }
+
+            if ((!auth.record.data.PhantasiaAI) || auth.record.data.PhantasiaAI === null)
+            {
+                auth.record.data =
+                {
+                    "username": auth.record.data.username,
+                    "PhantasiaAI": { "chat": { "psa1l65k283iv9o": { "messages": [] }, "lastchat": "psa1l65k283iv9o" } }
+                };
+                await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } );
+            }
+
+            // Load last chat
+            const recid = auth.record.data.PhantasiaAI.chat.lastchat;
+            const rec = await pb.collection('PhantasiaAI_Characters').getOne(recid, { fields: 'firstname,lastname,profile' } );
+            document.getElementById('lastchatimg').src = getImageURL('PhantasiaAI_Characters', recid, rec.profile);
+            document.getElementById('lastchatname').textContent = rec.firstname + ' ' + rec.lastname;
+            document.getElementById('lastchatdiv').setAttribute('onclick', `window.location.href = './chat.html?${recid}'`);
         }
 
-        let trns;
+        // Browser translations for en, zh, and ur
         async function autoTranslate()
         {
             await autoAuth();
@@ -60,169 +107,113 @@
             {
                 en:
                 {
-                    createpersona: 'Create Persona',
+                    greeting: `Hello, ${auth.record.data.username}.`,
+                    lastchat: 'Your last Chat',
+                    accountsettings: "Account Settings",
+                    createpersona: "Create Persona",
 
-                    names: 'Names',
-                    firstname: 'First Name',
-                    lastname: 'Last Name',
+                    newestpersonas: 'Newest Personas',
+                    searchpersona: 'Search Persona',
 
-                    persona: 'Persona',
-
-                    profilepp: 'Profile Picture',
-                    profilepplabel: 'Select Picture',
-                    ppselected: 'Profile Picture Selected',
-                    tolarge: 'Selected image\'s filesize is too big. Please select another one.',
-
-                    submit: 'Submit / Publish',
-                    submitbtn: 'Save & Upload',
-                    privacynotice: 'Note: Uploaded Persona\'s are public and can be used / seen by anyone using PhantasiaAI.',
-
-                    minlngth0: 'The minimum length for the first name is two characters. We\'re sorry.',
-                    minlngth1: 'The minimum length for the last name is two characters. We\'re sorry.',
-                    minlngth2: 'The minimum length for the persona is 64 characters. We\'re sorry.',
-                    noppselected: 'Please select a profile image for the persona.'
+                    loadmore: 'Load More',
                 },
                 zh:
                 {
-                    createpersona: '创建角色',
+                    greeting: `你好, ${auth.record.data.username}。`,
+                    lastchat: '您的最后聊天',
+                    accountsettings: "账户设置",
+                    createpersona: "创建角色",
 
-                    names: '名字',
-                    firstname: '名',
-                    lastname: '姓',
+                    newestpersonas: '最新角色',
+                    searchpersona: '搜索角色',
 
-                    persona: '角色',
-
-                    profilepp: '个人资料图片',
-                    profilepplabel: '选择图片',
-                    ppselected: '已選擇個人資料圖片',
-                    tolarge: '所选图片的文件大小太大。请选另一个。',
-
-                    submit: '提交 / 发布',
-                    submitbtn: '保存并上传',
-                    privacynotice: '注意：上传的角色是公开的，任何使用PhantasiaAI的人都可以使用/查看。',
-
-                    minlngth0: '名字的最小长度为两个字符。我们很抱歉。',
-                    minlngth1: '姓的最小长度为两个字符。我们很抱歉。',
-                    minlngth2: '角色的最小长度为64个字符。我们很抱歉。',
-                    noppselected: '请为角色选择一张个人资料图片。'
+                    loadmore: '加载更多',
                 },
                 ur:
                 {
-                    createpersona: 'شخصیت بنائیں',
+                    greeting: `ہیلو، ${auth.record.data.username}۔`,
+                    lastchat: 'آپ کا آخری چیٹ',
+                    accountsettings: "اکاؤنٹ کی ترتیبات",
+                    createpersona: "شخصیت بنائیں",
 
-                    names: 'نام',
-                    firstname: 'پہلا نام',
-                    lastname: 'آخری نام',
+                    newestpersonas: 'نئی شخصیات',
+                    searchpersona: 'شخصیت تلاش کریں',
 
-                    persona: 'شخصیت',
-
-                    profilepp: 'پروفائل تصویر',
-                    profilepplabel: 'تصویر منتخب کریں',
-                    profileppselected: 'پروفائل تصویر منتخب کی گئی۔',
-                    tolarge: 'منتخب کردہ تصویر کا حجم بہت بڑا ہے۔ براہ کرم کوئی اور منتخب کریں۔',
-
-                    submit: 'جمع کروائیں / شائع کریں',
-                    submitbtn: 'محفوظ کریں اور اپ لوڈ کریں',
-                    privacynotice: 'نوٹ: اپ لوڈ کردہ شخصیات عوامی ہیں اور کوئی بھی جو PhantasiaAI استعمال کر رہا ہے انہیں استعمال / دیکھ سکتا ہے۔',
-
-                    minlngth0: 'پہلے نام کی کم از کم لمبائی دو حروف ہے۔ ہمیں افسوس ہے۔',
-                    minlngth1: 'آخری نام کی کم از کم لمبائی دو حروف ہے۔ ہمیں افسوس ہے۔',
-                    minlngth2: 'شخصیت کی کم از کم لمبائی 64 حروف ہے۔ ہمیں افسوس ہے۔',
-                    noppselected: 'براہ کرم شخصیت کے لیے ایک پروفائل تصویر منتخب کریں۔'
+                    loadmore: 'مزید لوڈ کریں',
                 }
             };
 
             const userLang = navigator.language.slice(0, 2); // en, zh, ur
             const lang = translations[userLang] ? userLang : 'en';
-            trns = translations[lang];
+            const trns = translations[lang];
 
             for (let key in trns)
             {
-                if ((key !== 'firstname') || (key !== 'lastname') || (key !== 'profile'))
+                if (key !== 'searchpersona')
                 {
                     try { document.getElementById(key).innerHTML = trns[key]; }
                     catch { }
                 }
             }
 
+            document.getElementById('searchpersona').placeholder = trns.searchpersona;
+
             document.documentElement.lang = lang;
-
-            document.getElementById('firstname').placeholder = trns.firstname;
-            document.getElementById('lastname').placeholder = trns.lastname;
-            document.getElementById('_persona').placeholder = trns.persona;
         }
-        autoTranslate();
 
-        async function submit()
+        function personadiv(chatname, id, imgname)
         {
-            if (!confirm(trns.privacynotice)) { return; }
-
-            const firstname = document.getElementById('firstname').value;
-            const lastname = document.getElementById('lastname').value;
-            const persona = document.getElementById('_persona').value;
-            const pp = document.getElementById('profileppfile');
-
-            if (firstname.length < 2) { alert(trns.minlngth0); return; }
-            if (lastname.length < 2) { alert(trns.minlngth1); return; }
-            if (persona.length < 64) { alert(trns.minlngth2); return; }
-            if (pp.files.length <= 0) { alert(trns.noppselected); return; }
-
-            const file = pp.files[0];
-            if (file.size > 1048576)
-            {
-                const img = new Image();
-                const reader = new FileReader();
-            
-                reader.onload = (event) => { img.src = event.target.result; };
-                reader.readAsDataURL(file);
-            
-                img.onload = async () =>
-                {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                
-                    const newWidth = 512;
-                    const newHeight = img.height * (512 / img.width); // ik now div before mult, but JS is quite weird
-                
-                    canvas.width = newWidth;
-                    canvas.height = newHeight;
-                
-                    ctx.drawImage(img, 0, 0, newWidth, newHeight);
-                
-                    canvas.toBlob(async (blob) =>
-                    {
-                        if (blob.size > 1048576)
-                        {
-                            alert(trns.tolarge);
-                            return;
-                        }
-                    
-                        const form = new FormData();
-                        form.append('firstname', firstname);
-                        form.append('lastname', lastname);
-                        form.append('persona', persona);
-                        form.append('creatorid', auth.record.id);
-                        form.append('profile', blob, file.name);
-                    
-                        const record = await pb.collection('PhantasiaAI_Characters').create(form);
-                        window.location.href = `./chat.html?${record.id}`;
-                    }, 'image/jpeg', 1.0);
-                };
-            }
-            else
-            {
-                const form = new FormData();
-                form.append('firstname', firstname);
-                form.append('lastname', lastname);
-                form.append('persona', persona);
-                form.append('creatorid', auth.record.id);
-                form.append('profile', file);
-            
-                const record = await pb.collection('PhantasiaAI_Characters').create(form);
-                window.location.href = `./chat.html?${record.id}`;
-            }
+            const div =
+            `
+            <div class="card row chat" onclick="window.location.href = './chat.html?${id}'">
+                 <img alt="profile image of x persona" class="box-shadow chatpp" src="${getImageURL('PhantasiaAI_Characters', id, imgname)}"/>
+                <p>${chatname}</p>
+            </div>
+            `;
+            return div;
         }
 
-        function ppselected() { document.getElementById('profilepplabel').textContent = trns.ppselected; }
+        let currentchunk = 0;
+        async function popPersonas()
+        {
+            const list = await pb.collection('PhantasiaAI_Characters').getList(currentchunk, (currentchunk += 25), { fields: 'firstname,lastname,id,profile', sort: '+created' });
+            const personas = document.getElementById('personas');
+            personas.innerHTML = '';
+            let loadmore = undefined;
+
+            try { loadmore = document.getElementById('loadmore'); }
+            catch { }
+            
+            if (loadmore) { loadmore.outerHTML = ''; }
+            for (let i = 0; i < list.items.length; ++i)
+            {
+                const item = list.items[i];
+                personas.innerHTML += personadiv(item.firstname + ' ' + item.lastname, item.id, item.profile);
+            }
+            
+            if (list.items.length > 25) { personas.innerHTML += `<button class="sb" onclick="popPersonas()" id="loadmore"><span>${trns.loadmore}</span>`; }
+        }
+        async function popPersonasFirstTime()
+        {
+            await autoTranslate();
+            await popPersonas();
+            document.getElementById('main').style.display = 'flex';
+        }
+        popPersonasFirstTime();
+
+        async function applySearch()
+        {
+            const val = document.getElementById('searchpersona').value;
+            if (val.length === 0) { currentchunk = 0; popPersonas(); return; }
+            const list = await pb.collection('PhantasiaAI_Characters').getFullList({ fields: "firstname,lastname,id,profile", filter: `(firstname?~'${val}' || lastname?~'${val}')` });
+            const personas = document.getElementById('personas');
+
+            personas.innerHTML = '';
+            for (let i = 0; i < list.length; ++i)
+            {
+                const item = list[i];
+                personas.innerHTML += personadiv(item.firstname + ' ' + item.lastname, item.id, item.profile);
+            }
+        }
     </script>
 </html>

@@ -33,7 +33,7 @@
         <div class="card">
             <em id="profilepp"></em>
             <label class="sb" for="profileppfile" id="profilepplabel"></label>
-            <input id="profileppfile" type="file" class="si" style="display: none;"/>
+            <input id="profileppfile" type="file" class="si" style="display: none;" onchange="ppselected();"/>
         </div>
         <div class="card">
             <em id="submit"></em>
@@ -70,6 +70,7 @@
 
                     profilepp: 'Profile Picture',
                     profilepplabel: 'Select Picture',
+                    ppselected: 'Profile Picture Selected',
                     tolarge: 'Selected image\'s filesize is too big. Please select another one.',
 
                     submit: 'Submit / Publish',
@@ -93,6 +94,7 @@
 
                     profilepp: '个人资料图片',
                     profilepplabel: '选择图片',
+                    ppselected: '已選擇個人資料圖片',
                     tolarge: '所选图片的文件大小太大。请选另一个。',
 
                     submit: '提交 / 发布',
@@ -116,6 +118,7 @@
 
                     profilepp: 'پروفائل تصویر',
                     profilepplabel: 'تصویر منتخب کریں',
+                    profileppselected: 'پروفائل تصویر منتخب کی گئی۔',
                     tolarge: 'منتخب کردہ تصویر کا حجم بہت بڑا ہے۔ براہ کرم کوئی اور منتخب کریں۔',
 
                     submit: 'جمع کروائیں / شائع کریں',
@@ -219,5 +222,7 @@
                 window.location.href = `./chat.html?${record.id}`;
             }
         }
+
+        function ppselected() { document.getElementById('profilepplabel').textContent = trns.ppselected; }
     </script>
 </html>
