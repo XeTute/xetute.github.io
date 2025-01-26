@@ -320,7 +320,7 @@
                 try { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } ); }
                 catch { alert('Failed to sync messages to our cloud. We\'re sorry.'); }
 
-                document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, false, resp.choices[0].message.content.replace(/\n/g, '<br>'));
+                document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, false, resp.choices[0].message.content);
                 scrolltnm();
                 ++latestmessageid;
             }
