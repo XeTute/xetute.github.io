@@ -26,7 +26,6 @@
             align-items: center;
 
             max-width: 80%;
-            max-height: 80%;
             overflow-x: hidden;
             overflow-y: auto;
         }
@@ -41,13 +40,13 @@
 
         <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
         <em id="lastchat"></em>
-        <div class="card row chat" id="lastchatdiv">
+        <div class="card row chat" id="lastchatdiv" style="max-height: 6.25%;">
             <img alt="profile image of your last chat" class="box-shadow chatpp" id="lastchatimg"/>
             <em id="lastchatname"></em>
         </div>
         <div class="row" style="max-width: 80%;">
             <a href="../auth/profile.html" target="_blank" rel="noopener" class="sb card functioncard"><span id="accountsettings"></span></a>
-            <a href="../auth/profile.html" target="_blank" rel="noopener" class="sb card functioncard"><span id="createpersona"></span></a>
+            <a href="create.html" rel="noopener" class="sb card functioncard"><span id="createpersona"></span></a>
         </div>
         <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
 
@@ -111,7 +110,7 @@
                     greeting: `Hello, ${auth.record.data.username}.`,
                     lastchat: 'Your last Chat',
                     accountsettings: "Account Settings",
-                    createpersona: "Coming Soon",
+                    createpersona: "Create Persona",
 
                     newestpersonas: 'Newest Personas',
                     searchpersona: 'Search Persona',
@@ -120,9 +119,27 @@
                 },
                 zh:
                 {
+                    greeting: `你好, ${auth.record.data.username}。`,
+                    lastchat: '您的最后聊天',
+                    accountsettings: "账户设置",
+                    createpersona: "创建角色",
+
+                    newestpersonas: '最新角色',
+                    searchpersona: '搜索角色',
+
+                    loadmore: '加载更多',
                 },
                 ur:
                 {
+                    greeting: `ہیلو، ${auth.record.data.username}۔`,
+                    lastchat: 'آپ کا آخری چیٹ',
+                    accountsettings: "اکاؤنٹ کی ترتیبات",
+                    createpersona: "شخصیت بنائیں",
+
+                    newestpersonas: 'نئی شخصیات',
+                    searchpersona: 'شخصیت تلاش کریں',
+
+                    loadmore: 'مزید لوڈ کریں',
                 }
             };
 
@@ -159,7 +176,7 @@
         let currentchunk = 0;
         async function popPersonas()
         {
-            const list = await pb.collection('PhantasiaAI_Characters').getList(currentchunk, (currentchunk += 25), { fields: 'firstname,lastname,id,profile' });
+            const list = await pb.collection('PhantasiaAI_Characters').getList(currentchunk, (currentchunk += 25), { fields: 'firstname,lastname,id,profile', sort: '+created' });
             const personas = document.getElementById('personas');
             personas.innerHTML = '';
             let loadmore = undefined;
