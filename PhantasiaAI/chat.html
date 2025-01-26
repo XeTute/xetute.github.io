@@ -229,14 +229,9 @@
             `
             <div class="message card row ${userornot ? 'usermessage' : 'aimessage'}" id="message${id}">
                 <p>${sanitized(message)}</p>
+                ${userornot ? '' : `<div class="line msgln" id="message${id}ln"></div><button class="sb" onclick="regenerateLM()" id="message${id}btn"><i class="fa fa-refresh" aria-hidden="true"></i></button>`}
+            </div>
             `;
-
-            if (!userornot)
-            {
-                val +=
-                `<div class="line msgln" id="message${id}ln"></div><button class="sb" onclick="regenerateLM()" id="message${id}btn"><i class="fa fa-refresh" aria-hidden="true"></i></button>`;
-            }
-            val += '\n</div>';
 
             return val;
         }
