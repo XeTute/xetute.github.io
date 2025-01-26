@@ -30,6 +30,11 @@
             overflow-x: hidden;
             overflow-y: auto;
         }
+
+        .functioncard
+        {
+            min-width: 45%;
+        }
     </style>
     <body style="overflow: hidden; display: none;" id="main">
         <h1 id="greeting" style="margin: 20px;"></h1>
@@ -39,6 +44,10 @@
         <div class="card row chat" id="lastchatdiv">
             <img alt="profile image of your last chat" class="box-shadow chatpp" id="lastchatimg"/>
             <em id="lastchatname"></em>
+        </div>
+        <div class="row" style="max-width: 80%;">
+            <a href="../auth/profile.html" target="_blank" rel="noopener" class="sb card functioncard"><span id="accountsettings"></span></a>
+            <a href="../auth/profile.html" target="_blank" rel="noopener" class="sb card functioncard"><span id="createpersona"></span></a>
         </div>
         <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
 
@@ -101,6 +110,8 @@
                 {
                     greeting: `Hello, ${auth.record.data.username}.`,
                     lastchat: 'Your last Chat',
+                    accountsettings: "Account Settings",
+                    createpersona: "Coming Soon",
 
                     newestpersonas: 'Newest Personas',
                     searchpersona: 'Search Persona',
