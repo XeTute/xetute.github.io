@@ -23,17 +23,17 @@
         <h1 id="createpersona" style="margin: 20px;"></h1>
         <div class="card">
             <em id="names"></em>
-            <input id="firstname" class="si" maxlength="16"/>
-            <input id="lastname" class="si" maxlength="16"/>
+            <input id="firstname" class="si" maxlength="16" autocomplete="off"/>
+            <input id="lastname" class="si" maxlength="16" autocomplete="off"/>
         </div>
         <div class="card">
             <em id="persona"></em>
-            <textarea id="_persona" class="si" maxlength="2048"></textarea>
+            <textarea id="_persona" class="si" maxlength="2048" autocomplete="off"></textarea>
         </div>
         <div class="card">
             <em id="profilepp"></em>
             <label class="sb" for="profileppfile" id="profilepplabel"></label>
-            <input id="profileppfile" type="file" class="si" style="display: none;" onchange="ppselected();"/>
+            <input id="profileppfile" type="file" class="si" style="display: none;" onchange="ppselected();" autocomplete="off"/> <!-- Believe it or not some browsers do that -->
         </div>
         <div class="card">
             <em id="submit"></em>
@@ -204,7 +204,9 @@
                         form.append('creatorid', auth.record.id);
                         form.append('profile', blob, file.name);
                     
-                        const record = await pb.collection('PhantasiaAI_Characters').create(form);
+                        let record;
+                        try { record = await pb.collection('PhantasiaAI_Characters').create(form); }
+                        catch { alert('Failed to create. We\'re sorry.'); }
                         window.location.href = `./chat.html?${record.id}`;
                     }, 'image/jpeg', 1.0);
                 };
@@ -218,7 +220,9 @@
                 form.append('creatorid', auth.record.id);
                 form.append('profile', file);
             
-                const record = await pb.collection('PhantasiaAI_Characters').create(form);
+                let record;
+                try { record = await pb.collection('PhantasiaAI_Characters').create(form); }
+                catch { alert('Failed to create. We\'re sorry.'); }
                 window.location.href = `./chat.html?${record.id}`;
             }
         }
