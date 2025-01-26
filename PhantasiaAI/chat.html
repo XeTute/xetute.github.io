@@ -222,7 +222,7 @@
                 .replace(/\n/g, '<br>');
         }
 
-        let latestmessageid = 0;
+        let latestmessageid = -1;
         function messagediv(id, userornot, message)
         {
             let val =
@@ -246,7 +246,7 @@
             catch {}
         }
 
-        function scrolltnm() { try { document.getElementById(`message${(latestmessageid - 1)}`).scrollIntoView({ behavior: 'smooth' }); } catch { } } // scoll to newest message
+        function scrolltnm() { try { document.getElementById(`message${(latestmessageid)}`).scrollIntoView({ behavior: 'smooth' }); } catch { } } // scoll to newest message
         async function popMessages()
         {
             await autoTranslate();
@@ -257,10 +257,10 @@
             for (let i = 1; i < n; ++i)
             {
                 removeLastRegen();
+                ++latestmessageid;
                 document.getElementById('messagescontainer').innerHTML += 
                 messagediv(latestmessageid, user, auth.record.data.PhantasiaAI.chat[recid].messages[i].content);
                 user = (!user);
-                ++latestmessageid;
             }
 
             document.getElementById('main').style.display = 'flex';
@@ -273,14 +273,12 @@
             if (generatingmessage) { return; }
             generatingmessage = true;
 
-            ++latestmessageid;
-            removeLastRegen();
-
             const message = document.getElementById('message').value;
             let resp = undefined;
             let failed = false;
             document.getElementById('message').value = '';
 
+            ++latestmessageid;
             document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, true, message);
 
             try { auth.record.data.PhantasiaAI.chat[recid].messages.push({ role: "user", content: message }); }
@@ -294,7 +292,7 @@
                         { role: "user", content: message }
                     ]
                 }
-            }); ++latestmessageid; }
+            }); }
 
             document.getElementById('personastatus').style.display = 'flex';
             await fetch
@@ -320,9 +318,10 @@
                 try { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } ); }
                 catch { alert('Failed to sync messages to our cloud. We\'re sorry.'); }
 
+                removeLastRegen();
+                ++latestmessageid;
                 document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, false, resp.choices[0].message.content);
                 scrolltnm();
-                ++latestmessageid;
             }
 
             generatingmessage = false;
@@ -338,7 +337,7 @@
             let resp;
             let failed = false;
 
-            document.getElementById(`message${latestmessageid - 1}`).innerHTML = '<i class="fa fa-refresh" aria-hidden="true"></i>';
+            document.getElementById(`message${latestmessageid}`).innerHTML = '<i class="fa fa-refresh" aria-hidden="true"></i>';
             await fetch
             (
                 "https://ai.xetute.com/v1/chat/completions",
@@ -360,9 +359,8 @@
                 try { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } ); }
                 catch { alert('Failed to sync messages to our cloud. We\'re sorry.'); }
 
-                document.getElementById(`message${latestmessageid - 1}`).outerHTML = messagediv((latestmessageid - 1), false, resp.choices[0].message.content);
+                document.getElementById(`message${latestmessageid}`).outerHTML = messagediv(latestmessageid, false, resp.choices[0].message.content);
                 scrolltnm();
-                ++latestmessageid;
             }
 
             document.getElementById('personastatus').style.display = 'none';
