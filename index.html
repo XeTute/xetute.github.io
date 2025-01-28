@@ -134,6 +134,31 @@
                     <p class="hero-subtitle" id="authsub">—</p>
                 </div>
             </div>
+            <a class="sb scroll-indicator" onclick="document.getElementById('socials').scrollIntoView({ behavior: 'smooth' })">
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="section fullsize allcenter" id="socials">
+            <div class="prodpage fullsize allcenter nobottom">
+                <div class="allcenter fullsize dist" style="display: flex; flex-direction: row;">
+                    <div class="dist">
+                        <h2 class="hero-subtitle">General</h2>
+                        <a href="https://youtube.com/@XeTuteTechnologies" target="_blank" rel="noopener" class="sb"><span>YouTube</span></a>
+                        <a href="https://bsky.app/profile/xetute.bsky.social" target="_blank" rel="noopener" class="sb"><span>BlueSky</span></a>
+                    </div>
+
+                    <div class="dist">
+                        <h2 class="hero-subtitle">Specialized</h2>
+                        <a href="https://huggingface.co/XeTute" target="_blank" rel="noopener" class="sb"><span>HuggingFace</span></a>
+                        <a href="https://github.com/XeTute" target="_blank" rel="noopener" class="sb"><span>GitHub</span></a>
+                    </div>
+                </div>
+                <div class="allcenter fullsize dist">
+                    <h1 class="hero-title" style="scale: 0.75;" id="socialsheader">—</h1>
+                    <p class="hero-subtitle" id="socialssub">—</p>
+                </div>
+            </div>
             <a class="sb scroll-indicator" onclick="document.getElementById('longlivediv').scrollIntoView({ behavior: 'smooth' })">
                 <i class="fa fa-arrow-down" aria-hidden="true"></i>
             </a>
@@ -198,6 +223,10 @@
                     authsub0: "Connect with a community fostering knowledge.",
                     authsub1: "We may end up as your metaphorical second family =)",
 
+                    socialsheader: "Socials",
+                    socialssub0: "Get to know every small detail of what's currently happening.",
+                    socialssub1: "We value your feedback, this is the fastest way to give it to us.",
+
                     longlive: "Long live the Islamic Federal Republic of Pakistan.<br>Long live our alliance with the People's Republic of China, and long live the People's Republic of China."
                 },
                 zh:
@@ -215,6 +244,10 @@
                     authyourself: "我们的授权服务。",
                     authsub0: "与一个促进知识的社区联系。",
                     authsub1: "我们可能会成为你隐喻的第二个家庭 =)",
+
+                    socialsheader: "社群",
+                    socialssub0: "了解當前發生的每一個小細節。",
+                    socialssub1: "我們重視您的回饋，這是向我們提供回饋的最快方式。",
 
                     longlive: "巴基斯坦伊斯蘭聯邦共和國萬歲。我們同中華人民共和國的聯盟萬歲，中華人民共和國萬歲。"
                 },
@@ -234,6 +267,10 @@
                     authsub0: "علم کو فروغ دینے والے ایک کمیونٹی سے جڑیں۔",
                     authsub1: "ہم آپ کے مجازی دوسرے خاندان بن سکتے ہیں =)",
 
+                    socialsheader: "سوشلز",
+                    socialssub0: "اس وقت کیا ہو رہا ہے اس کی ہر چھوٹی سے چھوٹی تفصیل جانیں۔",
+                    socialssub1: "ہم آپ کے تاثرات کی قدر کرتے ہیں، یہ ہمیں دینے کا تیز ترین طریقہ ہے۔",
+
                     longlive: "اسلامی وفاقی جمہوریہ پاکستان زندہ باد۔<br>عوامی جمہوریہ چین کے ساتھ ہمارا اتحاد زندہ باد، اور عوامی جمہوریہ چین زندہ باد۔"
                 }
             };
@@ -252,6 +289,7 @@
             changeText([trns.herosub0, trns.herosub1], 'herosub');
             changeText([trns.paisub0, trns.paisub1], 'paisub');
             changeText([trns.authsub0, trns.authsub1], 'authsub');
+            changeText([trns.socialssub0, trns.socialssub1], 'socialssub');
             changeText([translations['en'].longlive, translations['ur'].longlive, translations['zh'].longlive], 'longlivetxt', 1500, 35);
 
             document.getElementById('main').style.display = 'flex';
