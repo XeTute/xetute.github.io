@@ -34,6 +34,8 @@
         {
             min-width: 45%;
         }
+
+        .leftpersona { justify-content: left; }
     </style>
     <body style="overflow: hidden; display: none;" id="main">
         <h1 id="greeting" style="margin: 20px;"></h1>
@@ -165,7 +167,7 @@
         {
             const div =
             `
-            <div class="card row chat" onclick="window.location.href = './chat.html?${id}'">
+            <div class="card row chat leftpersona" onclick="window.location.href = './chat.html?${id}'">
                  <img alt="profile image of x persona" class="box-shadow chatpp" src="${getImageURL('PhantasiaAI_Characters', id, imgname)}"/>
                 <p>${chatname}</p>
             </div>
