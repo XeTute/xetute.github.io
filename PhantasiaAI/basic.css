@@ -14,7 +14,6 @@
 {
     max-width: 80%;
     max-height: 20%;
-    overflow: hidden;
 }
 
 .chatpp
@@ -24,5 +23,6 @@
     margin: 15px;
     justify-self: center;
     align-self: center;
-    max-height: 95%;
+
+    max-height: 99%;
 }

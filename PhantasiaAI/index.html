@@ -42,7 +42,7 @@
 
         <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
         <em id="lastchat"></em>
-        <div class="card row chat" id="lastchatdiv" style="max-height: 6.25%;">
+        <div class="card row chat" id="lastchatdiv" style="max-width: 10%;">
             <img alt="profile image of your last chat" class="box-shadow chatpp" id="lastchatimg"/>
             <em id="lastchatname"></em>
         </div>
@@ -178,7 +178,7 @@
         let currentchunk = 0;
         async function popPersonas()
         {
-            const list = await pb.collection('PhantasiaAI_Characters').getList(currentchunk, (currentchunk += 25), { fields: 'firstname,lastname,id,profile', sort: '+created' });
+            const list = await pb.collection('PhantasiaAI_Characters').getList(currentchunk, (currentchunk += 25), { fields: 'firstname,lastname,id,profile', sort: '-created' });
             const personas = document.getElementById('personas');
             personas.innerHTML = '';
             let loadmore = undefined;
