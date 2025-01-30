@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="overflow: hidden;">
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -30,31 +30,53 @@
             overflow-y: auto;
         }
 
-        .functioncard
-        {
-            min-width: 45%;
-        }
-
+        .functioncard { min-width: 45%; }
         .leftpersona { justify-content: left; }
+
+        .fullscreen
+        {
+            display: flex;
+            flex-direction: column;
+
+            width: 199%;
+            height: 100%;
+
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+
+            justify-content: center;
+            justify-self: center;
+
+            align-items: center;
+            align-self: center;
+        }
     </style>
     <body style="overflow: hidden; display: none;" id="main">
-        <h1 id="greeting" style="margin: 20px;"></h1>
+        <div id="hook" class="fullscreen" style="display: flex;">
+            <h1 id="greeting" style="margin: 20px;"></h1>
 
-        <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
-        <em id="lastchat"></em>
-        <div class="card row chat" id="lastchatdiv" style="max-width: 10%;">
-            <img alt="profile image of your last chat" class="box-shadow chatpp" id="lastchatimg"/>
-            <em id="lastchatname"></em>
+            <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
+            <em id="lastchat"></em>
+            <div class="card row chat" id="lastchatdiv" style="max-width: 10%;">
+                <img alt="profile image of your last chat" class="box-shadow chatpp" id="lastchatimg"/>
+                <em id="lastchatname"></em>
+            </div>
+            <button onclick="switchForm();" class="sb card functioncard" style="max-width: 80%;"><span id="moreoptions"></span></button>
+            <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
+    
+            <em id="newestpersonas"></em>
+            <input id="searchpersona" class="si" onchange="applySearch()" autocomplete="off"/>
+            <div class="personas" id="personas"></div>
         </div>
-        <div class="row" style="max-width: 80%;">
+        <div id="more" class="fullscreen" style="display: none;">
             <a href="../auth/profile.html" target="_blank" rel="noopener" class="sb card functioncard"><span id="accountsettings"></span></a>
             <a href="create.html" rel="noopener" class="sb card functioncard"><span id="createpersona"></span></a>
-        </div>
-        <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
+            <a href="lastchats.html" rel="noopener" class="sb card functioncard"><span id="lastchats"></span></a>
+            <a href="updateselect.html" rel="noopener" class="sb card functioncard"><span id="updatecreations"></span></a>
 
-        <em id="newestpersonas"></em>
-        <input id="searchpersona" class="si" onchange="applySearch()" autocomplete="off"/>
-        <div class="personas" id="personas"></div>
+            <button onclick="switchForm();" class="sb card functioncard"><span id="closemenue"></span></button>
+        </div>
     </body>
     <script src="../pocketbase.umd.js"></script>
     <script defer>
@@ -102,6 +124,7 @@
         }
 
         // Browser translations for en, zh, and ur
+        let trns;
         async function autoTranslate()
         {
             await autoAuth();
@@ -113,11 +136,15 @@
                     lastchat: 'Your last Chat',
                     accountsettings: "Account Settings",
                     createpersona: "Create Persona",
-
+                
                     newestpersonas: 'Newest Personas',
                     searchpersona: 'Search Persona',
-
+                    moreoptions: 'More Options',
                     loadmore: 'Load More',
+                
+                    closemenue: '❌ Close Menue',
+                    lastchats: 'Last Chats',
+                    updatecreations: '🔁 Update Creations'
                 },
                 zh:
                 {
@@ -125,11 +152,15 @@
                     lastchat: '您的最后聊天',
                     accountsettings: "账户设置",
                     createpersona: "创建角色",
-
+                
                     newestpersonas: '最新角色',
                     searchpersona: '搜索角色',
-
+                    moreoptions: '更多选项',
                     loadmore: '加载更多',
+                
+                    closemenue: '❌ 关闭菜单',
+                    lastchats: '最近聊天',
+                    updatecreations: '🔁 更新创作'
                 },
                 ur:
                 {
@@ -137,17 +168,21 @@
                     lastchat: 'آپ کا آخری چیٹ',
                     accountsettings: "اکاؤنٹ کی ترتیبات",
                     createpersona: "شخصیت بنائیں",
-
+                
                     newestpersonas: 'نئی شخصیات',
                     searchpersona: 'شخصیت تلاش کریں',
-
+                    moreoptions: 'مزید اختیارات',
                     loadmore: 'مزید لوڈ کریں',
+                
+                    closemenue: '❌ مینو بند کریں',
+                    lastchats: 'آخری چیٹس',
+                    updatecreations: '🔁 تخلیقات کو اپ ڈیٹ کریں'
                 }
             };
 
             const userLang = navigator.language.slice(0, 2); // en, zh, ur
             const lang = translations[userLang] ? userLang : 'en';
-            const trns = translations[lang];
+            trns = translations[lang];
 
             for (let key in trns)
             {
@@ -215,6 +250,23 @@
             {
                 const item = list[i];
                 personas.innerHTML += personadiv(item.firstname + ' ' + item.lastname, item.id, item.profile);
+            }
+        }
+
+        function switchForm()
+        {
+            const hook = document.getElementById('hook');
+            const more = document.getElementById('more');
+
+            if (more.style.display === 'none')
+            {
+                more.style.display = 'flex';
+                hook.style.display = 'none';
+            }
+            else
+            {
+                more.style.display = 'none';
+                hook.style.display = 'flex';
             }
         }
     </script>

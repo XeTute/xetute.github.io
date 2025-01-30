@@ -171,7 +171,8 @@
                     clearchatbtn: "Clear Chat",
                     sharePAI: "Share PhantasiaAI!",
                     supportus: "Support Us 🤍",
-                    copiedlink: "Copied Link!"
+                    copiedlink: "Copied Link!",
+                    failedtosync: "Failed to sync messages to our cloud. We\'re sorry."
                 },
                 zh:
                 {
@@ -180,7 +181,8 @@
                     clearchatbtn: "清除聊天",
                     sharePAI: "分享PhantasiaAI！",
                     supportus: "支持我们 🤍",
-                    copiedlink: "链接已复制！"
+                    copiedlink: "链接已复制！",
+                    failedtosync: "無法將訊息同步到我們的雲端。我們很抱歉。"
                 },
                 ur:
                 {
@@ -189,7 +191,8 @@
                     clearchatbtn: "چیٹ صاف کریں",
                     sharePAI: "PhantasiaAI کا اشتراک کریں!",
                     supportus: "ہماری حمایت کریں 🤍",
-                    copiedlink: "لنک کاپی کر لیا!"
+                    copiedlink: "لنک کاپی کر لیا!",
+                    failedtosync: "ہمارے کلاؤڈ پر پیغامات کی مطابقت پذیری میں ناکام۔ ہمیں افسوس ہے۔"
                 }
             };
 
@@ -316,7 +319,7 @@
             {
                 auth.record.data.PhantasiaAI.chat[recid].messages.push({ role: "assistant", content: resp.choices[0].message.content });
                 try { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } ); }
-                catch { alert('Failed to sync messages to our cloud. We\'re sorry.'); }
+                catch { alert(trns.failedtosync); }
 
                 removeLastRegen();
                 ++latestmessageid;
