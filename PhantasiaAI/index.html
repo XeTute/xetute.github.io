@@ -112,7 +112,7 @@
                 auth.record.data =
                 {
                     "username": auth.record.data.username,
-                    "PhantasiaAI": { "chat": { "psa1l65k283iv9o": { "messages": [] }, "lastchat": "psa1l65k283iv9o" } }
+                    "PhantasiaAI": { "chat": { "psa1l65k283iv9o": { }, "lastchat": "psa1l65k283iv9o" } }
                 };
                 await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } );
             }
@@ -129,6 +129,7 @@
 
                 recid = "psa1l65k283iv9o";
                 auth.record.data.PhantasiaAI.chat.lastchat = recid;
+                Object.assign(auth.record.data.PhantasiaAI.chat, { [recid]: {  } });
 
                 await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });
                 rec = await pb.collection('PhantasiaAI_Characters').getOne(recid, { fields: 'firstname,lastname,profile' });

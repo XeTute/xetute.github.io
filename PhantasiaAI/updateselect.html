@@ -31,7 +31,15 @@
         }
 
         .functioncard { min-width: 45%; }
-        .leftpersona { justify-content: left; }
+        .leftpersona { justify-content: left; margin-bottom: 0; }
+        .delete
+        {
+            margin-top: 0;
+            width: 50%;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-top-color: transparent;
+        }
     </style>
     <body style="overflow: hidden; display: none;" id="main">
         <a href="./" rel="noopener" class="sb" style="position: absolute; top: 5px; left: 5px;"><</a>
@@ -62,17 +70,20 @@
                 en:
                 {
                     header: 'Your Creations',
-                    failedtosync: "Failed to sync messages to our cloud. We\'re sorry."
+                    failedtosync: "Failed to sync messages to our cloud. We\'re sorry.",
+                    deletepersona: "Delete this Persona? This cannot be undone."
                 },
                 zh:
                 {
                     header: '您的作品',
-                    failedtosync: "無法將訊息同步到我們的雲端。我們很抱歉。"
+                    failedtosync: "無法將訊息同步到我們的雲端。我們很抱歉。",
+                    deletepersona: "刪除這個角色嗎？這無法撤消。"
                 },
                 ur:
                 {
                     header: 'آپ کی تخلیقات',
-                    failedtosync: "ہمارے کلاؤڈ پر پیغامات کی مطابقت پذیری میں ناکام۔ ہمیں افسوس ہے۔"
+                    failedtosync: "ہمارے کلاؤڈ پر پیغامات کی مطابقت پذیری میں ناکام۔ ہمیں افسوس ہے۔",
+                    deletepersona: "اس شخصیت کو حذف کریں؟ اسے کالعدم نہیں کیا جا سکتا۔"
                 }
             };
 
@@ -94,9 +105,12 @@
             const div =
             `
             <div class="card row chat leftpersona" onclick="window.location.href = './update.html?${id}'">
-                 <img alt="profile image of x persona" class="box-shadow chatpp" src="${getImageURL('PhantasiaAI_Characters', id, imgname)}"/>
+                <img alt="profile image of x persona" class="box-shadow chatpp" src="${getImageURL('PhantasiaAI_Characters', id, imgname)}"/>
                 <p>${chatname}</p>
             </div>
+            <button class="sb delete" onclick="deletep('${id}');">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+            </button>
             `;
             return div;
         }
@@ -115,14 +129,21 @@
 
             const elems = list.length;
             for (let i = 0; i < elems; ++i)
-            {
-                personas.innerHTML += personadiv(list[i].firstname + ' ' + list[i].lastname, list[i].id, list[i].profile);
-            }
+            { personas.innerHTML += personadiv(list[i].firstname + ' ' + list[i].lastname, list[i].id, list[i].profile); }
 
             try { if (updated) { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });} }
             catch { alert(trns.failedtosync); }
             document.getElementById('main').style.display = 'flex';
         }
         popPersonas();
+
+        async function deletep(id)
+        {
+            if (confirm(trns.deletepersona))
+            {
+                await pb.collection('PhantasiaAI_Characters').delete(id);
+                window.location.href = window.location.href;
+            }
+        }
     </script>
 </html>
