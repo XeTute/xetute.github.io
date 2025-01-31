@@ -38,7 +38,8 @@
             display: flex;
             flex-direction: column;
 
-            width: 199%;
+            width: 100%;
+            max-width: 500px;
             height: 100%;
 
             margin: 0;
@@ -62,7 +63,7 @@
                 <img alt="profile image of your last chat" class="box-shadow chatpp" id="lastchatimg"/>
                 <em id="lastchatname"></em>
             </div>
-            <button onclick="switchForm();" class="sb card functioncard" style="max-width: 80%;"><span id="moreoptions"></span></button>
+            <button onclick="switchForm();" class="sb card functioncard"><span id="moreoptions"></span></button>
             <div class="line" style="height: 3px; width: 3rem; margin: 15px;"></div>
     
             <em id="newestpersonas"></em>
@@ -100,6 +101,7 @@
         let auth = undefined;
 
         function getImageURL(collectionID, recID, filename) { return `https://db.xetute.com/api/files/${collectionID}/${recID}/${filename}`; }
+        let failedlastchat = { did: false, id: '' };
         async function autoAuth()
         {
             try { auth = await pb.collection('accounts').authRefresh(); }
@@ -116,8 +118,22 @@
             }
 
             // Load last chat
-            const recid = auth.record.data.PhantasiaAI.chat.lastchat;
-            const rec = await pb.collection('PhantasiaAI_Characters').getOne(recid, { fields: 'firstname,lastname,profile' } );
+            let recid = auth.record.data.PhantasiaAI.chat.lastchat;
+            let rec;
+
+            try { rec = await pb.collection('PhantasiaAI_Characters').getOne(recid, { fields: 'firstname,lastname,profile' } ); }
+            catch
+            {
+                failedlastchat.did = true;
+                failedlastchat.id = recid;
+
+                recid = "psa1l65k283iv9o";
+                auth.record.data.PhantasiaAI.chat.lastchat = recid;
+
+                await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });
+                rec = await pb.collection('PhantasiaAI_Characters').getOne(recid, { fields: 'firstname,lastname,profile' });
+            }
+
             document.getElementById('lastchatimg').src = getImageURL('PhantasiaAI_Characters', recid, rec.profile);
             document.getElementById('lastchatname').textContent = rec.firstname + ' ' + rec.lastname;
             document.getElementById('lastchatdiv').setAttribute('onclick', `window.location.href = './chat.html?${recid}'`);
@@ -144,7 +160,10 @@
                 
                     closemenue: '❌ Close Menue',
                     lastchats: 'Last Chats',
-                    updatecreations: '🔁 Update Creations'
+                    updatecreations: '🔁 Update Creations',
+
+                    failedtogetchat0: "Failed to get Chat with ID ",
+                    failedtogetchat1: ". The Creator might have deleted the model. We're sorry." // => Failed to get Chat with ID xyz. [...] We're sorry.
                 },
                 zh:
                 {
@@ -160,7 +179,10 @@
                 
                     closemenue: '❌ 关闭菜单',
                     lastchats: '最近聊天',
-                    updatecreations: '🔁 更新创作'
+                    updatecreations: '🔁 更新创作',
+
+                    failedtogetchat0: "無法獲取 ID 為 ",
+                    failedtogetchat1: " 的聊天。創建者可能已刪除該模型。我們很抱歉。"
                 },
                 ur:
                 {
@@ -176,13 +198,18 @@
                 
                     closemenue: '❌ مینو بند کریں',
                     lastchats: 'آخری چیٹس',
-                    updatecreations: '🔁 تخلیقات کو اپ ڈیٹ کریں'
+                    updatecreations: '🔁 تخلیقات کو اپ ڈیٹ کریں',
+
+                    failedtogetchat0: "چیٹ ID حاصل کرنے میں ناکامی ",
+                    failedtogetchat1: "۔ تخلیق کار نے ماڈل کو حذف کر دیا ہو سکتا ہے۔ ہمیں افسوس ہے۔"
                 }
             };
 
             const userLang = navigator.language.slice(0, 2); // en, zh, ur
             const lang = translations[userLang] ? userLang : 'en';
             trns = translations[lang];
+
+            if (failedlastchat.did) { alert(trns.failedtogetchat0 + failedlastchat.id + trns.failedtogetchat1); }
 
             for (let key in trns)
             {
