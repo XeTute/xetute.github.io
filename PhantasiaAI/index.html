@@ -244,25 +244,30 @@
             return div;
         }
 
-        let currentchunk = 0;
+        let currentpage = 1;
         async function popPersonas()
         {
-            const list = await pb.collection('PhantasiaAI_Characters').getList(currentchunk, (currentchunk += 25), { fields: 'firstname,lastname,id,profile', sort: '-created' });
+            const list = await pb.collection('PhantasiaAI_Characters').getList(currentpage, 15, { fields: 'firstname,lastname,id,profile', sort: '-created' });
             const personas = document.getElementById('personas');
-            personas.innerHTML = '';
-            let loadmore = undefined;
 
-            try { loadmore = document.getElementById('loadmore'); }
-            catch { }
-            
-            if (loadmore) { loadmore.outerHTML = ''; }
             for (let i = 0; i < list.items.length; ++i)
             {
                 const item = list.items[i];
                 personas.innerHTML += personadiv(item.firstname + ' ' + item.lastname, item.id, item.profile);
             }
             
-            if (list.items.length > 25) { personas.innerHTML += `<button class="sb" onclick="popPersonas()" id="loadmore"><span>${trns.loadmore}</span>`; }
+            try
+            {
+                document.getElementById('loadmore').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('loadmore').outerHTML = '';
+            }
+            catch { }
+
+            if (list.items.length === 5)
+            {
+                ++currentpage;
+                personas.innerHTML += `<button class="sb" onclick="popPersonas()" id="loadmore"><span>${trns.loadmore}</span>`;
+            }
         }
         async function popPersonasFirstTime()
         {
@@ -275,7 +280,7 @@
         async function applySearch()
         {
             const val = document.getElementById('searchpersona').value;
-            if (val.length === 0) { currentchunk = 0; popPersonas(); return; }
+            if (val.length === 0) { currentpage = 0; popPersonas(); return; }
             const list = await pb.collection('PhantasiaAI_Characters').getFullList({ fields: "firstname,lastname,id,profile", filter: `(firstname?~'${val}' || lastname?~'${val}')` });
             const personas = document.getElementById('personas');
 
