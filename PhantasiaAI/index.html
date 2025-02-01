@@ -245,9 +245,10 @@
         }
 
         let currentpage = 1;
+        const perpage = 15;
         async function popPersonas()
         {
-            const list = await pb.collection('PhantasiaAI_Characters').getList(currentpage, 15, { fields: 'firstname,lastname,id,profile', sort: '-created' });
+            const list = await pb.collection('PhantasiaAI_Characters').getList(currentpage, perpage, { fields: 'firstname,lastname,id,profile', sort: '-created' });
             const personas = document.getElementById('personas');
 
             for (let i = 0; i < list.items.length; ++i)
@@ -263,7 +264,7 @@
             }
             catch { }
 
-            if (list.items.length === 5)
+            if (list.items.length >= perpage)
             {
                 ++currentpage;
                 personas.innerHTML += `<button class="sb" onclick="popPersonas()" id="loadmore"><span>${trns.loadmore}</span>`;
