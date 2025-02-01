@@ -222,7 +222,8 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;')
-                .replace(/\n/g, '<br>');
+                .replace(/\n/g, '<br>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>');
         }
 
         let latestmessageid = -1;
