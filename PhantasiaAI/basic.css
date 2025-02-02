@@ -1,0 +1,28 @@
+.row
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    justify-self: center;
+    align-self: center;
+    width: unset;
+    height: unset;
+    flex-direction: row;
+}
+
+.chat
+{
+    max-width: 80%;
+    max-height: 20%;
+}
+
+.chatpp
+{
+    border-radius: 25px;
+    padding: 0;
+    margin: 15px;
+    justify-self: center;
+    align-self: center;
+
+    max-height: 99%;
+}

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, PhantasiaAI, AI, Storywriting, Game"/>
+        <meta name="description" content="PhantasiaAI by XeTute Technologies"/>
+
+        <title>PhantasiaAI \\ XeTute Technologies</title>
+
+        <link rel="stylesheet" href="../../basic.css"/>
+        <link rel="stylesheet" href="../basic.css"/>
+        <link rel="icon" href="../logo.jpg"/>
+        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+
+        <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
+    </head>
+    <style>
+        .messagescontainer
+        {
+            display: flex;
+
+            flex-direction: column;
+            justify-content: flex-start;
+
+            align-items: center;
+            align-self: center;
+
+            width: 100%;
+            max-width: 575px;
+            max-height: 80%;
+
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            position: absolute;
+            bottom: 10%;
+        }
+
+        .message
+        {
+            display: flex;
+            max-width: 65%;
+            padding: 5px;
+            margin: 5px;
+            background: #050505;
+            border-radius: 5px;
+        }
+
+        .aimessage
+        {
+            align-self: flex-start;
+            border: 3px solid #333;
+            text-align: left;
+        }
+
+        .usermessage
+        {
+            align-self: flex-end;
+            border: 3px solid #222;
+            text-align: right;
+        }
+
+        #settingsbtn
+        {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 3;
+        }
+
+        fullscreen
+        {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+        .msgln { width: 2px; height: 2rem; }
+    </style>
+    <body style="display: none; overflow: hidden;" id="main">
+        <fullscreen id="chatpage">
+            <div class="card row chat" style="z-index: 1; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+                <img id="personapp" class="chatpp" style="max-height: 50%;"/>
+                <div style="flex-direction: column;">
+                    <p id="personaname" style="margin-bottom: 0;"></p>
+                    <em id="personastatus" style="margin-top: 0; scale: 0.75; display: none;"></em>
+                </div>
+            </div>
+    
+            <div class="messagescontainer" id="messagescontainer">
+                <div style="margin: 6.3%"></div>
+            </div>
+    
+            <div style="flex-direction: row; position: absolute; bottom: 0; width: 100%; justify-content: center;">
+                <a class="sb" href="../"><</a>
+                <button class="sb" onclick="openSettings()">
+                    <i class="fa fa-bars" aria-hidden="true"></i>
+                </button>
+                <textarea id="message" class="si" autocomplete="off"></textarea>
+                <button class="sb" onclick="sendCM()" id="sendbtn">
+                    <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+                </button>
+            </div>
+        </fullscreen>
+        <fullscreen style="display: none; align-items: center; align-self: center; justify-content: center;" id="settingspage">
+            <button class="sb" onclick="clearChat()" id="clearchatbtn"></button>
+            <button class="sb" onclick="sharePAI()" id="sharePAI"></button>
+            <a class="sb" href="https://ko-fi.com/XeTute" target="_blank" rel="noopener" id="supportus"></a>
+            <button class="sb" onclick="openSettings()">
+                <i class="fa fa-bars" aria-hidden="true"></i>
+            </button>
+        </fullscreen>
+    </body>
+    <script src="../../pocketbase.umd.js"></script>
+    <script defer>
+        const recid = window.location.search.substr(1);
+        if (recid.length === 0) { window.location.href = './'; }
+        const pb = new PocketBase('https://db.xetute.com/');
+
+        let auth = undefined;
+        let rec = undefined;
+        let fullname = undefined;
+        let generatingmessage = false;
+
+        async function autoAuth()
+        {
+            try { auth = await pb.collection('accounts').authRefresh(); }
+            catch { window.location.href = `../../auth/index.html?${window.location.href}`; }
+        }
+
+        function getImageURL(_collectionID, _recID, _filename) { return `https://db.xetute.com/api/files/${_collectionID}/${_recID}/${_filename}`; }
+        async function loadrec()
+        {
+            await autoAuth();
+            try
+            {
+                rec = await pb.collection('PhantasiaAI_Characters').getOne(recid, { fields: 'creatorid,firstname,lastname,persona,profile'});
+                auth.record.data.PhantasiaAI.chat.lastchat = recid;
+                await pb.collection('accounts').update(auth.record.id,  { "data": auth.record.data } );
+            }
+            catch
+            {
+                alert('Failed to load. Will go to the dashboard. We\'re sorry.');
+                window.location.href = './';
+            }
+
+            fullname = rec.firstname + ' ' + rec.lastname;
+            document.getElementById('personapp').src = getImageURL("PhantasiaAI_Characters", recid, rec.profile);
+            document.getElementById('personapp').alt = `${fullname}'s Profile Picture.`;
+            document.getElementById('personaname').textContent = fullname;
+
+            document.getElementById('main').style.display = 'flex';
+        }
+
+        let trns;
+        async function autoTranslate()
+        {
+            await loadrec();
+            const translations =
+            {
+                en:
+                {
+                    message: '"Saying", *action*',
+                    personastatus: 'Responding...',
+                    clearchatbtn: "Clear Chat",
+                    sharePAI: "Share PhantasiaAI!",
+                    supportus: "Support Us 🤍",
+                    copiedlink: "Copied Link!",
+                    failedtosync: "Failed to sync messages to our cloud. We\'re sorry."
+                },
+                zh:
+                {
+                    message: '"说", *action*',
+                    personastatus: '正在响应...',
+                    clearchatbtn: "清除聊天",
+                    sharePAI: "分享PhantasiaAI！",
+                    supportus: "支持我们 🤍",
+                    copiedlink: "链接已复制！",
+                    failedtosync: "無法將訊息同步到我們的雲端。我們很抱歉。"
+                },
+                ur:
+                {
+                    message: '"کہنا", *action*',
+                    personastatus: 'جواب دے رہے ہیں...',
+                    clearchatbtn: "چیٹ صاف کریں",
+                    sharePAI: "PhantasiaAI کا اشتراک کریں!",
+                    supportus: "ہماری حمایت کریں 🤍",
+                    copiedlink: "لنک کاپی کر لیا!",
+                    failedtosync: "ہمارے کلاؤڈ پر پیغامات کی مطابقت پذیری میں ناکام۔ ہمیں افسوس ہے۔"
+                }
+            };
+
+            const userLang = navigator.language.slice(0, 2); // en, zh, ur
+            const lang = translations[userLang] ? userLang : 'en';
+            trns = translations[lang];
+
+            for (let key in trns)
+            {
+                if (key !== 'message')
+                {
+                    try { document.getElementById(key).innerHTML = trns[key]; }
+                    catch { }
+                }
+            }
+
+            document.documentElement.lang = lang;
+
+            document.getElementById('message').placeholder = trns.message;
+        }
+
+        function sanitized(str)
+        {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/\n/g, '<br>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>');
+        }
+
+        let latestmessageid = -1;
+        function messagediv(id, userornot, message)
+        {
+            let val =
+            `
+            <div class="message card row ${userornot ? 'usermessage' : 'aimessage'}" id="message${id}">
+                <p>${sanitized(message)}</p>
+                ${userornot ? '' : `<div class="line msgln" id="message${id}ln"></div><button class="sb" onclick="regenerateLM()" id="message${id}btn"><i class="fa fa-refresh" aria-hidden="true"></i></button>`}
+            </div>
+            `;
+
+            return val;
+        }
+
+        function removeLastRegen()
+        {
+            try
+            {
+                document.getElementById(`message${latestmessageid - 1}ln`).outerHTML = '';
+                document.getElementById(`message${latestmessageid - 1}btn`).outerHTML = '';
+            }
+            catch {}
+        }
+
+        function scrolltnm() { try { document.getElementById(`message${(latestmessageid)}`).scrollIntoView({ behavior: 'smooth' }); } catch { } } // scoll to newest message
+        async function popMessages()
+        {
+            await autoTranslate();
+
+            let user = true;
+            let n = 0;
+            try { n = auth.record.data.PhantasiaAI.chat[recid].messages.length; } catch { }
+            for (let i = 1; i < n; ++i)
+            {
+                removeLastRegen();
+                ++latestmessageid;
+                document.getElementById('messagescontainer').innerHTML += 
+                messagediv(latestmessageid, user, auth.record.data.PhantasiaAI.chat[recid].messages[i].content);
+                user = (!user);
+            }
+
+            document.getElementById('main').style.display = 'flex';
+            try { scrolltnm(); } catch { }
+        }
+        popMessages();
+
+        async function sendCM()
+        {
+            if (generatingmessage) { return; }
+            generatingmessage = true;
+
+            const message = document.getElementById('message').value;
+            let resp = undefined;
+            let failed = false;
+            document.getElementById('message').value = '';
+
+            ++latestmessageid;
+            document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, true, message);
+
+            try { auth.record.data.PhantasiaAI.chat[recid].messages.push({ role: "user", content: message }); }
+            catch { Object.assign(auth.record.data.PhantasiaAI.chat,
+            {
+                [recid]:
+                {
+                    messages:
+                    [
+                        { role: "system", content: `You're ${fullname}, and your personality is\n${rec.persona}.` },
+                        { role: "user", content: message }
+                    ]
+                }
+            }); }
+
+            document.getElementById('personastatus').style.display = 'flex';
+            await fetch
+            (
+                "https://ai.xetute.com/v1/chat/completions",
+                {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ "messages": auth.record.data.PhantasiaAI.chat[recid].messages, "temperature": 0.6 })
+                }
+            ).then(response => response.json())
+            .then( data => { resp = data; } )
+            .catch(e => 
+            { 
+                alert('Failed to process your message. We\'re sorry.');
+                document.getElementById('message').value = message;
+                failed = true;
+            });
+            document.getElementById('personastatus').style.display = 'none';
+
+            if (!failed)
+            {
+                auth.record.data.PhantasiaAI.chat[recid].messages.push({ role: "assistant", content: resp.choices[0].message.content });
+                try { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } ); }
+                catch { alert(trns.failedtosync); }
+
+                removeLastRegen();
+                ++latestmessageid;
+                document.getElementById('messagescontainer').innerHTML += messagediv(latestmessageid, false, resp.choices[0].message.content);
+                scrolltnm();
+            }
+
+            generatingmessage = false;
+        }
+
+        async function regenerateLM()
+        {
+            if (generatingmessage) { return; }
+            generatingmessage = true;
+            document.getElementById('personastatus').style.display = 'flex';
+
+            auth.record.data.PhantasiaAI.chat[recid].messages.pop();
+            let resp;
+            let failed = false;
+
+            document.getElementById(`message${latestmessageid}`).innerHTML = '<i class="fa fa-refresh" aria-hidden="true"></i>';
+            await fetch
+            (
+                "https://ai.xetute.com/v1/chat/completions",
+                {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ "messages": auth.record.data.PhantasiaAI.chat[recid].messages, "temperature": 0.7 })
+                }
+            ).then(response => response.json()).then(data => { resp = data; })
+            .catch(e => 
+            { 
+                alert('Failed to process your message. We\'re sorry.');
+                document.getElementById('message').value = message;
+                failed = true;
+            });
+
+            if (!failed)
+            {
+                auth.record.data.PhantasiaAI.chat[recid].messages.push({ role: "assistant", content: resp.choices[0].message.content });
+                try { await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data } ); }
+                catch { alert('Failed to sync messages to our cloud. We\'re sorry.'); }
+
+                document.getElementById(`message${latestmessageid}`).outerHTML = messagediv(latestmessageid, false, resp.choices[0].message.content);
+                scrolltnm();
+            }
+
+            document.getElementById('personastatus').style.display = 'none';
+            generatingmessage = false;
+        }
+
+        function fadein(element)
+        {
+            let op = 0.1;
+            element.style.display = 'flex';
+            let timer = setInterval(function ()
+            {
+                if (op >= 1) { clearInterval(timer); }
+                element.style.opacity = op;
+                element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+                op += op * 0.1;
+            }, 10);
+        }
+
+        async function openSettings()
+        {
+            const chatpage = document.getElementById('chatpage');
+            const settingspage = document.getElementById('settingspage');
+
+            if (chatpage.style.display === "none")
+            {
+                settingspage.style.display = 'none';
+                fadein(chatpage);
+            }
+            else
+            {
+                chatpage.style.display = 'none';
+                fadein(settingspage);
+            }
+        }
+
+        async function clearChat()
+        {
+            if (confirm(trns.clearchatbtn + '?'))
+            {
+                auth.record.data.PhantasiaAI.chat[recid] = {};
+                await pb.collection("Accounts").update(auth.record.id, { "data": auth.record.data } );
+                alert("Cleared & Synced to XeTute Technologies Cloud.");
+                window.location.href = window.location.href;
+            }
+        }
+
+        function sharePAI(_title = "PhantasiaAI by XeTute Technologies", _text = "Immerse in your very own realm on: ", copied = trns.copiedlink) // Sharetext = _text + url
+        {
+            const link = window.location.href;
+            if (navigator.share)
+            {
+                navigator.share
+                ({
+                    title: _title,
+                    text: _text,
+                    url: link
+                });
+            }
+            else { navigator.clipboard.writeText(link).then(() => { alert(copied); }); }
+        }
+    </script>
+</html>
