@@ -74,7 +74,7 @@
     
                 <div class="inp">
                     <input class="si" placeholder="E-Mail"   type="email"    id="signin-email" autocomplete="off"/>
-                    <input class="si" placeholder="Password" type="password" id="signin-password"/>
+                    <input class="si" placeholder="Password" type="password" id="signin-password" maxlength="16"/>
                     <strong class="sb" style="color: rgb(255, 150, 150);" id="signin-error"></strong>
                 </div>
                 
@@ -86,8 +86,8 @@
     
                 <div class="inp">
                     <input class="si" placeholder="E-Mail"           type="email"    id="signup-email" autocomplete="off"/>
-                    <input class="si" placeholder="Password"         type="password" id="signup-password0"/>
-                    <input class="si" placeholder="Confrm. Password" type="password" id="signup-password1"/>
+                    <input class="si" placeholder="Password"         type="password" id="signup-password0" maxlength="16"/>
+                    <input class="si" placeholder="Confrm. Password" type="password" id="signup-password1" maxlength="16"/>
                     <strong class="sb" style="color: rgb(255, 150, 150);" id="signup-error"></strong>
                 </div>
                 
@@ -132,13 +132,13 @@
             {
                 fsi.style.display = 'none';
                 fsu.style.display = 'flex';
-                fcbt.innerHTML = trns.cfBtnTextExisting;
+                fcbt.innerHTML = "I already have an Account";
             }
             else
             {
                 fsi.style.display = 'flex';
                 fsu.style.display = 'none';
-                fcbt.innerHTML = trns.cfBtnTextCreate;
+                fcbt.innerHTML = "Create an Account";
             }
         }
 
@@ -152,7 +152,7 @@
                 if (link) { window.location.href = link; }
                 else { window.location.href = '../'; }
             }
-            catch { document.getElementById('signin-error').textContent = 'An unexpected error occurred. We\'re sorry.'; }
+            catch { document.getElementById('signin-error').textContent = 'Invalid Credentials.'; }
         }
 
         async function signUp()
@@ -160,6 +160,10 @@
             const txtnotif = document.getElementById('signup-error');
             try
             {
+                if (sup[0].value !== sup[1].value) { alert("Passwords don't match."); return; }
+                if (sup[0].value.length > 4) { alert("Password requires minimum four characters."); return; }
+                if (sup[0].value.length < 16) { alert("Password can have 16 characters at most."); return; }
+
                 const record = await pb.collection('accounts').create
                 ({
                     "email": sue.value,
@@ -191,75 +195,5 @@
             catch { txtnotif.textContent = 'An unexpected error occurred. We\'re sorry.'; }
             txtnotif.style.color = 'red';
         }
-
-        // Translation ur zh en
-        const translations =
-        {
-            en:
-            {
-                headerText: "XeTute Technologies",
-                signinTitle: "Sign-In",
-                signinBtn: "Sign In",
-                signupTitle: "Sign-Up",
-                signupBtn: "Sign Up",
-                orText: "or",
-                cfBtnTextCreate: "Create an Account",
-                cfBtnTextExisting: "I already have an Account",
-                signinEmailPlaceholder: "E-Mail",
-                signinPasswordPlaceholder: "Password",
-                signupEmailPlaceholder: "E-Mail",
-                signupPasswordPlaceholder: "Password",
-                signupConfirmPasswordPlaceholder: "Confirm Password"
-            },
-            zh:
-            {
-                headerText: "XeTute 技术公司",
-                signinTitle: "登录",
-                signinBtn: "登录",
-                signupTitle: "注册",
-                signupBtn: "注册",
-                orText: "或者",
-                cfBtnTextCreate: "创建账户",
-                cfBtnTextExisting: "我已有账户",
-                signinEmailPlaceholder: "电子邮件",
-                signinPasswordPlaceholder: "密码",
-                signupEmailPlaceholder: "电子邮件",
-                signupPasswordPlaceholder: "密码",
-                signupConfirmPasswordPlaceholder: "确认密码"
-            },
-            ur:
-            {
-                headerText: "زے ٹیوٹ ٹیکنالوجیز",
-                signinTitle: "سائن ان کریں",
-                signinBtn: "سائن ان کریں",
-                signupTitle: "سائن اپ کریں",
-                signupBtn: "سائن اپ کریں",
-                orText: "یا",
-                cfBtnTextCreate: "اکاؤنٹ بنائیں",
-                cfBtnTextExisting: "میرے پاس پہلے سے اکاؤنٹ ہے",
-                signinEmailPlaceholder: "ای میل",
-                signinPasswordPlaceholder: "پاس ورڈ",
-                signupEmailPlaceholder: "ای میل",
-                signupPasswordPlaceholder: "پاس ورڈ",
-                signupConfirmPasswordPlaceholder: "پاس ورڈ کی تصدیق کریں"
-            }
-        };
-
-        const userLang = navigator.language.slice(0, 2);
-        const lang = translations[userLang] ? userLang : 'en';
-        const trns = translations[lang];
-
-        document.getElementById('header-text').textContent = trns.headerText;
-        document.getElementById('signin-title').textContent = trns.signinTitle;
-        document.getElementById('signin-btn').textContent = trns.signinBtn;
-        document.getElementById('signup-title').textContent = trns.signupTitle;
-        document.getElementById('signup-btn').textContent = trns.signupBtn;
-        document.getElementById('or-text').textContent = trns.orText;
-        fcbt.textContent = trns.cfBtnTextCreate;
-        document.getElementById('signin-email').placeholder = trns.signinEmailPlaceholder;
-        document.getElementById('signin-password').placeholder = trns.signinPasswordPlaceholder;
-        document.getElementById('signup-email').placeholder = trns.signupEmailPlaceholder;
-        document.getElementById('signup-password0').placeholder = trns.signupPasswordPlaceholder;
-        document.getElementById('signup-password1').placeholder = trns.signupConfirmPasswordPlaceholder;
     </script>
 </html>
