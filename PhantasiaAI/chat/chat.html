@@ -3,8 +3,14 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, PhantasiaAI, AI, Storywriting, Game"/>
-        <meta name="description" content="PhantasiaAI by XeTute Technologies"/>
+        <meta name="keywords" content="XeTute, XeTute Technologies, PhantasiaAI, AI, Storywriting, Game, AI Chat, AI Characters"/>
+        <meta name="description" content="PhantasiaAI by XeTute Technologies - AI-driven storytelling and interactive character chats."/>
+        <meta name="robots" content="index, follow"/>
+        <meta property="og:title" content="PhantasiaAI \\ XeTute Technologies"/>
+        <meta property="og:description" content="Experience AI-driven storytelling with PhantasiaAI. Create, chat, and engage with intelligent characters."/>
+        <meta property="og:image" content="https://xetute.com/PhantasiaAI/logo.jpg"/>
+        <meta property="og:url" content="https://xetute.com/PhantasiaAI/"/>
+        <meta name="twitter:card" content="summary_large_image"/>  
 
         <title>PhantasiaAI \\ XeTute Technologies</title>
 
@@ -120,7 +126,7 @@
     <script src="../../pocketbase.umd.js"></script>
     <script defer>
         const recid = window.location.search.substr(1);
-        if (recid.length === 0) { window.location.href = './'; }
+        if (recid.length === 0) { window.location.href = '../'; }
         const pb = new PocketBase('https://db.xetute.com/');
 
         let auth = undefined;
@@ -147,13 +153,18 @@
             catch
             {
                 alert('Failed to load. Will go to the dashboard. We\'re sorry.');
-                window.location.href = './';
+                window.location.href = '../';
             }
 
             fullname = rec.firstname + ' ' + rec.lastname;
             document.getElementById('personapp').src = getImageURL("PhantasiaAI_Characters", recid, rec.profile);
             document.getElementById('personapp').alt = `${fullname}'s Profile Picture.`;
             document.getElementById('personaname').textContent = fullname;
+
+            // idk why I'm doing this
+            document.querySelector('meta[property="og:description"]').setAttribute("content", `Chat with ${fullname} on PhantasiaAI =)`);
+            document.querySelector('meta[property="og:image"]').setAttribute("content", getImageURL("PhantasiaAI_Characters", recid, rec.profile));
+            document.querySelector('meta[property="og:url"]').setAttribute("content", window.location.href);
 
             document.getElementById('main').style.display = 'flex';
         }
@@ -169,7 +180,7 @@
                     message: '"Saying", *action*',
                     personastatus: 'Responding...',
                     clearchatbtn: "Clear Chat",
-                    sharePAI: "Share PhantasiaAI!",
+                    sharePAI: "Share this Persona!",
                     supportus: "Support Us 🤍",
                     copiedlink: "Copied Link!",
                     failedtosync: "Failed to sync messages to our cloud. We\'re sorry."
@@ -179,7 +190,7 @@
                     message: '"说", *action*',
                     personastatus: '正在响应...',
                     clearchatbtn: "清除聊天",
-                    sharePAI: "分享PhantasiaAI！",
+                    sharePAI: "分享這個角色！",
                     supportus: "支持我们 🤍",
                     copiedlink: "链接已复制！",
                     failedtosync: "無法將訊息同步到我們的雲端。我們很抱歉。"
@@ -189,7 +200,7 @@
                     message: '"کہنا", *action*',
                     personastatus: 'جواب دے رہے ہیں...',
                     clearchatbtn: "چیٹ صاف کریں",
-                    sharePAI: "PhantasiaAI کا اشتراک کریں!",
+                    sharePAI: "اس شخصیت کا اشتراک کریں!",
                     supportus: "ہماری حمایت کریں 🤍",
                     copiedlink: "لنک کاپی کر لیا!",
                     failedtosync: "ہمارے کلاؤڈ پر پیغامات کی مطابقت پذیری میں ناکام۔ ہمیں افسوس ہے۔"
@@ -412,7 +423,7 @@
             }
         }
 
-        function sharePAI(_title = "PhantasiaAI by XeTute Technologies", _text = "Immerse in your very own realm on: ", copied = trns.copiedlink) // Sharetext = _text + url
+        function sharePAI(_title = "PhantasiaAI by XeTute Technologies", _text = `Chat with ${fullname} on PhantasiaAI: `, copied = trns.copiedlink) // Sharetext = _text + url
         {
             const link = window.location.href;
             if (navigator.share)
