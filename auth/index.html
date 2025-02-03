@@ -161,8 +161,8 @@
             try
             {
                 if (sup[0].value !== sup[1].value) { alert("Passwords don't match."); return; }
-                if (sup[0].value.length > 4) { alert("Password requires minimum four characters."); return; }
-                if (sup[0].value.length < 16) { alert("Password can have 16 characters at most."); return; }
+                if (sup[0].value.length < 4) { alert("Password requires minimum four characters."); return; }
+                if (sup[0].value.length > 16) { alert("Password can have 16 characters at most."); return; }
 
                 const record = await pb.collection('accounts').create
                 ({
