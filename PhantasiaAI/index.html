@@ -107,6 +107,7 @@
         let auth = undefined;
 
         function getImageURL(collectionID, recID, filename) { return `https://db.xetute.com/api/files/${collectionID}/${recID}/${filename}`; }
+        function getImageURLthumb(collectionID, recID, filename) { return `https://db.xetute.com/api/files/${collectionID}/${recID}/${filename}?thumb=256x0`; }
         let failedlastchat = { did: false, id: '' };
         async function autoAuth()
         {
@@ -141,7 +142,7 @@
                 rec = await pb.collection('PhantasiaAI_Characters').getOne(recid, { fields: 'firstname,lastname,profile' });
             }
 
-            document.getElementById('lastchatimg').src = getImageURL('PhantasiaAI_Characters', recid, rec.profile);
+            document.getElementById('lastchatimg').src = getImageURLthumb('PhantasiaAI_Characters', recid, rec.profile);
             document.getElementById('lastchatname').textContent = rec.firstname + ' ' + rec.lastname;
             document.getElementById('lastchatdiv').setAttribute('onclick', `window.location.href = './chat/chat.html?${recid}'`);
         }
@@ -237,7 +238,7 @@
             const div =
             `
             <div class="card row chat leftpersona" onclick="window.location.href = './chat/chat.html?${id}'">
-                 <img alt="profile image of x persona" class="box-shadow chatpp" src="${getImageURL('PhantasiaAI_Characters', id, imgname)}"/>
+                 <img alt="profile image of x persona" class="box-shadow chatpp" src="${getImageURLthumb('PhantasiaAI_Characters', id, imgname)}"/>
                 <p>${chatname}</p>
             </div>
             `;
