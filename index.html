@@ -134,6 +134,22 @@
                     <p class="hero-subtitle" id="authsub">—</p>
                 </div>
             </div>
+            <a class="sb scroll-indicator" onclick="document.getElementById('intellectv0.1').scrollIntoView({ behavior: 'smooth' })">
+                <i class="fa fa-arrow-down" aria-hidden="true"></i>
+            </a>
+        </div>
+
+        <div class="section fullsize allcenter" id="intellectv0.1">
+            <div class="prodpage fullsize allcenter nobottom">
+                <div class="allcenter fullsize dist">
+                    <img src="https://cdn-thumbnails.huggingface.co/social-thumbnails/models/XeTute/Intellect_V0.1-1.8B.png" class="box-shadow decovid" alt="decorative image" />
+                    <a href="https://huggingface.co/XeTute/Intellect_V0.1-1.8B" class="sb"><span>HuggingFace &#129303;</span></a>
+                </div>
+                <div class="allcenter fullsize dist">
+                    <h1 class="hero-title" style="scale: 0.75;" id="introdintellect">—</h1>
+                    <p class="hero-subtitle" id="intellectsub">—</p>
+                </div>
+            </div>
             <a class="sb scroll-indicator" onclick="document.getElementById('socials').scrollIntoView({ behavior: 'smooth' })">
                 <i class="fa fa-arrow-down" aria-hidden="true"></i>
             </a>
@@ -223,6 +239,10 @@
                     authsub0: "Connect with a community fostering knowledge.",
                     authsub1: "We may end up as your metaphorical second family =)",
 
+                    introdintellect: "Introducing Intellect 1.8B",
+                    intellectsub0: "A series of tiny but capable, Open-Source Reasoning Large Language Models.",
+                    intellectsub1: "A series of tiny but mighty, Open-Source Reasoning Large Language Models.",
+
                     socialsheader: "Socials",
                     socialssub0: "Get to know every small detail of what's currently happening.",
                     socialssub1: "We value your feedback, this is the fastest way to give it to us.",
@@ -245,6 +265,10 @@
                     authsub0: "与一个促进知识的社区联系。",
                     authsub1: "我们可能会成为你隐喻的第二个家庭 =)",
 
+                    introdintellect: "Intellect 1.8B 簡介",
+                    intellectsub0: "一系列微小但功能強大的開源推理大型語言模型。",
+                    intellectsub1: "一系列微小但強大的開源推理大型語言模型。",
+
                     socialsheader: "社群",
                     socialssub0: "了解當前發生的每一個小細節。",
                     socialssub1: "我們重視您的回饋，這是向我們提供回饋的最快方式。",
@@ -266,6 +290,10 @@
                     authyourself: "ہماری اجازت کی خدمات۔",
                     authsub0: "علم کو فروغ دینے والے ایک کمیونٹی سے جڑیں۔",
                     authsub1: "ہم آپ کے مجازی دوسرے خاندان بن سکتے ہیں =)",
+
+                    introdintellect: "Intellect 1.8B کا تعارف",
+                    intellectsub0: "چھوٹے لیکن قابل، اوپن سورس ریزننگ بڑی زبان کے ماڈلز کا ایک سلسلہ۔",
+                    intellectsub1: "چھوٹے لیکن طاقتور، سستے ریزننگ لارج لینگویج ماڈلز کا ایک سلسلہ۔",
 
                     socialsheader: "سوشلز",
                     socialssub0: "اس وقت کیا ہو رہا ہے اس کی ہر چھوٹی سے چھوٹی تفصیل جانیں۔",
@@ -290,6 +318,7 @@
             changeText([trns.paisub0, trns.paisub1], 'paisub');
             changeText([trns.authsub0, trns.authsub1], 'authsub');
             changeText([trns.socialssub0, trns.socialssub1], 'socialssub');
+            changeText([trns.intellectsub0, trns.intellectsub1], 'intellectsub');
             changeText([translations['en'].longlive, translations['ur'].longlive, translations['zh'].longlive], 'longlivetxt', 1500, 35);
 
             document.getElementById('main').style.display = 'flex';
