@@ -171,7 +171,9 @@
                     updatecreations: '🔁 Update Creations',
 
                     failedtogetchat0: "Failed to get Chat with ID ",
-                    failedtogetchat1: ". The Creator might have deleted the model. We're sorry." // => Failed to get Chat with ID xyz. [...] We're sorry.
+                    failedtogetchat1: ". The Creator might have deleted the model. We're sorry.", // => Failed to get Chat with ID xyz. [...] We're sorry.
+
+                    aioffline: "XeTute Technologies AI APIE is offline. Sending messages will result in an error."
                 },
                 zh:
                 {
@@ -190,7 +192,9 @@
                     updatecreations: '🔁 更新创作',
 
                     failedtogetchat0: "無法獲取 ID 為 ",
-                    failedtogetchat1: " 的聊天。創建者可能已刪除該模型。我們很抱歉。"
+                    failedtogetchat1: " 的聊天。創建者可能已刪除該模型。我們很抱歉。",
+
+                    aioffline: "XeTute Technologies AI APIE 處於離線狀態。發送訊息將會導致錯誤。"
                 },
                 ur:
                 {
@@ -209,7 +213,9 @@
                     updatecreations: '🔁 تخلیقات کو اپ ڈیٹ کریں',
 
                     failedtogetchat0: "چیٹ ID حاصل کرنے میں ناکامی ",
-                    failedtogetchat1: "۔ تخلیق کار نے ماڈل کو حذف کر دیا ہو سکتا ہے۔ ہمیں افسوس ہے۔"
+                    failedtogetchat1: "۔ تخلیق کار نے ماڈل کو حذف کر دیا ہو سکتا ہے۔ ہمیں افسوس ہے۔",
+
+                    aioffline: "XeTute Technologies AI APIE آف لائن ہے۔ پیغامات بھیجنے کے نتیجے میں ایک خرابی ہوگی۔"
                 }
             };
 
@@ -229,6 +235,9 @@
             }
 
             document.getElementById('searchpersona').placeholder = trns.searchpersona;
+
+            if (!(await fetch("https://ai.xetute.com/api/v1/model")).ok)
+            { alert(trns.aioffline); }
 
             document.documentElement.lang = lang;
         }
