@@ -236,8 +236,12 @@
 
             document.getElementById('searchpersona').placeholder = trns.searchpersona;
 
-            if (!(await fetch("https://ai.xetute.com/api/v1/model")).ok)
-            { alert(trns.aioffline); }
+            try
+            {
+                if (!(await fetch("https://ai.xetute.com/api/v1/model")).ok)
+                { alert(trns.aioffline); }
+            }
+            catch { alert(trns.aioffline); }
 
             document.documentElement.lang = lang;
         }
