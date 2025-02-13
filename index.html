@@ -3,325 +3,171 @@
     <head>
         <meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
-        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, PhantasiaAI, AI, Hello Friend"/>
-        <meta name="description" content="Follow your Curiosity — Lead Humanity Forward"/>
+        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, Free AI Chatbot"/>
+        <meta name="description" content="Long live the Islamic Republic of Pakistan."/>
 
-        <title>Hello, Friend \\ XeTute Technologies</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
-        <link rel="stylesheet" href="basic.css"/>
-        <link rel="icon" href="logo.jpg"/>
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
-        <script src="https://kit.fontawesome.com/cc84e7136d.js" crossorigin="anonymous"></script>
-        <style>
-            .section
-            {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                width: 100%;
-                position: relative;
-                padding: 2rem 0;
-            }
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-            .allcenter
-            {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .fullsize
-            {
-                width: 100%;
-                height: 100%;
-            }
-
-            .hero-title
-            {
-                font-size: 4.5rem;
-                margin-bottom: 1rem;
-            }
-
-            .hero-subtitle
-            {
-                font-size: 1.2rem;
-                line-height: 1.6;
-                margin-bottom: 2rem;
-                max-width: 85%;
-            }
-
-            .feature-container
-            {
-                background: rgba(255, 255, 255, 0.03);
-                padding: 3rem;
-                border-radius: 25px;
-                max-width: 90%;
-            }
-
-            .scroll-indicator
-            {
-                width: 50px;
-                height: 50px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                border-radius: 25px;
-                transition: .4s;
-                margin-top: 2rem;
-            }
-            .scroll-indicator:hover
-            { 
-                transform: scale(1.1);
-                cursor: pointer;
-            }
-            .section-title { margin-bottom: 3rem; }
-
-            .prodpage
-            {
-                display: flex;
-                flex-direction: row;
-                width: 100%;
-            }
-            .nobottom { margin-bottom: 0; padding-bottom: 0; }
-            .dist { margin: 20px; padding: 15px; }
-            .decovid { border-radius: 25px; max-width: 80%; margin: 20px; }
-
-            @media (max-width: 768px)
-            {
-                .hero-title { font-size: 3.5rem; }
-                .prodpage { flex-direction: column-reverse; }
-            }
-        </style>
+        <link rel="icon"       src ="logo.jpg" >
+        <link rel="stylesheet" href="basic.css">
     </head>
-    <body id="main" style="display: none; overflow-x: hidden;">
-        <!-- Hero Section -->
-        <div class="section">
-            <h1 class="hero-title" id="herotitle">—</h1>
-            <p class="hero-subtitle" id="herosub">—</p>
-            <a class="sb scroll-indicator" onclick="document.getElementById('pai').scrollIntoView({ behavior: 'smooth' })">
-                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </a>
-        </div>
+    <style>
+        #chatContainer
+        {
+            scrollbar-width: thin;
+            scrollbar-color: #444 #222;
+        }
 
-        <!-- Apps -->
-        <div class="section" id="pai">
-            <div class="prodpage fullsize allcenter nobottom">
-                <div class="allcenter fullsize dist">
-                    <video src="https://github.com/XeTute/xetute.github.io/raw/main/pai-deco.mp4" class="box-shadow decovid" alt="decorative video" muted loop autoplay></video>
-                    <a href="PhantasiaAI/" class="sb"><span id="paiinvitation">—</span></a>
-                </div>
-                <div class="allcenter fullsize dist">
-                    <h1 class="hero-title" style="scale: 0.75;" id="introducingpai">—</h1>
-                    <p class="hero-subtitle" id="paisub">—</p>
-                </div>
-            </div>
-            <a class="sb scroll-indicator" onclick="document.getElementById('auth').scrollIntoView({ behavior: 'smooth' })">
-                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </a>
-        </div>
+        #chatContainer::-webkit-scrollbar { width: 8px; }
 
-        <div class="section fullsize allcenter" id="auth">
-            <div class="prodpage fullsize allcenter nobottom">
-                <div class="allcenter fullsize dist">
-                    <video src="https://github.com/XeTute/xetute.github.io/raw/main/auth-deco.mp4" class="box-shadow decovid" alt="decorative video" muted loop autoplay></video>
-                    <a href="auth/profile.html" class="sb"><span id="checkauthstat"></span></a>
-                </div>
-                <div class="allcenter fullsize dist">
-                    <h1 class="hero-title" style="scale: 0.75;" id="authyourself">—</h1>
-                    <p class="hero-subtitle" id="authsub">—</p>
-                </div>
-            </div>
-            <a class="sb scroll-indicator" onclick="document.getElementById('intellectv0.2').scrollIntoView({ behavior: 'smooth' })">
-                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </a>
-        </div>
+        #chatContainer::-webkit-scrollbar-track
+        {
+            background: #222;
+            border-radius: 10px;
+        }
 
-        <div class="section fullsize allcenter" id="intellectv0.2">
-            <div class="prodpage fullsize allcenter nobottom">
-                <div class="allcenter fullsize dist">
-                    <img src="https://cdn-thumbnails.huggingface.co/social-thumbnails/models/XeTute/Intellect_V0.2-1.6B.png" class="box-shadow decovid" alt="decorative image" />
-                    <a href="https://huggingface.co/XeTute/Intellect_V0.2-1.6B" class="sb"><span>HuggingFace &#129303;</span></a>
-                </div>
-                <div class="allcenter fullsize dist">
-                    <h1 class="hero-title" style="scale: 0.75;" id="introdintellect">—</h1>
-                    <p class="hero-subtitle" id="intellectsub">—</p>
-                </div>
-            </div>
-            <a class="sb scroll-indicator" onclick="document.getElementById('socials').scrollIntoView({ behavior: 'smooth' })">
-                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </a>
-        </div>
+        #chatContainer::-webkit-scrollbar-thumb
+        {
+            background: #444;
+            border-radius: 10px;
+        }
 
-        <div class="section fullsize allcenter" id="socials">
-            <div class="prodpage fullsize allcenter nobottom">
-                <div class="allcenter fullsize dist" style="display: flex; flex-direction: row;">
-                    <div class="dist">
-                        <h2 class="hero-subtitle">General</h2>
-                        <a href="https://youtube.com/@XeTuteTechnologies" target="_blank" rel="noopener" class="sb"><span>YouTube</span></a>
-                        <a href="https://bsky.app/profile/xetute.bsky.social" target="_blank" rel="noopener" class="sb"><span>BlueSky</span></a>
-                    </div>
+        .message
+        {
+            max-width: 70%;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 25px;
+            word-break: break-word;
+        }
+    
+        .user-message
+        {
+            background: #050505;
+            border: 2px solid #444;
+            align-self: flex-end;
+            text-align: right;
+        }
 
-                    <div class="dist">
-                        <h2 class="hero-subtitle">Specialized</h2>
-                        <a href="https://huggingface.co/XeTute" target="_blank" rel="noopener" class="sb"><span>HuggingFace</span></a>
-                        <a href="https://github.com/XeTute" target="_blank" rel="noopener" class="sb"><span>GitHub</span></a>
-                    </div>
-                </div>
-                <div class="allcenter fullsize dist">
-                    <h1 class="hero-title" style="scale: 0.75;" id="socialsheader">—</h1>
-                    <p class="hero-subtitle" id="socialssub">—</p>
-                </div>
-            </div>
-            <a class="sb scroll-indicator" onclick="document.getElementById('longlivediv').scrollIntoView({ behavior: 'smooth' })">
-                <i class="fa fa-arrow-down" aria-hidden="true"></i>
-            </a>
-        </div>
+        .assistant-message
+        {
+            background: #050505;
+            align-self: flex-start;
+            border: 2px solid #444;
+            text-align: left;
+        }
 
-        <div class="section fullsize allcenter" id="longlivediv">
-            <h2 id="longlivetxt" style="width: 90%; max-width: 550px;"></h2>
-        </div>
+        .loading-message
+        {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        <script defer>
-            function textAnim(elemid, newText, delay = 2000, speed = 50)
+        @media (min-width: 768px)
+        {
+            #chatContainer
             {
-                return new Promise((resolve) =>
-                {
-                    const semislogan = document.getElementById(elemid);
-                    if (!semislogan) return resolve();
-                
-                    setTimeout(() =>
-                    {
-                        const currentText = semislogan.textContent;
-                        const totalFrames = Math.max(currentText.length, newText.length);
-                        let frame = 0;
-                    
-                        function updateText()
-                        {
-                            if (frame >= totalFrames) return resolve();
-                            semislogan.innerHTML = newText.substring(0, frame + 1) + currentText.substring(frame + 1);
-                            ++frame;
-                            setTimeout(updateText, speed);
-                        }
-                    
-                        updateText();
-                    }, delay);
-                });
+                max-width: 800px;
+                margin: 20px auto;
+                padding: 0 20px;
             }
-
-            async function changeText(texts, elemid, delay = 2000, speed = 50)
-            {
-                while (true)
-                {
-                    for (const text of texts)
-                        await textAnim(elemid, text, delay, speed);
-                }
-            }
-
-            // Browser translations for en, zh and ur
-            const translations =
-            {
-                en:
-                {
-                    herotitle: "HELLO, FRIEND.",
-                    herosub0: "Follow your Curiosity<br>Lead Humanity Forward",
-                    herosub1: "Reach the end of the Story in your own way.",
-
-                    introducingpai: "Introducing PhantasiaAI",
-                    paisub0: "Immerse in your very own digital realm.",
-                    paisub1: "Socialize with artificial beings, safely and privately.",
-                    paiinvitation: "Envision Now",
-                
-                    checkauthstat: "Check Authorisation Status",
-                    authyourself: "Our Authorisation Services.",
-                    authsub0: "Connect with a community fostering knowledge.",
-                    authsub1: "We may end up as your metaphorical second family =)",
-
-                    introdintellect: "Introducing Intellect 1.6B",
-                    intellectsub0: "A series of tiny but capable, Open-Source Reasoning Large Language Models.",
-                    intellectsub1: "A series of tiny but mighty, Open-Source Reasoning Large Language Models.",
-
-                    socialsheader: "Socials",
-                    socialssub0: "Get to know every small detail of what's currently happening.",
-                    socialssub1: "We value your feedback, this is the fastest way to give it to us.",
-
-                    longlive: "Long live the Islamic Federal Republic of Pakistan.<br>Long live our alliance with the People's Republic of China, and long live the People's Republic of China."
-                },
-                zh:
-                {
-                    herotitle: "你好，朋友。",
-                    herosub0: "追随你的好奇心<br>引领人类向前",
-                    herosub1: "以你自己的方式到达故事的尽头。",
-
-                    introducingpai: "介绍 PhantasiaAI",
-                    paisub0: "沉浸在你自己的数字领域中。",
-                    paisub1: "与人工智能安全、私密地社交。",
-                    paiinvitation: "现在想象",
-                
-                    checkauthstat: "检查授权状态",
-                    authyourself: "我们的授权服务。",
-                    authsub0: "与一个促进知识的社区联系。",
-                    authsub1: "我们可能会成为你隐喻的第二个家庭 =)",
-
-                    introdintellect: "Intellect 1.6B 簡介",
-                    intellectsub0: "一系列微小但功能強大的開源推理大型語言模型。",
-                    intellectsub1: "一系列微小但強大的開源推理大型語言模型。",
-
-                    socialsheader: "社群",
-                    socialssub0: "了解當前發生的每一個小細節。",
-                    socialssub1: "我們重視您的回饋，這是向我們提供回饋的最快方式。",
-
-                    longlive: "巴基斯坦伊斯蘭聯邦共和國萬歲。我們同中華人民共和國的聯盟萬歲，中華人民共和國萬歲。"
-                },
-                ur:
-                {
-                    herotitle: "ہیلو، دوست۔",
-                    herosub0: "اپنی تجسس کی پیروی کریں<br>انسانیت کو آگے بڑھائیں",
-                    herosub1: "کہانی کے آخر تک اپنے طریقے سے پہنچیں۔",
-
-                    introducingpai: "فینٹاسیا اے آئی کا تعارف",
-                    paisub0: "اپنی ذاتی ڈیجیٹل دنیا میں غوطہ زن ہوں۔",
-                    paisub1: "مصنوعی مخلوق کے ساتھ محفوظ اور نجی طور پر ملیں۔",
-                    paiinvitation: "اب تصور کریں",
-                
-                    checkauthstat: "اجازت کی حالت چیک کریں",
-                    authyourself: "ہماری اجازت کی خدمات۔",
-                    authsub0: "علم کو فروغ دینے والے ایک کمیونٹی سے جڑیں۔",
-                    authsub1: "ہم آپ کے مجازی دوسرے خاندان بن سکتے ہیں =)",
-
-                    introdintellect: "Intellect 1.6B کا تعارف",
-                    intellectsub0: "چھوٹے لیکن قابل، اوپن سورس ریزننگ بڑی زبان کے ماڈلز کا ایک سلسلہ۔",
-                    intellectsub1: "چھوٹے لیکن طاقتور، سستے ریزننگ لارج لینگویج ماڈلز کا ایک سلسلہ۔",
-
-                    socialsheader: "سوشلز",
-                    socialssub0: "اس وقت کیا ہو رہا ہے اس کی ہر چھوٹی سے چھوٹی تفصیل جانیں۔",
-                    socialssub1: "ہم آپ کے تاثرات کی قدر کرتے ہیں، یہ ہمیں دینے کا تیز ترین طریقہ ہے۔",
-
-                    longlive: "اسلامی وفاقی جمہوریہ پاکستان زندہ باد۔<br>عوامی جمہوریہ چین کے ساتھ ہمارا اتحاد زندہ باد، اور عوامی جمہوریہ چین زندہ باد۔"
-                }
-            };
-
-            const userLang = navigator.language.slice(0, 2); // en, zh, ur
-            const lang = translations[userLang] ? userLang : 'en';
-            const trns = translations[lang];
-            document.documentElement.lang = lang;
-
-            for (let key in trns)
-            {
-                try { document.getElementById(key).innerHTML = trns[key]; }
-                catch {}
-            }
-
-            changeText([trns.herosub0, trns.herosub1], 'herosub');
-            changeText([trns.paisub0, trns.paisub1], 'paisub');
-            changeText([trns.authsub0, trns.authsub1], 'authsub');
-            changeText([trns.socialssub0, trns.socialssub1], 'socialssub');
-            changeText([trns.intellectsub0, trns.intellectsub1], 'intellectsub');
-            changeText([translations['en'].longlive, translations['ur'].longlive, translations['zh'].longlive], 'longlivetxt', 1500, 35);
-
-            document.getElementById('main').style.display = 'flex';
-        </script>
+        
+            .message { max-width: 50%; }
+            .user-message { margin-right: 20px; }
+            .assistant-message { margin-left: 20px; }
+        }
+    </style>
+    <body style="overflow: hidden;">
+        <column id="chatContainer" style="height: 100%; overflow-y: auto; margin: 20px;">
+            <em id="startingquestion">How may I help you today?</em>
+        </column>
+        <row style="gap: 10px; height: fit-content; align-items: center; justify-content: center;">
+            <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off"/>
+            <button onclick="sendMessage()" style="width: fit-content; height: 100%;">
+                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+            </button>
+        </row>
     </body>
+    <script defer>
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const messages = [ { role: 'system', content: "You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/. Always respond as short as possible while remaining helpful."} ];
+
+        let processing = false;
+
+        async function sendMessage()
+        { 
+            if (processing) return;
+            processing = true;
+
+            const message = messageInput.value.trim();
+            if (!message) return;
+        
+            try { document.getElementById('startingquestion').outerHTML = ''; }
+            catch {}
+
+            addMessage(message, 'user');
+            messageInput.value = '';
+
+            const loadingDiv = document.createElement('div');
+            const spinner = document.createElement('i');
+
+            loadingDiv.classList.add('message', 'assistant-message', 'loading-message');
+            spinner.classList.add('fa', 'fa-spinner', 'fa-spin');
+
+            loadingDiv.appendChild(spinner);
+            loadingDiv.appendChild(document.createTextNode(' Thinking...'));
+
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        
+            try
+            {
+                messages.push({ role: 'user', content: message });
+                const response = await fetch('https://ai.xetute.com/v1/chat/completions',
+                {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: messages, stream: false })
+                });
+            
+                const data = await response.json();
+                const reply = data.choices[0].message.content;
+
+                messages.push({ role: 'assistant', content: reply });
+                loadingDiv.remove();
+                addMessage(reply, 'assistant');
+            }
+            catch (error)
+            {
+                console.error('Error:', error);
+                loadingDiv.remove();
+                addMessage("Sorry, I'm having trouble connecting to the server.", 'assistant');
+            }
+            processing = false;
+        }
+
+        function addMessage(content, sender)
+        {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            messageDiv.textContent = content;
+            chatContainer.appendChild(messageDiv);
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        messageInput.addEventListener('keypress', (e) =>
+        {
+            if (e.key === 'Enter' && !e.shiftKey)
+            {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
 </html>

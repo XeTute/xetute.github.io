@@ -1,160 +1,88 @@
-:root
+html, body
 {
-    --material-theme: #000;
-}
-
-html[lang="ur"]
-{
-    direction: rtl;
-    text-align: right;
-}
-
-body, html
-{
-    width: 100%;
-    height: 100%;
-
-    padding: 0;
-    margin: 0;
+    background: #111;
+    color: #fff;
 
     display: flex;
     flex-direction: column;
+
+    width: 100%;
+    height: 100vh;
+
     justify-content: flex-start;
     align-items: center;
-    text-align: center;
 
-    background: #050505;
-    filter: brightness(75%);
+    text-align: center;
+}
+
+h1, h2, h3, h4, h5, h6
+{
+    font-family: 'Alumni Sans Pinstripe', serif;
+}
+
+p, em, strong, sub, sup, code
+{
+    font-family: 'Funnel Sans', serif;
+}
+
+a, button
+{
     color: #fff;
-    font-family: 'PT Sans';
-
-    transition: 0.4s ease-in-out;
-
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-body:hover, body:focus, html:hover, html:focus { filter: brightness(100%); }
-
-/* Wallpaper */
-@media screen and (orientation:portrait)
-{
-    :root { --material-theme: #888; }
-}
-
-@media screen and (orientation:landscape)
-{
-    :root { --material-theme: #555; }
-}
-
-/* Text */
-h1, h2, h3, h4, h5, h6, p, a, button, em { padding: 0; margin: 0; font-family: 'PT Sans'; }
-h1, h2, h3, h4, h5, h6 { font-family: 'Orbitron';}
-p, a, button, em { font-size: 17px; }
-div { display: flex; flex-direction: column; }
-
-::-webkit-scrollbar { display: none; }
-
-/* Styled Button*/
-.sb
-{
-    text-align: center;
     text-decoration: none;
-    color: #fff;
-    background: rgba(127, 127, 127, 0.2);
-
-    justify-content: center;
-    align-items: center;
-    align-self: center;
-
-    margin: 8px;
-    padding: 8px;
-
-    border: 2px solid rgba(127, 127, 127, 0.4);
-    border-radius: 6px;
-}
-.sb span
-{
-    position: relative;
-    transition: 0.3s ease-in-out;
-}
-.sb span::after
-{
-    content: '\00bb';
-    position: absolute;
-    opacity: 0;
-    top: 0;
-    right: -20px;
-    transition: 0.3s ease-in-out;
-}
-.sb:hover span { padding-right: 25px; }
-.sb:hover span:after { opacity: 1; right: 0; }
-
-.ib { color: white; text-decoration: underline; } /* Inline Button */
-
-/* Styled input */
-.si
-{
-    font-family: 'PT Sans';
     text-align: center;
-    text-decoration: none;
-    color: #fff;
-    background: rgba(127, 127, 127, 0.2);
-
-    justify-content: center;
     align-items: center;
-    align-self: center;
 
-    margin: 8px;
-    padding: 8px;
+    width: fit-content;
+    height: fit-content;
 
-    border: 2px solid rgba(127, 127, 127, 0.4);
-    border-radius: 6px;
+    font-family: 'Funnel Sans', serif;
+    background: transparent;
 
-    transition: 0.2s ease-in-out;
-}
-.si:hover, .si:focus { padding: 10px; margin: 6px; }
-
-/* Commonly used CSS-Based elems */
-.line
-{
-    background: #fff;
-    border: 0;
+    border: 2px solid #444;
     border-radius: 25px;
-    margin: 0;
-    padding: 0;
-    align-self: center;
-}
 
-.card
-{
-    align-self: center;
-    justify-self: center;
-    width: 25%;
-    min-width: 300px;
-    
-    border: 0;
-    border-radius: 15px;
-    margin: 10px;
-    padding: 8px;
-    background: rgba(127, 127, 127, 0.075);
-    transition: 0.2s ease-in-out;
-}
-.card:hover, .card:focus
-{
-    background: rgba(127, 127, 127, 0.15);
-    margin: 8px;
     padding: 10px;
-}
-.card h1, .card h2, .card p, .card em, .card strong
-{
-    margin: 6px;
-    padding: 8px;
+    margin: 0;
+    transition: 0.25s ease-in-out;
 }
 
-/* Shadowed Box, good for both white & black wallpaper */
-.box-shadow
+a:hover, button:hover
 {
-    box-shadow:         0px 0px 25px 8px rgba(127, 127, 127, 0.4);
-    -webkit-box-shadow: 0px 0px 25px 8px rgba(127, 127, 127, 0.4);
-    -moz-box-shadow:    0px 0px 25px 8px rgba(127, 127, 127, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid #555;
+}
+
+.center
+{
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+}
+
+input, textarea
+{
+    padding: 15px;
+    background: #222;
+    border: 2px solid #444;
+    border-radius: 25px;
+    color: white;
+    font-family: 'Funnel Sans', serif;
+}
+
+row
+{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+}
+
+column
+{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%; 
 }
