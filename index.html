@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
         <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, Free AI Chatbot"/>
         <meta name="description" content="Long live the Islamic Republic of Pakistan."/>
 
@@ -20,6 +20,8 @@
         {
             scrollbar-width: thin;
             scrollbar-color: #444 #222;
+            height: calc(100vh - 160px - env(safe-area-inset-bottom));
+            margin-bottom: 80px;
         }
 
         #chatContainer::-webkit-scrollbar { width: 8px; }
@@ -68,6 +70,21 @@
             gap: 8px;
         }
 
+        row.fixed-bottom
+        {
+            position: fixed;
+            bottom: 0;
+            padding: 15px;
+            margin: 0 !important;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        }
+
+        input
+        {
+            font-size: 16px !important;
+            min-height: 45px;
+        }
+
         @media (min-width: 768px)
         {
             #chatContainer
@@ -82,11 +99,11 @@
             .assistant-message { margin-left: 20px; }
         }
     </style>
-    <body style="overflow: hidden;">
-        <column id="chatContainer" style="height: 100%; overflow-y: auto; margin: 20px;">
+    <body>
+        <column id="chatContainer" style="overflow-y: auto; margin: 20px; padding-bottom: 20px;">
             <em id="startingquestion">How may I help you today?</em>
         </column>
-        <row style="gap: 10px; height: fit-content; align-items: center; justify-content: center;">
+        <row class="fixed-bottom" style="gap: 10px; height: fit-content; align-items: center; justify-content: center;">
             <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off"/>
             <button onclick="sendMessage()" style="width: fit-content; height: 100%;">
                 <i class="fa fa-paper-plane" aria-hidden="true"></i>
