@@ -7,138 +7,143 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="basic.css">
     <style>
-        /* Previous styles remain the same */
-        html, body {
+        html, body
+        {
+            overflow: hidden;
             background: #1a1a1a;
-            color: #fff;
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            font-family: 'Funnel Sans', sans-serif;
         }
 
-        #chat-interface {
+        #chat-interface
+        {
+            width: 100%;
+            height: 100vh;
             display: flex;
-            height: 100vh;
+            position: relative;
         }
 
-        #sidebar {
-            width: 260px;
+        #sidebar
+        {
             background: #202020;
-            padding: 20px;
+            width: 260px;
+            height: 100vh;
+
             display: flex;
             flex-direction: column;
+
             gap: 20px;
+
+            position: absolute;
+            left: -260px;
+            transition: left 0.3s ease-in-out;
+            z-index: 1000;
         }
 
-        #main-content {
+        #sidebar.active { left: 0; }
+
+        #main-content
+        {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            width: 100%;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
         }
 
-        #chat-container {
+        @media (min-width: 769px)
+        {
+            #sidebar
+            {
+                position: relative;
+                left: 0;
+            }
+            
+            #menu-toggle { display: none; }
+        }
+
+        #menu-toggle
+        {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        #chat-container
+        {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .message {
+        .message
+        {
             max-width: 800px;
             margin: 0 auto;
-            width: 100%;
+            width: calc(100% - 40px);
             padding: 20px;
             border-radius: 8px;
             line-height: 1.5;
         }
 
-        .user-message {
+        .user-message
+        {
             background: #2a2a2a;
+            text-align: right;
         }
+        .assistant-message { background: #333; }
 
-        .assistant-message {
-            background: #333;
-        }
-
-        #input-container {
+        #input-container
+        {
+            padding: 20px;
+            width: 100%;
             max-width: 800px;
-            margin: 20px auto;
-            width: 100%;
-            position: relative;
-        }
-
-        #messageInput {
-            width: 100%;
-            min-height: 50px;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            border-radius: 8px;
-            color: white;
-            padding: 15px;
-            font-size: 16px;
-            resize: none;
+            margin: 0 auto;
             box-sizing: border-box;
         }
 
-        .nav-button {
-            background: #2a2a2a;
-            color: #fff;
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 10px;
-            cursor: pointer;
-            text-align: left;
-            transition: background 0.2s;
+        #messageInput
+        {
+            width: 100%;
+            min-height: 50px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
         }
 
-        .nav-button:hover {
-            background: #333;
-        }
-
-        .message code {
-            background: #2a2a2a;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-        }
-
-        .message pre {
-            background: #2a2a2a;
-            padding: 15px;
-            border-radius: 8px;
-            overflow-x: auto;
-        }
-
-        #actions-bar {
+        #links-bar
+        {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 15px;
             justify-content: center;
+            padding: 10px;
+            flex-wrap: wrap;
         }
 
-        .action-button {
-            background: transparent;
+        .social-link
+        {
             color: #888;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 5px;
             font-size: 14px;
+            text-decoration: none;
         }
+        .social-link:hover { color: #fff; }
 
-        .action-button:hover {
-            color: #fff;
-        }
-
-        /* New loading indicator styles */
-        .loading {
+        .loading
+        {
             display: flex;
             align-items: center;
             gap: 8px;
@@ -146,15 +151,17 @@
             padding: 20px;
             max-width: 800px;
             margin: 0 auto;
-            width: 100%;
+            width: calc(100% - 40px);
         }
 
-        .loading-dots {
+        .loading-dots
+        {
             display: flex;
             gap: 4px;
         }
 
-        .loading-dots span {
+        .loading-dots span
+        {
             width: 8px;
             height: 8px;
             background: #888;
@@ -162,26 +169,46 @@
             animation: pulse 1.5s infinite;
         }
 
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { -delay: 0.4s; }
 
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes pulse {
+        @keyframes pulse
+        {
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(0.7); opacity: 0.5; }
+        }
+
+        #overlay
+        {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        @media (max-width: 768px)
+        {
+            #main-content { padding-top: 60px; }
+            .message { width: calc(100% - 20px); }
+            #overlay.active { display: block; }
         }
     </style>
 </head>
 <body>
+    <button id="menu-toggle">
+        <i class="fa fa-bars fa-2x"></i>
+    </button>
+
+    <div id="overlay"></div>
+
     <div id="chat-interface">
         <div id="sidebar">
-            <button class="nav-button" onclick="startNewChat()">New Chat</button>
-            <div style="flex: 1"></div>
-            <button class="nav-button">Upgrade to Plus</button>
+            <div style="padding: 0; margin: 0; width: 100%; height: 2rem;"></div>
+            <button style="margin-left: 20px; margin-top: 20px;" onclick="startNewChat()">New Chat</button>
         </div>
         
         <div id="main-content">
@@ -189,10 +216,16 @@
             
             <div id="input-container">
                 <textarea id="messageInput" placeholder="Send a message..." rows="1"></textarea>
-                <div id="actions-bar">
-                    <button class="action-button">Create Image</button>
-                    <button class="action-button">Help me write</button>
-                    <button class="action-button">Analyze Data</button>
+                <div id="links-bar">
+                    <a href="https://github.com/XeTute" target="_blank" class="social-link">
+                        <i class="fa fa-github"></i> GitHub
+                    </a>
+                    <a href="https://huggingface.co/XeTute" target="_blank" class="social-link">
+                        <i class="fa fa-rocket"></i> HuggingFace
+                    </a>
+                    <a href="https://ko-fi.com/XeTute" target="_blank" class="social-link">
+                        <i class="fa fa-heart"></i> Support Us
+                    </a>
                 </div>
             </div>
         </div>
@@ -201,14 +234,31 @@
     <script>
         const chatContainer = document.getElementById('chat-container');
         const messageInput = document.getElementById('messageInput');
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
         
-        const messages = 
+        const messages =
         [{
             role: 'system',
             content: "You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/. Always respond as short as possible while remaining helpful."
         }];
 
         let processing = false;
+
+        function toggleSidebar()
+        {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        menuToggle.addEventListener('click', (e) =>
+        {
+            e.stopPropagation();
+            toggleSidebar();
+        });
+
+        overlay.addEventListener('click', toggleSidebar);
 
         function parseMarkdown(text)
         {
@@ -255,6 +305,7 @@
             processing = true;
             messageInput.value = '';
             addMessage(message, 'user');
+            
             messages.push({ role: 'user', content: message });
 
             const loadingDiv = createLoadingIndicator();
@@ -269,8 +320,7 @@
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify
-                        ({
+                        body: JSON.stringify({
                             messages: messages,
                             stream: false
                         })
@@ -281,6 +331,7 @@
                 const reply = data.choices[0].message.content;
 
                 messages.push({ role: 'assistant', content: reply });
+                
                 loadingDiv.remove();
                 addMessage(reply, 'assistant');
             }
@@ -297,13 +348,15 @@
         function startNewChat()
         {
             chatContainer.innerHTML = '';
-            
             messages.length = 0;
             messages.push
-            ({
+            (
+                {
                 role: 'system',
                 content: "You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/. Always respond as short as possible while remaining helpful."
-            });
+                }
+            );
+            if (window.innerWidth <= 768) { toggleSidebar(); }
         }
 
         messageInput.addEventListener('keypress', (e) =>

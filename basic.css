@@ -3,6 +3,9 @@ html, body
     background: #111;
     color: #fff;
 
+    margin: 0;
+    padding: 0;
+
     display: flex;
     flex-direction: column;
 
