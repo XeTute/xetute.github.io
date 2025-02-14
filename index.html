@@ -1,157 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-        <meta name="keywords" content="XeTute, XeTute Technologies, Technologies, Free AI Chatbot"/>
-        <meta name="description" content="Long live the Islamic Republic of Pakistan."/>
-
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
-
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-        <link rel="icon"       src ="logo.jpg" >
-        <link rel="stylesheet" href="basic.css">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <style>
-        #chatContainer
-        {
-            scrollbar-width: thin;
-            scrollbar-color: #444 #222;
-            height: calc(100vh - 160px - env(safe-area-inset-bottom));
-            margin-bottom: 80px;
+        /* Previous styles remain the same */
+        html, body {
+            background: #1a1a1a;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: 'Funnel Sans', sans-serif;
         }
 
-        #chatContainer::-webkit-scrollbar { width: 8px; }
-
-        #chatContainer::-webkit-scrollbar-track
-        {
-            background: #222;
-            border-radius: 10px;
+        #chat-interface {
+            display: flex;
+            height: 100vh;
         }
 
-        #chatContainer::-webkit-scrollbar-thumb
-        {
-            background: #444;
-            border-radius: 10px;
+        #sidebar {
+            width: 260px;
+            background: #202020;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        .message
-        {
-            max-width: 70%;
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background: #2a2a2a;
+        }
+
+        .assistant-message {
+            background: #333;
+        }
+
+        #input-container {
+            max-width: 800px;
+            margin: 20px auto;
+            width: 100%;
+            position: relative;
+        }
+
+        #messageInput {
+            width: 100%;
+            min-height: 50px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: white;
+            padding: 15px;
+            font-size: 16px;
+            resize: none;
+            box-sizing: border-box;
+        }
+
+        .nav-button {
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 8px;
             padding: 10px;
-            margin: 10px;
-            border-radius: 25px;
-            word-break: break-word;
-        }
-    
-        .user-message
-        {
-            background: #050505;
-            border: 2px solid #444;
-            align-self: flex-end;
-            text-align: right;
-        }
-
-        .assistant-message
-        {
-            background: #050505;
-            align-self: flex-start;
-            border: 2px solid #444;
+            cursor: pointer;
             text-align: left;
+            transition: background 0.2s;
         }
 
-        .loading-message
-        {
+        .nav-button:hover {
+            background: #333;
+        }
+
+        .message code {
+            background: #2a2a2a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .message pre {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        #actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .action-button {
+            background: transparent;
+            color: #888;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+        }
+
+        .action-button:hover {
+            color: #fff;
+        }
+
+        /* New loading indicator styles */
+        .loading {
             display: flex;
             align-items: center;
             gap: 8px;
+            color: #888;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        row.fixed-bottom
-        {
-            position: fixed;
-            bottom: 0;
-            padding: 15px;
-            margin: 0 !important;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        .loading-dots {
+            display: flex;
+            gap: 4px;
         }
 
-        input
-        {
-            font-size: 16px !important;
-            min-height: 45px;
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background: #888;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
         }
 
-        @media (min-width: 768px)
-        {
-            #chatContainer
-            {
-                max-width: 800px;
-                margin: 20px auto;
-                padding: 0 20px;
-            }
-        
-            .message { max-width: 50%; }
-            .user-message { margin-right: 20px; }
-            .assistant-message { margin-left: 20px; }
+        .loading-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(0.7); opacity: 0.5; }
         }
     </style>
-    <body>
-        <column id="chatContainer" style="overflow-y: auto; margin: 20px; padding-bottom: 20px;">
-            <em id="startingquestion">How may I help you today?</em>
-        </column>
-        <row class="fixed-bottom" style="gap: 10px; height: fit-content; align-items: center; justify-content: center;">
-            <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off"/>
-            <button onclick="sendMessage()" style="width: fit-content; height: 100%;">
-                <i class="fa fa-paper-plane" aria-hidden="true"></i>
-            </button>
-        </row>
-    </body>
-    <script defer>
-        const chatContainer = document.getElementById('chatContainer');
+</head>
+<body>
+    <div id="chat-interface">
+        <div id="sidebar">
+            <button class="nav-button" onclick="startNewChat()">New Chat</button>
+            <div style="flex: 1"></div>
+            <button class="nav-button">Upgrade to Plus</button>
+        </div>
+        
+        <div id="main-content">
+            <div id="chat-container"></div>
+            
+            <div id="input-container">
+                <textarea id="messageInput" placeholder="Send a message..." rows="1"></textarea>
+                <div id="actions-bar">
+                    <button class="action-button">Create Image</button>
+                    <button class="action-button">Help me write</button>
+                    <button class="action-button">Analyze Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
         const messageInput = document.getElementById('messageInput');
-        const messages = [ { role: 'system', content: "You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/. Always respond as short as possible while remaining helpful."} ];
+        
+        const messages = 
+        [{
+            role: 'system',
+            content: "You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/. Always respond as short as possible while remaining helpful."
+        }];
 
         let processing = false;
 
-        async function sendMessage()
-        { 
-            if (processing) return;
-            processing = true;
+        function parseMarkdown(text)
+        {
+            text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+            text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+            text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+            text = text.replace(/^\* (.+)$/gm, '<li>$1</li>');
+            text = text.replace(/\n/g, '<br>');
+            return text;
+        }
 
+        function createLoadingIndicator()
+        {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            loadingDiv.innerHTML = `
+                Generating response
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            return loadingDiv;
+        }
+
+        function addMessage(content, sender)
+        {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            messageDiv.innerHTML = parseMarkdown(content);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function sendMessage()
+        {
+            if (processing) return;
+            
             const message = messageInput.value.trim();
             if (!message) return;
-        
-            try { document.getElementById('startingquestion').outerHTML = ''; }
-            catch {}
 
-            addMessage(message, 'user');
+            processing = true;
             messageInput.value = '';
+            addMessage(message, 'user');
+            messages.push({ role: 'user', content: message });
 
-            const loadingDiv = document.createElement('div');
-            const spinner = document.createElement('i');
-
-            loadingDiv.classList.add('message', 'assistant-message', 'loading-message');
-            spinner.classList.add('fa', 'fa-spinner', 'fa-spin');
-
-            loadingDiv.appendChild(spinner);
-            loadingDiv.appendChild(document.createTextNode(' Thinking...'));
-
+            const loadingDiv = createLoadingIndicator();
             chatContainer.appendChild(loadingDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
-        
+
             try
             {
-                messages.push({ role: 'user', content: message });
-                const response = await fetch('https://ai.xetute.com/v1/chat/completions',
-                {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: messages, stream: false })
-                });
-            
+                const response = await fetch
+                (
+                    'https://ai.xetute.com/v1/chat/completions',
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify
+                        ({
+                            messages: messages,
+                            stream: false
+                        })
+                    }
+                );
+
                 const data = await response.json();
                 const reply = data.choices[0].message.content;
 
@@ -165,17 +290,20 @@
                 loadingDiv.remove();
                 addMessage("Sorry, I'm having trouble connecting to the server.", 'assistant');
             }
+
             processing = false;
         }
 
-        function addMessage(content, sender)
+        function startNewChat()
         {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', `${sender}-message`);
-            messageDiv.textContent = content;
-            chatContainer.appendChild(messageDiv);
-
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            chatContainer.innerHTML = '';
+            
+            messages.length = 0;
+            messages.push
+            ({
+                role: 'system',
+                content: "You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/. Always respond as short as possible while remaining helpful."
+            });
         }
 
         messageInput.addEventListener('keypress', (e) =>
@@ -186,5 +314,12 @@
                 sendMessage();
             }
         });
+
+        messageInput.addEventListener('input', () =>
+        {
+            messageInput.style.height = 'auto';
+            messageInput.style.height = messageInput.scrollHeight + 'px';
+        });
     </script>
+</body>
 </html>
