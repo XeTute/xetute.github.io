@@ -340,7 +340,7 @@
         <div id="sidebar">
             <div style="padding: 0; margin: 0; width: 100%; height: 2rem;"></div>
             <h1 style="margin-top: 20px;" class="sidebartxt">Quick Actions</h1>
-            <button id="sidebarbtn" onclick="startNewChat()">New Chat</button>
+            <button id="sidebarbtn" onclick="window.location.href = 'https://xetute.com';">New Chat</button>
         </div>
         
         <div id="main-content">
@@ -427,7 +427,7 @@ Basic Markdown is supported.`
                     for (let i = 0; i < chatid; ++i)
                     {
                         buffer += 
-                        `<button id="sidebarbtn" onclick="window.location.href=(window.location.href + '?${i}');">— ${auth.record.data.chat[i][1]["content"]}</button>`;
+                        `<button id="sidebarbtn" onclick="window.location.href='https://xetute.com/?${i}'">— ${auth.record.data.chat[i][1]["content"]}</button>`;
                     }
                     buffer += "</div>";
                     sidebar.innerHTML += buffer;
@@ -615,21 +615,6 @@ Basic Markdown is supported.`
             }
             
             processing = false;
-        }
-        
-        function startNewChat()
-        {
-            chatContainer.innerHTML = '';
-            messages.length = 0;
-            messages.push
-            ({
-                role: 'system',
-                content: `You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/.
-Always respond as engaging as possible while remaining helpful.
-Answering scientific/STEM-related questions, always reason BEFORE you answer.
-Basic Markdown is supported.`
-            });
-            if (window.innerWidth <= 768) toggleSidebar();
         }
         
         messageInput.addEventListener('keypress', function(e)
