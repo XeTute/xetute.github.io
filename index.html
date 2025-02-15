@@ -21,7 +21,7 @@
       updateVh();
       window.addEventListener('resize', updateVh);
     </script>
-    
+
     <style>
         html, body
         {
@@ -342,7 +342,29 @@
         </div>
     </div>
 
-    <script>
+    <script src="pocketbase.umd.js"></script>
+    <script defer>
+        const pb = new PocketBase("https://db.xetute.com");
+
+        let loggedin = false;
+        async function authRefresh()
+        {
+            try
+            {
+                await pb.collection('accounts').authRefresh();
+                loggedin = true;
+
+                document.getElementById('sidebar').innerHTML +=
+                `<button id="sidebarbtn">Logged In</button>`;
+            }
+            catch
+            {
+                document.getElementById('sidebar').innerHTML +=
+                `<button id="sidebarbtn" onclick="window.location.href='./auth/?../';">Log In</button>`;
+            }
+        }
+        authRefresh();
+
         const chatContainer = document.getElementById('chat-container');
         const messageInput = document.getElementById('messageInput');
         const menuToggle = document.getElementById('menu-toggle');
