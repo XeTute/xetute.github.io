@@ -123,7 +123,7 @@
         {
             await pb.collection('accounts').create({ "email": email, "password": password0, "passwordConfirm": password1 });
             await pb.collection('accounts').requestVerification(email);
-            notice.innerHTML = `<button onclick="switchForms();">We sent an verification E-Mail to ${email}. After verification, log in.</button>`;
+            notice.innerHTML = `<button onclick="switchForms();">We sent an verification E-Mail to ${email}. After verification, click me.</button>`;
             
             document.getElementById('signinemail').value = email;
             document.getElementById('signinpassword').value = password0;
