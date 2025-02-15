@@ -75,7 +75,7 @@
     const referto = (window.location.search.substr(1) ? window.location.search.substr(1) : '../'); 
     const pb = new PocketBase('https://db.xetute.com');
     async function authRefresh() { try { await pb.collection('accounts').authRefresh(); window.location.href = referto; } catch { console.log('Not currently logged in.'); } };
-    authRefresh;
+    authRefresh();
 
     function switchForms()
     {
