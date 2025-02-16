@@ -655,7 +655,8 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                 }
 
                 // After completing the message, re-render math if any
-                if (window.MathJax) { MathJax.typeset([messageDiv]); }
+                try { if (window.MathJax) { MathJax.typeset([messageDiv]); } }
+                catch {}
                 messages.push({ role: 'assistant', content: assistantContent });
 
                 if (loggedin)
@@ -672,9 +673,8 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
             }
             catch (error)
             {
-                console.error('Error:', error);
                 loadingDiv.remove();
-                addMessage("Sorry, I'm having trouble connecting to the server.", 'assistant');
+                addMessage("Sorry, I'm having trouble connecting to the server: " + error, 'assistant');
             }
             
             processing = false;
