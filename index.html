@@ -393,6 +393,14 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
         let chatid = window.location.search.substr(1);
         let loggedin = false;
         let auth = undefined;
+
+        function goToApex()
+        {
+            const mystr = window.location.href;
+            const questionMarkIndex = mystr.indexOf('?');
+            window.location.href = questionMarkIndex !== -1 ? mystr.substring(0, questionMarkIndex) : mystr;
+        }
+
         async function authRefresh()
         {
             const userimg = '<img src="user.jpg" class="message-avatar avatar-modified"/>';
@@ -417,40 +425,49 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                 }
                 sidebar.innerHTML += `<button id="sidebarbtn">${userimg} ${name}</button>`;
                 
-                // Get chatid, create first chat if none exists, list chats in sidebar if existing
-                if (chatid)
+                try
                 {
-                    messages = auth.record.data.chat[chatid];
-                    for (let i = 1; i < messages.length; ++i)
-                    { addMessage(messages[i].content, ((i % 2) === 0) ? 'assistant' : 'user'); }
-                }
-                
-                if (auth.record.data.chat === undefined)
-                {
-                    auth.record.data.chat = [];
-                    chatid = '0';
-                }
-                else
-                {
-                    const chats = auth.record.data.chat.length;
-
-                    sidebar.innerHTML += "<h1 class=\"sidebartxt\">Recent Chats</h1>";
-                    let buffer = '<div style="display: flex; flex-direction: column; justify-content: flex-start; overflow-x: hidden; overflow-y: auto; max-height: 100%; gap: 10px; padding-bottom: 10px;">';
-                    
-                    for (let i = 0; i < chats; ++i)
+                    // Get chatid, create first chat if none exists, list chats in sidebar if existing
+                    if (chatid)
                     {
-                        const fulltitle = auth.record.data.chat[i][1]["content"];
-                        const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8) + '...') : (fulltitle);
+                        // Handle invalid chatids
+                        if (auth.record.data.chat === undefined) { goToApex(); }
+                        if (chatid >= auth.record.data.chat.length) { goToApex(); }
 
-                        const buttonstart = `<div class="chathistorybtn"><button id="sidebarbtn" onclick="window.location.href='https://xetute.com/?${i}'">`;
-                        const buttonend = `</button><button onclick="deleteChat('${i}');"><i class="fa fa-trash" aria-hidden="true"></i></button></div>`;
-                        buffer += `${buttonstart}— ${title}${buttonend}`;
+                        // If valid, load chat
+                        messages = auth.record.data.chat[chatid];
+                        for (let i = 1; i < messages.length; ++i)
+                        { addMessage(messages[i].content, ((i % 2) === 0) ? 'assistant' : 'user'); }
                     }
-                    buffer += "</div>";
-                    sidebar.innerHTML += buffer;
 
-                    if (chatid.length === 0) { chatid = String(chats); }
+                    if (auth.record.data.chat === undefined)
+                    {
+                        auth.record.data.chat = [];
+                        chatid = '0';
+                    }
+                    else
+                    {
+                        const chats = auth.record.data.chat.length;
+
+                        sidebar.innerHTML += "<h1 class=\"sidebartxt\">Recent Chats</h1>";
+                        let buffer = '<div style="display: flex; flex-direction: column; justify-content: flex-start; overflow-x: hidden; overflow-y: auto; max-height: 100%; gap: 10px; padding-bottom: 10px;">';
+                        
+                        for (let i = 0; i < chats; ++i)
+                        {
+                            const fulltitle = auth.record.data.chat[i][1]["content"];
+                            const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8) + '...') : (fulltitle);
+
+                            const buttonstart = `<div class="chathistorybtn"><button id="sidebarbtn" onclick="window.location.href='https://xetute.com/?${i}'">`;
+                            const buttonend = `</button><button onclick="deleteChat('${i}');"><i class="fa fa-trash" aria-hidden="true"></i></button></div>`;
+                            buffer += `${buttonstart}— ${title}${buttonend}`;
+                        }
+                        buffer += "</div>";
+                        sidebar.innerHTML += buffer;
+
+                        if (chatid.length === 0) { chatid = String(chats); }
+                    }
                 }
+                catch (error) { alert("An unexpected error happened. We're sorry."); console.log(error); }
             }
             catch (error)
             {
@@ -474,7 +491,7 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
 
                     await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });
                     alert(`Deleted CHATID${__id__} successfully.`);
-                    window.location.href = window.location.href;
+                    goToApex();
                 }
                 catch { alert(`Failed to delete CHATID${__id__}. We're sorry.`); }
             }
@@ -641,10 +658,16 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
 
                 if (loggedin)
                 {
+                    // If chat array does not exist, create it and load messages into, if it does, update messages
                     if (auth.record.data.chat === undefined) { auth.record.data["chat"] = [messages]; }
                     else { auth.record.data.chat[chatid] = messages; }
+                    
+                    // Upload new messages to the database
                     try { auth = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
                     catch { alert("Failed to sync chat history to XeTute Technologies Authentication. We're sorry."); }
+
+                    // If this message created a new chat, refer to it
+                    if (messages.length === 3) { window.location.href += `?${chatid}`; }
                 }
                 else { if ((((messages.length - 1) / 2) % 3) === 0) { alert("Your chat history is not being saved. To save your chats for free, create an account (by clicking the Icon on the top left)."); } }
             }
