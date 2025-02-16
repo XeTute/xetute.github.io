@@ -425,12 +425,13 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
             const userimg = '<img src="user.jpg" class="message-avatar avatar-modified"/>';
             try
             {
+                // Check if logged in, if not, will throw an error => go to catch, if is logged in, will set let loggedin = true
                 auth = await pb.collection('accounts').authRefresh();
                 loggedin = true;
 
+                // Get username from databank, if none exists or formatting is wrong, will re-format and set to let name.
                 const sidebar = document.getElementById('sidebar');
                 let name = "Noname";
-
                 try { if (auth.record.data.username === undefined) { throw("Data was an undefined string."); } name = auth.record.data.username; }
                 catch (error)
                 {
@@ -441,7 +442,7 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                         catch (anothererror) { console.log(anothererror); }
                     }
                 }
-                sidebar.innerHTML += `<button id="sidebarbtn">${userimg} ${name}</button>`;
+                sidebar.innerHTML += `<button id="sidebarbtn" onclick="window.location.href='./account/';">${userimg} ${name}</button>`;
                 
                 try
                 {
@@ -664,7 +665,7 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                     if (auth.record.data.chat === undefined) { auth.record.data["chat"] = [messages]; }
                     else { auth.record.data.chat[chatid] = messages; }
                     
-                    try { auth.record.data = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
+                    try { auth.record = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
                     catch { alert("Failed to sync chat history to XeTute Technologies Authentication. We're sorry."); }
 
                     if (messages.length === 3) { window.location.href += `?${chatid}`; }

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Long live the Islamic Republic of Pakistan.">
+    <title>Authentication \\ Xetute Technologies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../basic.css">
+    <link rel="icon" href="../logo.jpg">
+    
+    <style>
+        cdiv
+        {
+            border: 2px solid #555;
+            border-radius: 25px;
+            margin: 10px;
+            padding: 10px;
+
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+            align-items: center;
+
+            width: fit-content;
+            height: fit-content;
+        }
+
+        rdiv
+        {
+            margin-top: -10px;
+            padding: 10px;
+
+            display: flex;
+            flex-direction: row;
+
+            justify-content: center;
+            align-items: center;
+
+            width: fit-content;
+            height: fit-content;
+        }
+
+        line { background: #fff; margin: 10px; }
+
+        .underline
+        {
+            text-decoration: underline;
+            text-decoration-color: #999; 
+            text-decoration-thickness: 2px;
+        }
+
+        .dangerous > p { color: rgba(255, 100, 100, .85); }
+        .dangerous > button { background: rgba(255, 150, 150, .2); border: 0; }
+    </style>
+</head>
+<body>
+    <h1>Your Account</h1>
+    <cdiv>
+        <p class="underline">Username</p>
+        <rdiv>
+            <p id="username"></p>
+            <line style="width: 2px; height: 2rem;"></line>
+            <button onclick="updateUsername();">Update</button>
+        </rdiv>
+    </cdiv>
+
+    <cdiv>
+        <p class="underline">Authorisation</p>
+        <rdiv class="dangerous">
+            <p>Logged In</p>
+            <line style="width: 2px; height: 2rem;"></line>
+            <button onclick="logOut();">Log Out</button>
+        </rdiv>
+        <rdiv class="dangerous">
+            <p>Record</p>
+            <line style="width: 2px; height: 2rem;"></line>
+            <button onclick="deleteAccount();">Delete Account</button>
+        </rdiv>
+    </cdiv>
+</body>
+<script src="../pocketbase.umd.js"></script>
+<script defer>
+    const pb = new PocketBase('https://db.xetute.com/');
+    let auth;
+
+    function refreshPage()
+    {
+        window.location.href = window.location.href;
+    }
+
+    async function authRefresh()
+    {
+        try { auth = await pb.collection('accounts').authRefresh(); }
+        catch { window.location.href = "../auth/?../account/"; }
+
+        if ((auth.record.data === undefined) || (auth.record.data === ""))
+        {
+            auth.record.data = { "username": "Noname" };
+            auth.record.data = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });
+        }
+
+        document.getElementById('username').textContent = auth.record.data.username;
+    }
+    authRefresh();
+
+    async function updateUsername()
+    {
+        if (confirm("Update Username?"))
+        {
+            const newname = prompt("Type in your desired Username...");
+            auth.record.data["username"] = newname;
+            
+            try { auth.record = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
+            catch { alert("Failed to update your Username. We're sorry."); }
+
+            document.getElementById('username').textContent = auth.record.data.username;
+        }
+    }
+
+    async function logOut()
+    {
+        if (confirm("Log Out? You'll be able to Log In afterwards."))
+        {
+            pb.authStore.clear();
+            refreshPage();
+        }
+    }
+
+    async function deleteAccount()
+    {
+        if (confirm("Delete Account? This action cannot be undone."))
+        {
+            try { await pb.collection('accounts').delete(auth.record.id); window.location.href = "https://xetute.com/"; }
+            catch { alert("Failed to delete your account. Maybe that's a sign?"); }
+        }
+    }
+</script>
