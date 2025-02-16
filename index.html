@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="basic.css">
     <link rel="icon" href="logo.jpg">
 
-    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script async src="tex-mml-chtml.js"></script>
     <script type="text/javascript">
     window.MathJax =
     {
@@ -79,6 +79,10 @@
             min-height: 0;
         }
         
+        ::-webkit-scrollbar { width: 1px; }
+        ::-webkit-scrollbar-track       { background: rgba(255, 255, 255, 0); }
+        ::-webkit-scrollbar-thumb       { background: rgba(255, 255, 255, 0); }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0); }
         @media (min-width: 769px)
         {
             #sidebar
@@ -408,6 +412,14 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
             window.location.href = questionMarkIndex !== -1 ? mystr.substring(0, questionMarkIndex) : mystr;
         }
 
+        function getApex()
+        {
+            const mystr = window.location.href;
+            const questionMarkIndex = mystr.indexOf('?');
+            const returnval = questionMarkIndex !== -1 ? mystr.substring(0, questionMarkIndex) : mystr;
+            return returnval;
+        }
+
         async function authRefresh()
         {
             const userimg = '<img src="user.jpg" class="message-avatar avatar-modified"/>';
@@ -460,7 +472,7 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                             const fulltitle = auth.record.data.chat[i][1]["content"];
                             const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8) + '...') : (fulltitle);
 
-                            const buttonstart = `<div class="chathistorybtn"><button id="sidebarbtn" onclick="window.location.href='https://xetute.com/?${i}'">`;
+                            const buttonstart = `<div class="chathistorybtn"><button id="sidebarbtn" onclick="window.location.href=(getApex() + '${i}');">`;
                             const buttonend = `</button><button onclick="deleteChat('${i}');"><i class="fa fa-trash" aria-hidden="true"></i></button></div>`;
                             buffer += `${buttonstart}— ${title}${buttonend}`;
                         }
@@ -560,7 +572,7 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
             const contentDiv = document.createElement('div');
             contentDiv.innerHTML = parseMarkdown(content);
             
-            if (window.MathJax) { MathJax.typeset([contentDiv]); }
+            if (window.MathJax) { try { MathJax.typeset([contentDiv]); } catch {} }
             
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(contentDiv);
@@ -641,7 +653,7 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                     }
                     chatContainer.scrollTop = chatContainer.scrollHeight;
                 }
-                
+
                 // After completing the message, re-render math if any
                 if (window.MathJax) { MathJax.typeset([messageDiv]); }
                 messages.push({ role: 'assistant', content: assistantContent });
@@ -651,7 +663,7 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                     if (auth.record.data.chat === undefined) { auth.record.data["chat"] = [messages]; }
                     else { auth.record.data.chat[chatid] = messages; }
                     
-                    try { auth = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
+                    try { auth.record.data = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
                     catch { alert("Failed to sync chat history to XeTute Technologies Authentication. We're sorry."); }
 
                     if (messages.length === 3) { window.location.href += `?${chatid}`; }
