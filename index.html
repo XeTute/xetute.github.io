@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="Long live the Islamic Republic of Pakistan.">
@@ -11,6 +11,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="basic.css">
     <link rel="icon" href="logo.jpg">
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script type="text/javascript">
+    window.MathJax =
+    {
+      tex:
+      {
+        inlineMath: [['\\(', '\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]']]
+      },
+      options:
+      {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+    </script>
 
     <script>
       function updateVh()
@@ -304,10 +320,8 @@
         {
             margin-left: 20px;
             font-size: 16px;
-
             display: flex;
             justify-content: center;
-
             align-items: left;
             gap: 10px;
             padding: 10px;
@@ -334,13 +348,12 @@
             flex-direction: row;
             width: fit-content;
             height: fit-content;
-
             align-items: left;
             gap: 10px;
         }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <button id="menu-toggle">
         <i class="fa fa-bars fa-2x"></i>
     </button>
@@ -406,7 +419,6 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                 const sidebar = document.getElementById('sidebar');
                 let name = "Noname";
 
-                // Get username, format if not existing
                 try { if (auth.record.data.username === undefined) { throw("Data was an undefined string."); } name = auth.record.data.username; }
                 catch (error)
                 {
@@ -421,14 +433,11 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                 
                 try
                 {
-                    // Get chatid, create first chat if none exists, list chats in sidebar if existing
                     if (chatid)
                     {
-                        // Handle invalid chatids
                         if (auth.record.data.chat === undefined) { goToApex(); }
                         if (chatid >= auth.record.data.chat.length) { goToApex(); }
 
-                        // If valid, load chat
                         messages = auth.record.data.chat[chatid];
                         for (let i = 1; i < messages.length; ++i)
                         { addMessage(messages[i].content, ((i % 2) === 0) ? 'assistant' : 'user'); }
@@ -521,7 +530,6 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
             text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
             text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
             text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-        
             text = text.replace(/\n/g, '<br>');
             return text;
         }
@@ -551,6 +559,8 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
             
             const contentDiv = document.createElement('div');
             contentDiv.innerHTML = parseMarkdown(content);
+            
+            if (window.MathJax) { MathJax.typeset([contentDiv]); }
             
             messageDiv.appendChild(avatar);
             messageDiv.appendChild(contentDiv);
@@ -626,25 +636,24 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                             {
                                 assistantContent += token;
                                 contentDiv.innerHTML = parseMarkdown(assistantContent);
-                                chatContainer.scrollTop = chatContainer.scrollHeight;
                             }
                         } catch (e) { console.error('Error parsing stream chunk:', e); }
                     }
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
                 }
                 
+                // After completing the message, re-render math if any
+                if (window.MathJax) { MathJax.typeset([messageDiv]); }
                 messages.push({ role: 'assistant', content: assistantContent });
 
                 if (loggedin)
                 {
-                    // If chat array does not exist, create it and load messages into, if it does, update messages
                     if (auth.record.data.chat === undefined) { auth.record.data["chat"] = [messages]; }
                     else { auth.record.data.chat[chatid] = messages; }
                     
-                    // Upload new messages to the database
                     try { auth = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
                     catch { alert("Failed to sync chat history to XeTute Technologies Authentication. We're sorry."); }
 
-                    // If this message created a new chat, refer to it
                     if (messages.length === 3) { window.location.href += `?${chatid}`; }
                 }
                 else { if ((((messages.length - 1) / 2) % 3) === 0) { alert("Your chat history is not being saved. To save your chats for free, create an account (by clicking the Icon on the top left)."); } }
@@ -676,5 +685,5 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
         
         document.getElementById('sendButton').addEventListener('click', sendMessage);
     </script>
-</body>
+  </body>
 </html>
