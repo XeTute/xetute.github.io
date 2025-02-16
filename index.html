@@ -362,15 +362,9 @@
                     <button id="sendButton"><i class="fa fa-paper-plane"></i></button>
                 </div>
                 <div id="links-bar">
-                    <a href="https://github.com/XeTute" target="_blank" class="social-link">
-                        <i class="fa fa-github"></i> GitHub
-                    </a>
-                    <a href="https://huggingface.co/XeTute" target="_blank" class="social-link">
-                        &#129303; HuggingFace
-                    </a>
-                    <a href="https://ko-fi.com/XeTute" target="_blank" class="social-link">
-                        &#128147; Support Us
-                    </a>
+                    <a href="https://github.com/XeTute" target="_blank" class="social-link"><i class="fa fa-github"></i> GitHub</a>
+                    <a href="https://huggingface.co/XeTute" target="_blank" class="social-link">&#129303; HuggingFace</a>
+                    <a href="https://ko-fi.com/XeTute" target="_blank" class="social-link">&#128147; Support Us</a>
                 </div>
             </div>
         </div>
@@ -482,7 +476,7 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
         {
             const fulltitle = auth.record.data.chat[__id__][1]["content"];
             const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8) + '...') : (fulltitle);
-            if (confirm(`Do you really want to delete CHATID${__id__}(${title})? This can NOT be undone.`))
+            if (confirm(`Do you really want to delete CHATID-${__id__}(${title})? This can NOT be undone.`))
             {
                 try
                 {
@@ -490,12 +484,12 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                     if (auth.record.data.chat.length === 0) { delete auth.record.data.chat; }
 
                     await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });
-                    alert(`Deleted CHATID${__id__} successfully.`);
+                    alert(`Deleted CHATID-${__id__} successfully.`);
                     goToApex();
                 }
                 catch { alert(`Failed to delete CHATID${__id__}. We're sorry.`); }
             }
-            else { alert(`Didn't delete CHATID${__id__} =)`); }
+            else { alert(`Didn't delete CHATID-${__id__} =)`); }
         }
 
         const chatContainer = document.getElementById('chat-container');
@@ -527,20 +521,6 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
             text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
             text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
             text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-            text = text.replace(/(^(?:\* .+$\n?)+)/gm, function(match)
-            {
-                const items = match.split('\n').filter(line => line.trim() !== '');
-                const lis = items.map(item => item.replace(/^\* (.+)$/, '<li>$1</li>')).join('');
-                return `<ul>${lis}</ul>`;
-            });
-        
-            text = text.replace(/(^(?:\d+\. .+$\n?)+)/gm, function(match)
-            {
-                const items = match.split('\n').filter(line => line.trim() !== '');
-                const lis = items.map(item => item.replace(/^\d+\. (.+)$/, '<li>$1</li>')).join('');
-                return `<ol>${lis}</ol>`;
-            });
         
             text = text.replace(/\n/g, '<br>');
             return text;
@@ -568,7 +548,6 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
             const avatar = document.createElement('img');
             avatar.className = 'message-avatar';
             avatar.src = sender === 'user' ? 'user.jpg' : 'logo.jpg';
-            avatar.alt = `${sender} avatar`;
             
             const contentDiv = document.createElement('div');
             contentDiv.innerHTML = parseMarkdown(content);
@@ -619,7 +598,6 @@ Basic Markdown is supported, boxed math notations are not. Do NOT use stuff like
                 const avatar = document.createElement('img');
                 avatar.className = 'message-avatar';
                 avatar.src = 'logo.jpg';
-                avatar.alt = 'assistant avatar';
 
                 const contentDiv = document.createElement('div');
                 messageDiv.append(avatar, contentDiv);
