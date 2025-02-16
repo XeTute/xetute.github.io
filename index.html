@@ -327,6 +327,17 @@
             justify-self: center;
             margin: 0;
         }
+
+        .chathistorybtn
+        {
+            display: flex;
+            flex-direction: row;
+            width: fit-content;
+            height: fit-content;
+
+            align-items: left;
+            gap: 10px;
+        }
     </style>
 </head>
 <body>
@@ -427,10 +438,10 @@ Basic Markdown is supported.`
                     for (let i = 0; i < chats; ++i)
                     {
                         const fulltitle = auth.record.data.chat[i][1]["content"];
-                        const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8)) : (fulltitle);
+                        const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8) + '...') : (fulltitle);
 
-                        const buttonstart = `<button id="sidebarbtn" onclick="window.location.href='https://xetute.com/?${i}'">`;
-                        const buttonend = `</button>`;
+                        const buttonstart = `<div class="chathistorybtn"><button id="sidebarbtn" onclick="window.location.href='https://xetute.com/?${i}'">`;
+                        const buttonend = `</button><button onclick="deleteChat('${i}');"><i class="fa fa-trash" aria-hidden="true"></i></button></div>`;
                         buffer += `${buttonstart}— ${title}${buttonend}`;
                     }
                     buffer += "</div>";
@@ -447,6 +458,26 @@ Basic Markdown is supported.`
             }
         }
         authRefresh();
+
+        async function deleteChat(__id__)
+        {
+            const fulltitle = auth.record.data.chat[__id__][1]["content"];
+            const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8) + '...') : (fulltitle);
+            if (confirm(`Do you really want to delete CHATID${__id__}(${title})? This can NOT be undone.`))
+            {
+                try
+                {
+                    auth.record.data.chat.splice(__id__, 1);
+                    if (auth.record.data.chat.length === 0) { delete auth.record.data.chat; }
+
+                    await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });
+                    alert(`Deleted CHATID${__id__} successfully.`);
+                    window.location.href = window.location.href;
+                }
+                catch { alert(`Failed to delete CHATID${__id__}. We're sorry.`); }
+            }
+            else { alert(`Didn't delete CHATID${__id__} =)`); }
+        }
 
         const chatContainer = document.getElementById('chat-container');
         const messageInput = document.getElementById('messageInput');
@@ -565,10 +596,12 @@ Basic Markdown is supported.`
                 
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('message', 'assistant-message');
+
                 const avatar = document.createElement('img');
                 avatar.className = 'message-avatar';
                 avatar.src = 'logo.jpg';
                 avatar.alt = 'assistant avatar';
+
                 const contentDiv = document.createElement('div');
                 messageDiv.append(avatar, contentDiv);
                 
