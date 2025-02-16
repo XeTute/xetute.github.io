@@ -132,7 +132,7 @@
 
     async function deleteAccount()
     {
-        if (confirm("Delete Account? This action cannot be undone."))
+        if (confirm("Delete Account? Bad things will happen if you do that, this action cannot be undone."))
         {
             try { await pb.collection('accounts').delete(auth.record.id); window.location.href = "https://xetute.com/"; }
             catch { alert("Failed to delete your account. Maybe that's a sign?"); }
