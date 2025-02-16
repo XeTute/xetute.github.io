@@ -379,13 +379,15 @@
     <script src="pocketbase.umd.js"></script>
     <script defer>
         const pb = new PocketBase("https://db.xetute.com");
+        const systemprompt = `You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/.
+Always respond as engaging as possible while remaining helpful.
+Answering scientific/STEM-related questions, always reason BEFORE you answer.
+Basic Markdown is supported, LaTeX-style math equations are not. Do NOT use something like (\\20 \\times ...), just do (20 * ...).`;
+
         let messages =
         [{
             role: 'system',
-            content: `You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/.
-Always respond as engaging as possible while remaining helpful.
-Answering scientific/STEM-related questions, always reason BEFORE you answer.
-Basic Markdown is supported.`
+            content: systemprompt
         }];
 
         let chatid = window.location.search.substr(1);
