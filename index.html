@@ -408,11 +408,10 @@ Basic Markdown is supported.`
                 if (chatid)
                 {
                     messages = auth.record.data.chat[chatid];
-                    const count = messages.length;
-                    for (let i = 1; i < count; ++i)
+                    for (let i = 1; i < messages.length; ++i)
                     { addMessage(messages[i].content, ((i % 2) === 0) ? 'assistant' : 'user'); }
                 }
-
+                
                 if (auth.record.data.chat === undefined)
                 {
                     auth.record.data.chat = [];
@@ -420,17 +419,24 @@ Basic Markdown is supported.`
                 }
                 else
                 {
-                    chatid = String(auth.record.data.chat.length);
+                    const chats = auth.record.data.chat.length;
 
                     sidebar.innerHTML += "<h1 class=\"sidebartxt\">Recent Chats</h1>";
                     let buffer = '<div style="display: flex; flex-direction: column; justify-content: flex-start; overflow-x: hidden; overflow-y: auto; max-height: 100%; gap: 10px; padding-bottom: 10px;">';
-                    for (let i = 0; i < chatid; ++i)
+                    
+                    for (let i = 0; i < chats; ++i)
                     {
-                        buffer += 
-                        `<button id="sidebarbtn" onclick="window.location.href='https://xetute.com/?${i}'">— ${auth.record.data.chat[i][1]["content"]}</button>`;
+                        const fulltitle = auth.record.data.chat[i][1]["content"];
+                        const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8)) : (fulltitle);
+
+                        const buttonstart = `<button id="sidebarbtn" onclick="window.location.href='https://xetute.com/?${i}'">`;
+                        const buttonend = `</button>`;
+                        buffer += `${buttonstart}— ${title}${buttonend}`;
                     }
                     buffer += "</div>";
                     sidebar.innerHTML += buffer;
+
+                    if (chatid.length === 0) { chatid = String(chats); }
                 }
             }
             catch (error)
