@@ -641,7 +641,7 @@ Basic Markdown is supported.`;
                 messages.pop();
 
                 // If not required, skip websearch, else append searchresults
-                if (response === 'No browsing needed.') { throw('LLM said that no Websearch is required'); }
+                if (response.substring(0, 19) === 'No browsing needed.') { throw('LLM said that no Websearch is required'); }
                 else
                 {
                     loadingDiv.remove();
@@ -680,7 +680,7 @@ Important! If you use any of the webpages, please source them too (for example: 
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ messages: messages, stream: true, temperature: 0.5 })
+                        body: JSON.stringify({ messages: messages, stream: true, temperature: 0.3, max_completion_tokens: 2048 })
                     }
                 );
 
