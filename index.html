@@ -644,15 +644,21 @@ Basic Markdown is supported.`;
                 if (response === 'No browsing needed.') { throw('LLM said that no Websearch is required'); }
                 else
                 {
+                    loadingDiv.remove();
+                    loadingDiv = createLoadingIndicator('Found immediate! Processing');
+                    chatContainer.appendChild(loadingDiv);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+
                     searched = true;
                     const webresults = await getTopWebsearchResults(response);
                     messages.push
                     ({
                         "role": "system", "content":
-`Following are internet search results which may help you answer the user's prompt. If you use any of the webpages, source them too.
+`Following are internet search results which may help you answer the user's prompt.
 First  Webresult[title: ${webresults[0].title}, URL: ${webresults[0].url}, Description: ${webresults[0].desc}]:\n--- CONTENT START ---\n${webresults[0].content}\n--- CONTENT END ---\n
 Second Webresult[title: ${webresults[1].title}, URL: ${webresults[1].url}, Description: ${webresults[1].desc}]:\n--- CONTENT START ---\n${webresults[1].content}\n--- CONTENT END ---\n
-Third  Webresult[title: ${webresults[2].title}, URL: ${webresults[2].url}, Description: ${webresults[2].desc}]:\n--- CONTENT START ---\n${webresults[2].content}\n--- CONTENT END ---\n`
+Third  Webresult[title: ${webresults[2].title}, URL: ${webresults[2].url}, Description: ${webresults[2].desc}]:\n--- CONTENT START ---\n${webresults[2].content}\n--- CONTENT END ---
+Important! If you use any of the webpages, please source them too (for example: "I got that information from [page title](page link).")`
                     });
                     console.log(messages[messages.length - 1].content);
                 }
