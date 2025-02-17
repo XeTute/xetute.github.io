@@ -547,12 +547,12 @@ Basic Markdown is supported.`;
             return text;
         }
         
-        function createLoadingIndicator()
+        function createLoadingIndicator(currentlydoing)
         {
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'loading';
             loadingDiv.innerHTML = `
-                Thinking
+                ${currentlydoing}
                 <div class="loading-dots">
                     <span></span>
                     <span></span>
@@ -581,6 +581,24 @@ Basic Markdown is supported.`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
         
+        async function getTopWebsearchResults(query)
+        {
+            const raw = await fetch
+            (
+                "https://ai.xetute.com/api/extra/websearch",
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 'q': query })
+                }
+            );
+            const normalized = await raw.json();
+            return normalized;
+
+            // Format: 
+            // [ { "title", "url", "desc", "content" }, {...}, {...} ];
+        }
+
         async function sendMessage()
         {
             if (processing) return;
@@ -595,12 +613,61 @@ Basic Markdown is supported.`;
             addMessage(message, 'user');
             messages.push({ role: 'user', content: message });
             
-            const loadingDiv = createLoadingIndicator();
+            let loadingDiv = createLoadingIndicator('Filtering a huge corpus of information');
             chatContainer.appendChild(loadingDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
-            
+
+            // Ask the LLM if websearch is required, if yes, perform it
+            let searched = false;
             try
             {
+                messages.push
+                ({
+                    "role": "system", "content":
+                    "Respond with a short, relevant search query (max 50 tokens) if web search would help. Otherwise (if no web search is needed), reply with 'No browsing needed.'"
+                });
+
+                const raw = await fetch
+                (
+                    'https://ai.xetute.com/v1/chat/completions',
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ messages: messages, stream: false, temperature: 0, max_completion_tokens: 64 })
+                    }
+                );
+                const normalized = await raw.json();
+                const response = normalized.choices[0].message.content; console.log(response);
+                messages.pop();
+
+                // If not required, skip websearch, else append searchresults
+                if (response === 'No browsing needed.') { throw('LLM said that no Websearch is required'); }
+                else
+                {
+                    searched = true;
+                    const webresults = await getTopWebsearchResults(response);
+                    messages.push
+                    ({
+                        "role": "system", "content":
+`Following are internet search results which may help you answer the user's prompt. If you use any of the webpages, source them too.
+First  Webresult[title: ${webresults[0].title}, URL: ${webresults[0].url}, Description: ${webresults[0].desc}]:\n--- CONTENT START ---\n${webresults[0].content}\n--- CONTENT END ---\n
+Second Webresult[title: ${webresults[1].title}, URL: ${webresults[1].url}, Description: ${webresults[1].desc}]:\n--- CONTENT START ---\n${webresults[1].content}\n--- CONTENT END ---\n
+Third  Webresult[title: ${webresults[2].title}, URL: ${webresults[2].url}, Description: ${webresults[2].desc}]:\n--- CONTENT START ---\n${webresults[2].content}\n--- CONTENT END ---\n`
+                    });
+                    console.log(messages[messages.length - 1].content);
+                }
+            }
+            catch (error) { console.log("Won't browse the web. 'Error' message: ", error); }
+
+            loadingDiv.remove();
+            loadingDiv = createLoadingIndicator('Thinking');
+            chatContainer.appendChild(loadingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            // Get normal message, no tools or modifications used in here
+            try
+            {
+                // Fetch raw response & tell the server to use streaming
                 const response = await fetch
                 (
                     'https://ai.xetute.com/v1/chat/completions',
@@ -610,24 +677,30 @@ Basic Markdown is supported.`;
                         body: JSON.stringify({ messages: messages, stream: true, temperature: 0.5 })
                     }
                 );
-                
+
+                // Extract reader from raw response, create decoder and a tmp str to store the most completed message
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let assistantContent = '';
                 
+                // Create message div which will be filled with `assistantContent`
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('message', 'assistant-message');
 
+                // Create an avatar for the message div above
                 const avatar = document.createElement('img');
                 avatar.className = 'message-avatar';
                 avatar.src = 'logo.jpg';
 
+                // Append avatar
                 const contentDiv = document.createElement('div');
                 messageDiv.append(avatar, contentDiv);
                 
+                // And play loading animation till the tokens flow in
                 loadingDiv.replaceWith(messageDiv);
                 chatContainer.scrollTop = chatContainer.scrollHeight;
                 
+                // Check for tokens till server says it's over
                 while (true)
                 {
                     const { done, value } = await reader.read();
@@ -658,8 +731,11 @@ Basic Markdown is supported.`;
                 // After completing the message, re-render math if any
                 try { if (window.MathJax) { MathJax.typeset([messageDiv]); } }
                 catch (error) { console.log(error); }
+
+                if (searched) { messages.pop(); } // Pop search results after answer is generated, takes up a huge amount of context
                 messages.push({ role: 'assistant', content: assistantContent });
 
+                // Save chat if logged in
                 if (loggedin)
                 {
                     if (auth.record.data.chat === undefined) { auth.record.data["chat"] = [messages]; }
@@ -674,6 +750,7 @@ Basic Markdown is supported.`;
             }
             catch (error)
             {
+                if (searched) { messages.pop(); }
                 loadingDiv.remove();
                 addMessage("Sorry, I'm having trouble connecting to the server: " + error, 'assistant');
             }
