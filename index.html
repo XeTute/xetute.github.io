@@ -355,6 +355,29 @@
             align-items: left;
             gap: 10px;
         }
+
+        .markdownlink
+        {
+            margin: 0;
+            padding: 0;
+            border: 0;
+
+            text-decoration: underline;
+            text-decoration-color: rgba(105, 105, 255, 0.8);
+            text-decoration-thickness: 1px;
+
+            transition: 0.125s ease-in-out;
+        }
+        .markdownlink:hover, .markdownlink:focus
+        {
+            margin: 0;
+            padding: 0;
+            border: 0;
+
+            text-decoration: underline;
+            text-decoration-color: rgba(105, 105, 255, 0.8);
+            text-decoration-thickness: 2px;
+        }
     </style>
   </head>
   <body>
@@ -366,8 +389,11 @@
 
     <div id="chat-interface">
         <div id="sidebar">
-            <div style="padding: 0; margin: 0; width: 100%; height: 2rem;"></div>
-            <h1 style="margin-top: 20px;" class="sidebartxt">Quick Actions</h1>
+            <div style="padding: 0; margin-top: 20px; width: 100%; height: 2rem;"></div>
+
+            <button id="sidebarbtn" onclick="builtWithLLaMA();">Built with Llama</button>
+
+            <h1 class="sidebartxt">Quick Actions</h1>
             <button id="sidebarbtn" onclick="window.location.href = 'https://xetute.com';">New Chat</button>
         </div>
         
@@ -389,12 +415,11 @@
 
     <script src="pocketbase.umd.js"></script>
     <script defer>
+        const aiendpoint = 'https://ai.xetute.com/v1/chat/completions';
         const pb = new PocketBase("https://db.xetute.com");
         const systemprompt =
-`You're a Chatbot with no name by the Pakistani startup XeTute Technologies at https://xetute.com/.
-Always respond as engaging as possible while remaining helpful. Answering scientific/STEM-related questions, always reason BEFORE you answer.
-Before every answer you generate, you'll be asked if you want to perform a internet / websearch beforehand to be able to provide better answers to a broader variety questions, meaning your knowledge is not cut off—you have access to the internet.
-Basic Markdown is supported.`;
+`You are an unnamed AI assistant from Pakistan-based XeTute Technologies. You have access to the internet: Before every answer you generate, you have the choice to either receive search engine results or not.
+You mimic human assistant behavior.`;
 
         let messages =
         [{
@@ -521,8 +546,6 @@ Basic Markdown is supported.`;
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         
-        let processing = false;
-        
         function toggleSidebar()
         {
             sidebar.classList.toggle('active');
@@ -545,7 +568,7 @@ Basic Markdown is supported.`;
             text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
             text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
             text = text.replace(/\n/g, '<br>');
-            text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+            text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="markdownlink">$1</a>');
             text = text.replace(/!$$([^$$]*)\]$([^)]+)$/g, '<img src="$2" alt="$1" style="max-width: 95%;">');
             return text;
         }
@@ -602,6 +625,7 @@ Basic Markdown is supported.`;
             // [ { "title", "url", "desc", "content" }, {...}, {...} ];
         }
 
+        let processing = false;
         async function sendMessage()
         {
             if (processing) return;
@@ -622,17 +646,18 @@ Basic Markdown is supported.`;
 
             // Ask the LLM if websearch is required, if yes, perform it
             let searched = false;
+            let sources = [];
             try
             {
                 messages.push
                 ({
                     "role": "system", "content":
-                    "Respond with a short, relevant search query (max 50 tokens) if web search would help. Otherwise (if no web search is needed), reply with 'No browsing needed.'"
+                    "Respond with a short, relevant search query (max 50 tokens) if you need additional information from the internet. Otherwise (if no web search is needed), reply with exactly 'No browsing needed.' If you don't use this feature, you also don't have to cry to the user by saying shit like \"I don't have real-time information\"."
                 });
 
                 const raw = await fetch
                 (
-                    'https://ai.xetute.com/v1/chat/completions',
+                    aiendpoint,
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -644,7 +669,7 @@ Basic Markdown is supported.`;
                 messages.pop();
 
                 // If not required, skip websearch, else append searchresults
-                if (response.substring(0, 19) === 'No browsing needed.') { throw('LLM said that no Websearch is required'); }
+                if (response.substring(0, 18) === 'No browsing needed') { throw('LLM said that no Websearch is required'); }
                 else
                 {
                     loadingDiv.remove();
@@ -663,6 +688,7 @@ Second Webresult[title: ${webresults[1].title}, URL: ${webresults[1].url}, Descr
 Third  Webresult[title: ${webresults[2].title}, URL: ${webresults[2].url}, Description: ${webresults[2].desc}]:\n--- CONTENT START ---\n${webresults[2].content}\n--- CONTENT END ---
 Important! If you use any of the webpages, please source them too (for example: "I got that information from [page title](page link).")`
                     });
+                    sources.push(webresults[0].url, webresults[1].url, webresults[2].url);
                     console.log(messages[messages.length - 1].content);
                 }
             }
@@ -679,7 +705,7 @@ Important! If you use any of the webpages, please source them too (for example: 
                 // Fetch raw response & tell the server to use streaming
                 const response = await fetch
                 (
-                    'https://ai.xetute.com/v1/chat/completions',
+                    aiendpoint,
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -734,14 +760,19 @@ Important! If you use any of the webpages, please source them too (for example: 
                             }
                         } catch (e) { console.error('Error parsing stream chunk:', e); }
                     }
-                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    chatContainer.scrollTop = chatContainer.scrollHeight; // for scrolling while message is being generated
                 }
 
                 // After completing the message, re-render math if any
                 try { if (window.MathJax) { MathJax.typeset([messageDiv]); } }
                 catch (error) { console.log(error); }
 
-                if (searched) { messages.pop(); } // Pop search results after answer is generated, takes up a huge amount of context
+                if (searched)
+                {
+                    messages.pop();
+                    assistantContent += `\n\nSources: [First](${sources[0]}) | [Second](${sources[1]}) | [Third](${sources[2]})`;
+                    contentDiv.innerHTML = parseMarkdown(assistantContent);
+                }
                 messages.push({ role: 'assistant', content: assistantContent });
 
                 // Save chat if logged in
