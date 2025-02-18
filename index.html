@@ -520,6 +520,17 @@ You mimic human assistant behavior.`;
         }
         authRefresh();
 
+        async function seeIfAIonline()
+        {
+            // See if the AI endpoint is online or not
+            if (aiendpoint === "https://ai.xetute.com/v1/chat/completions")
+            {
+                try { console.log(await fetch("https://ai.xetute.com/api/v1/model")); }
+                catch { alert("AI isn't online. Sending a request to the AI will result in an error."); }
+            }
+        }
+        seeIfAIonline();
+
         async function deleteChat(__id__)
         {
             const fulltitle = auth.record.data.chat[__id__][1]["content"];
