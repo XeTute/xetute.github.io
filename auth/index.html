@@ -125,6 +125,12 @@
             return;
         }
 
+        if (password0.length > 32)
+        {
+            notice.textContent = "The maximum allowed length for passwords is 32 characters";
+            return;
+        }
+
         try
         {
             await pb.collection('accounts').create({ "email": email, "password": password0, "passwordConfirm": password1 });
