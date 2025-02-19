@@ -480,8 +480,15 @@ You mimic human assistant behavior.`;
                     {
                         if (auth.record.data.chat === undefined) { goToApex(); }
                         if (chatid >= auth.record.data.chat.length) { goToApex(); }
-
                         messages = auth.record.data.chat[chatid];
+
+                        if (messages[0]["content"] !== systemprompt)
+                        {
+                            messages[0]["content"] = systemprompt;
+                            try { auth.record = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
+                            catch { alert("Failed to update AI instructions. AI functionality may decline for this chat."); }
+                        }
+
                         for (let i = 1; i < messages.length; ++i)
                         { addMessage(messages[i].content, ((i % 2) === 0) ? 'assistant' : 'user'); }
                     }
@@ -529,7 +536,7 @@ You mimic human assistant behavior.`;
             // See if the AI endpoint is online or not
             if (aiendpoint === "https://ai.xetute.com/v1/chat/completions")
             {
-                try { console.log(await fetch("https://ai.xetute.com/api/v1/model")); }
+                try { await fetch("https://ai.xetute.com/api/v1/model"); }
                 catch { alert("AI isn't online. Sending a request to the AI will result in an error."); }
             }
         }
