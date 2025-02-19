@@ -45,7 +45,29 @@
             margin: 0;
             overflow-x: hidden;
         }
+
+        pre, code
+        {
+            display: block;
+            flex-wrap: wrap;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-width: 100%;
+        }
         
+        pre
+        {
+            max-width: 95%;
+            padding: 10px;
+            margin: 0;
+            background: #222;
+
+            border: 2px solid #000;
+            border-radius: 10px;
+        }
+
         #chat-interface
         {
             width: 100%;
@@ -176,8 +198,9 @@
         .message
         {
             position: relative;
+            display: block;
 
-            max-width: 700px;
+            max-width: 95%;
             width: calc(100% - 40px);
 
             padding: 15px;
@@ -430,8 +453,7 @@
         const aiendpoint = 'https://ai.xetute.com/v1/chat/completions';
         const pb = new PocketBase("https://db.xetute.com");
         const systemprompt =
-`You are an unnamed AI assistant from Pakistan-based XeTute Technologies. You have access to the internet: Before every answer you generate, you have the choice to either receive search engine results or not.
-You mimic human assistant behavior.`;
+`You are an unnamed AI assistant from Pakistan-based XeTute Technologies. You mimic human assistant behavior.`;
 
         let messages =
         [{
@@ -683,7 +705,7 @@ You mimic human assistant behavior.`;
                 messages.push
                 ({
                     "role": "system", "content":
-                    "Respond with a short, relevant search query (max 50 tokens) if you need additional information from the internet. Otherwise (if no web search is needed), reply with exactly 'No browsing needed.' If you don't use this feature, you also don't have to cry to the user by saying shit like \"I don't have real-time information\"."
+                    "Respond with a short, relevant search query (max 36 tokens) if you need additional information from the internet to answer the user's input. Otherwise (if no web search is needed), reply with EXACTLY 'No browsing needed.' and end your response there, don't generate any further tokens."
                 });
 
                 const raw = await fetch
@@ -692,7 +714,7 @@ You mimic human assistant behavior.`;
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ messages: messages, stream: false, temperature: 0, max_completion_tokens: 64 })
+                        body: JSON.stringify({ messages: messages, stream: false, temperature: 0, max_completion_tokens: 48 })
                     }
                 );
                 const normalized = await raw.json();
@@ -713,7 +735,7 @@ You mimic human assistant behavior.`;
                     messages.push
                     ({
                         "role": "system", "content":
-`Following are internet search results which may help you answer the user's prompt.
+`Use following information to answer the user's query if relevant.
 First  Webresult[title: ${webresults[0].title}, URL: ${webresults[0].url}, Description: ${webresults[0].desc}]:\n--- CONTENT START ---\n${webresults[0].content}\n--- CONTENT END ---\n
 Second Webresult[title: ${webresults[1].title}, URL: ${webresults[1].url}, Description: ${webresults[1].desc}]:\n--- CONTENT START ---\n${webresults[1].content}\n--- CONTENT END ---\n
 Third  Webresult[title: ${webresults[2].title}, URL: ${webresults[2].url}, Description: ${webresults[2].desc}]:\n--- CONTENT START ---\n${webresults[2].content}\n--- CONTENT END ---`
