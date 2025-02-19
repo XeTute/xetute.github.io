@@ -44,7 +44,6 @@
             height: 100%;
             margin: 0;
             overflow-x: hidden;
-            background: #1a1a1a;
         }
         
         #chat-interface
@@ -57,7 +56,7 @@
         
         #sidebar
         {
-            background: #202020;
+            background: #151515;
             width: 260px;
             height: 100vh;
             display: flex;
@@ -65,7 +64,7 @@
             gap: 20px;
             position: fixed;
             left: -260px;
-            transition: left 0.3s ease-in-out;
+            transition: left 0.5s ease-in-out;
             z-index: 1000;
         }
         #sidebar.active { left: 0; }
@@ -83,6 +82,15 @@
         ::-webkit-scrollbar-track       { background: rgba(255, 255, 255, 0); }
         ::-webkit-scrollbar-thumb       { background: rgba(255, 255, 255, 0); }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0); }
+
+        #input-container
+        {
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+
+            background: #151515;
+        }
+
         @media (min-width: 769px)
         {
             #sidebar
@@ -120,7 +128,6 @@
                 margin: 0 auto;
                 padding: 20px;
                 box-sizing: border-box;
-                background: #1a1a1a;
                 z-index: 100;
             }
         }
@@ -143,7 +150,6 @@
             {
                 flex: 0 0 auto;
                 padding: 20px 15px calc(20px + env(safe-area-inset-bottom)) 15px;
-                background: #1a1a1a;
                 border-top: 1px solid #333;
                 z-index: 100;
             }
@@ -167,11 +173,16 @@
         .message
         {
             position: relative;
+            background: #181818;
+
             max-width: 700px;
             width: calc(100% - 40px);
+
             padding: 15px 20px;
-            margin: 10px 0;
-            border-radius: 20px;
+            margin: 0;
+
+            border-top: 1px solid #666;
+
             line-height: 1.5;
             display: flex;
             gap: 15px;
@@ -180,33 +191,20 @@
         
         .message-avatar
         {
-            width: 35px;
-            height: 35px;
+            width: 25px;
+            height: 25px;
             border-radius: 50%;
             object-fit: cover;
             flex-shrink: 0;
-            margin-top: 5px;
+            margin: 5px;
         }
-        
-        .user-message .message-avatar { margin-left: 10px; }
-        .assistant-message .message-avatar { margin-right: 10px; }
         
         .user-message
         {
-            background: #2a2a2a;
             flex-direction: row-reverse;
             text-align: right;
-            margin-left: auto;
-            margin-right: 10px;
         }
-        
-        .assistant-message
-        {
-            background: #333;
-            text-align: left;
-            margin-right: auto;
-            margin-left: 10px;
-        }
+        .assistant-message { text-align: left; }
         
         .input-wrapper
         {
@@ -217,7 +215,7 @@
         
         #messageInput
         {
-            width: 100%;
+            flex-grow: 1;
             min-height: 50px;
             box-sizing: border-box;
             resize: none;
@@ -225,20 +223,23 @@
             border: 2px solid #444;
             border-right: none;
             border-radius: 25px 0 0 25px;
-            padding: 15px 60px 15px 20px;
+            padding: 15px;
             background: #222;
-            color: white;
+            color: #fff;
         }
-        
+
         #sendButton
         {
-            height: 50px;
+            height: auto;
             width: 50px;
             border: 2px solid #444 !important;
             border-left: none !important;
             border-radius: 0 25px 25px 0;
             background: #222;
             color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         #links-bar 
@@ -254,7 +255,7 @@
         
         .social-link
         {
-            color: #888;
+            color: #777;
             display: flex;
             align-items: center;
             gap: 5px;
@@ -361,9 +362,10 @@
             margin: 0;
             padding: 0;
             border: 0;
+            border-radius: 0;
 
             text-decoration: underline;
-            text-decoration-color: rgba(105, 105, 255, 0.8);
+            text-decoration-color: rgba(105, 105, 255, 1);
             text-decoration-thickness: 1px;
 
             transition: 0.125s ease-in-out;
@@ -373,6 +375,7 @@
             margin: 0;
             padding: 0;
             border: 0;
+            border-radius: 0;
 
             text-decoration: underline;
             text-decoration-color: rgba(105, 105, 255, 0.8);
@@ -391,6 +394,7 @@
         <div id="sidebar">
             <div style="padding: 0; margin-top: 20px; width: 100%; height: 2rem;"></div>
 
+            <h1 class="sidebartxt">Other</h1>
             <button id="sidebarbtn" onclick="alert('The AI responses you get are powered by a custom version of Meta\'s LLaMA 3.1 8B INT4.');">Built with Llama</button>
 
             <h1 class="sidebartxt">Quick Actions</h1>
@@ -401,7 +405,7 @@
             <div id="chat-container"></div>
             <div id="input-container">
                 <div class="input-wrapper">
-                    <textarea id="messageInput" placeholder="Send a message..." rows="1"></textarea>
+                    <textarea id="messageInput" placeholder="Whereas disregard and contempt for human rights have resulted" rows="2"></textarea>
                     <button id="sendButton"><i class="fa fa-paper-plane"></i></button>
                 </div>
                 <div id="links-bar">
