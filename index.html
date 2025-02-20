@@ -347,7 +347,7 @@
             z-index: 999;
         }
         
-        #sidebarbtn
+        .sidebarbtn
         {
             margin-left: 20px;
             font-size: 16px;
@@ -429,8 +429,8 @@
             <div style="padding: 0; margin-top: 20px; width: 100%; min-height: 2rem; max-height: 2.05rem;"></div>
 
             <h1 class="sidebartxt">Other</h1>
-            <button id="sidebarbtn" onclick="alert('The AI responses you get are powered by a custom version of Meta\'s LLaMA 3.1 8B INT4.');">Built with LLaMA</button>
-            <a id="sidebarbtn" href="#" style="margin-top: -10px; margin-bottom: 0;" onclick="alert('Coming soon!');">About Us</a>
+            <button class="sidebarbtn" id="builtWithLLaMA" onclick="alert('The AI responses you get are powered by a custom version of Meta\'s LLaMA 3.1 8B.');">Built with LLaMA</button>
+            <a class="sidebarbtn" href="#" style="margin-top: -10px; margin-bottom: 0;" onclick="alert('Coming soon!');">About Us</a>
         </div>
         
         <div id="main-content">
@@ -542,7 +542,7 @@
                             const fulltitle = auth.record.data.chat[i][1]["content"];
                             const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8) + '...') : (fulltitle);
 
-                            const buttonstart = `<div class="chathistorybtn"><button id="sidebarbtn" onclick="window.location.href=(getApex() + '?${i}');">`;
+                            const buttonstart = `<div class="chathistorybtn"><button class="sidebarbtn" onclick="window.location.href=(getApex() + '?${i}');">`;
                             const buttonend = `</button><button onclick="deleteChat('${i}');"><i class="fa fa-trash" aria-hidden="true"></i></button></div>`;
                             buffer += `${buttonstart}— ${title}${buttonend}`;
                         }
@@ -567,8 +567,15 @@
             // See if the AI endpoint is online or not
             if (aiendpoint === "https://ai.xetute.com/v1/chat/completions")
             {
-                try { await fetch("https://ai.xetute.com/api/v1/model"); }
-                catch (error) { console.log("AI not online: ", error); alert("AI isn't online. Sending a request to the AI will result in an error."); }
+                try
+                {
+                    const bwd = document.getElementById('builtWithLLaMA');
+                    const raw = await fetch("https://ai.xetute.com/api/v1/model");
+                    const modelname = (await raw.json()).result;
+                    
+                    if (modelname.search("LLaMA") === -1) { bwd.remove(); }
+                }
+                catch (error) { console.log("AI not online: ", error); alert("AI isn't online. Sending a message may result in an error. We're sorry.\n(Error: " + error + ")"); }
             }
         }
         seeIfAIonline();
