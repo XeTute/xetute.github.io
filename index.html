@@ -215,6 +215,32 @@
             display: flex;
             align-items: flex-start;
         }
+        .messageimg { max-width: 95%; }
+        .messageli, .messageul { margin: 0; padding: 0; }
+        .messagea
+        {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+
+            text-decoration: underline;
+            text-decoration-color: rgba(105, 105, 255, 1);
+            text-decoration-thickness: 1px;
+
+            transition: 0.125s ease-in-out;
+        }
+        .messagea:hover, .messagea:focus
+        {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+
+            text-decoration: underline;
+            text-decoration-color: rgba(105, 105, 255, 0.8);
+            text-decoration-thickness: 2px;
+        }
         
         .message-avatar
         {
@@ -390,31 +416,6 @@
             align-items: left;
             gap: 10px;
         }
-
-        .markdownlink
-        {
-            margin: 0;
-            padding: 0;
-            border: 0;
-            border-radius: 0;
-
-            text-decoration: underline;
-            text-decoration-color: rgba(105, 105, 255, 1);
-            text-decoration-thickness: 1px;
-
-            transition: 0.125s ease-in-out;
-        }
-        .markdownlink:hover, .markdownlink:focus
-        {
-            margin: 0;
-            padding: 0;
-            border: 0;
-            border-radius: 0;
-
-            text-decoration: underline;
-            text-decoration-color: rgba(105, 105, 255, 0.8);
-            text-decoration-thickness: 2px;
-        }
     </style>
   </head>
   <body>
@@ -453,7 +454,7 @@
         const aiendpoint = 'https://ai.xetute.com/v1/chat/completions';
         const pb = new PocketBase("https://db.xetute.com");
         const systemprompt =
-`You are an unnamed AI assistant from Pakistan-based XeTute Technologies. You mimic human assistant behavior.`;
+`You are an unnamed AI assistant from Pakistan-based XeTute Technologies. You mimic human assistant behavior. Very basic, regex Markdown is supported, try your best not to break it.`;
 
         let messages =
         [{
@@ -622,17 +623,22 @@
         
         function parseMarkdown(text)
         {
-            text = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-            text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-            text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-            text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-            text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-            text = text.replace(/\n/g, '<br>');
-            text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="markdownlink">$1</a>');
-            text = text.replace(/!$$([^$$]*)\]$([^)]+)$/g, '<img src="$2" alt="$1" style="max-width: 95%;">');
-            return text;
-        }
+          text = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+          text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+          text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+          text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+          text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+          text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+          text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="messageimg">');
+          text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="messagea">$1</a>');
+          text = text.replace(/^\s*\*\s+(.*)$/gm, '<li class="messageli">$1</li>');
+          text = text.replace(/((?:<li>.*<\/li>\s*)+)/g, '<ul class="messageul">$1</ul>');
+          text = text.replace(/\n/g, '<br>');
         
+          return text;
+        }
+
         function createLoadingIndicator(currentlydoing)
         {
             const loadingDiv = document.createElement('div');
