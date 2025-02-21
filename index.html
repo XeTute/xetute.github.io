@@ -99,11 +99,6 @@
             position: relative;
             min-height: 0;
         }
-        
-        ::-webkit-scrollbar { width: 1px; }
-        ::-webkit-scrollbar-track       { background: rgba(255, 255, 255, 0); }
-        ::-webkit-scrollbar-thumb       { background: rgba(255, 255, 255, 0); }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0); }
 
         #input-container
         {
@@ -430,8 +425,8 @@
             <div style="padding: 0; margin-top: 20px; width: 100%; min-height: 2rem; max-height: 2.05rem;"></div>
 
             <h1 class="sidebartxt">Other</h1>
-            <button class="sidebarbtn" id="builtWithLLaMA" onclick="alert('The AI responses you get are powered by a custom version of Meta\'s LLaMA 3.1 8B.');">Built with LLaMA</button>
-            <a class="sidebarbtn" href="#" style="margin-top: -10px; margin-bottom: 0;" onclick="alert('Coming soon!');">About Us</a>
+            <button class="sidebarbtn" id="builtWithLLaMA" onclick="alert('The AI responses you get are powered by a custom version of Meta\'s LLaMA 3.1 8B.');"></button>
+            <a class="sidebarbtn" href="./about/?https://xetute.com/" style="margin-top: -10px; margin-bottom: 0;">About Us</a>
         </div>
         
         <div id="main-content">
@@ -443,7 +438,7 @@
                 </div>
                 <row style="padding: 0; margin: 0; margin-bottom: -5px; margin-top: 8px; height: min-content; justify-content: center;">
                     <a href="https://xetute.com/" class="quickactions">New Chat</a>
-                    <a id="authprofile" href="./account/" class="quickactions">Loading...</a>
+                    <a id="authprofile" class="quickactions">Loading...</a>
                 </row>
             </div>
         </div>
@@ -506,6 +501,7 @@
                 }
                 authprofile.innerHTML = `Logged in as ${name}`;
                 authprofile.style.color = '#ddd';
+                authprofile.href = `./account/?${window.location.href}`;
                 
                 try
                 {
@@ -559,6 +555,7 @@
             {
                 console.log(error);
                 authprofile.innerHTML = "Click me to log in";
+                authprofile.textContent = `./auth/?${window.location.href}`
             }
         }
         authRefresh();
@@ -568,15 +565,20 @@
             // See if the AI endpoint is online or not
             if (aiendpoint === "https://ai.xetute.com/v1/chat/completions")
             {
+                const bwd = document.getElementById('builtWithLLaMA');
                 try
                 {
-                    const bwd = document.getElementById('builtWithLLaMA');
                     const raw = await fetch("https://ai.xetute.com/api/v1/model");
                     const modelname = (await raw.json()).result;
                     
                     if (modelname.search("LLaMA") === -1) { bwd.remove(); }
+                    else { bwd.textContent = "Built with LLaMA"; }
                 }
-                catch (error) { console.log("AI not online: ", error); alert("AI isn't online. Sending a message may result in an error. We're sorry.\n(Error: " + error + ")"); }
+                catch (error)
+                {
+                    console.log("AI not online: ", error); alert("AI isn't online. Sending a message may result in an error. We're sorry.\n(Error: " + error + ")");
+                    bwd.remove();
+                }
             }
         }
         seeIfAIonline();

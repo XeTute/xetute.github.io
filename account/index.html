@@ -55,9 +55,34 @@
 
         .dangerous > p { color: rgba(255, 100, 100, .85); }
         .dangerous > button { background: rgba(255, 150, 150, .2); border: 0; }
+
+        .backbtn
+        {
+            display: flex;
+            flex-direction: row;
+
+            justify-content: center;
+            align-items: center;
+
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            padding: 10px;
+            
+            border: 2px solid #666;
+            border-radius: 25px;
+
+            width: 35px;
+            height: 35px;
+
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
+    <a class="backbtn" id="backbutton">
+        <i class="fa fa-chevron-left" style="justify-self: center; align-self: center;" aria-hidden="true"></i>
+    </a>
     <h1>Your Account</h1>
     <cdiv>
         <p class="underline">Username</p>
@@ -85,12 +110,15 @@
 <script src="../pocketbase.umd.js"></script>
 <script defer>
     const pb = new PocketBase('https://db.xetute.com/');
+    const backbtn = document.getElementById('backbutton');
+    const origin = window.location.search.substr(1);
+
+    if (!origin) { backbtn.remove(); }
+    else { backbtn.href = origin; }
+
     let auth;
 
-    function refreshPage()
-    {
-        window.location.href = window.location.href;
-    }
+    function refreshPage() { window.location.href = window.location.href; }
 
     async function authRefresh()
     {
