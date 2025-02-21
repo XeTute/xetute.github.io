@@ -555,7 +555,7 @@
             {
                 console.log(error);
                 authprofile.innerHTML = "Click me to log in";
-                authprofile.textContent = `./auth/?${window.location.href}`
+                authprofile.href = `./auth/?${window.location.href}`
             }
         }
         authRefresh();
