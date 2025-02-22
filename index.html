@@ -46,7 +46,8 @@
             overflow-x: hidden;
         }
 
-        pre, code
+        mycode { font-family: monospace; }
+        mypre, mycode
         {
             display: block;
             flex-wrap: wrap;
@@ -57,7 +58,7 @@
             max-width: 100%;
         }
         
-        pre
+        mypre
         {
             max-width: 95%;
             padding: 10px;
@@ -626,8 +627,8 @@
         function parseMarkdown(text)
         {
           text = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-          text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+          text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<mypre><mycode>$2</mycode></mypre>');
+          text = text.replace(/`([^`]+)`/g, '<mycode>$1</mycode>');
           text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
           text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
           text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
