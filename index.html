@@ -11,6 +11,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="basic.css">
     <link rel="icon" href="logo.jpg">
+    
+    <!-- Add Marked.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      // Configure Marked.js
+      marked.setOptions
+      ({
+        breaks: true,
+        highlight: function(code) { return code; },
+        renderer: new marked.Renderer
+        ({
+          code(code, infostring) { return `<mypre><mycode>${code}</mycode></mypre>`; }
+        })
+      });
+    </script>
 
     <script type="text/javascript">
     window.MathJax =
@@ -46,27 +61,26 @@
             overflow-x: hidden;
         }
 
-        mycode { font-family: monospace; }
-        mypre, mycode
-        {
-            display: block;
-            flex-wrap: wrap;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            max-width: 100%;
-        }
-        
-        mypre
+        pre
         {
             max-width: 95%;
             padding: 10px;
             margin: 0;
             background: #222;
-
             border: 2px solid #000;
             border-radius: 10px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        code
+        {
+            font-family: monospace;
+            display: block;
+            white-space: pre-wrap;
+            word-break: break-word;
+            font-family: 'Comic Sans MS', 'Comic Sans', cursive;
         }
 
         #chat-interface
@@ -195,21 +209,18 @@
         {
             position: relative;
             display: block;
-
             max-width: 95%;
             width: calc(100% - 40px);
-
             padding: 15px;
             margin: 5px;
-
             border: 2px solid #222;
             border-radius: 13px;
-
             line-height: 1.5;
             gap: 15px;
-
             display: flex;
             align-items: flex-start;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
         .messageimg { max-width: 95%; }
         .messageli, .messageul { margin: 0; padding: 0; }
@@ -450,7 +461,7 @@
         const aiendpoint = 'https://ai.xetute.com/v1/chat/completions';
         const pb = new PocketBase("https://db.xetute.com");
         const systemprompt =
-`You are an unnamed AI assistant from Pakistan-based XeTute Technologies. You mimic human assistant behavior. Very basic, regex Markdown is supported, try your best not to break it.`;
+`You are an unnamed AI assistant from Pakistan-based XeTute Technologies. You mimic human assistant behavior. Markdown is supported.`;
 
         let messages =
         [{
@@ -626,20 +637,9 @@
         
         function parseMarkdown(text)
         {
-          text = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<mypre><mycode>$2</mycode></mypre>');
-          text = text.replace(/`([^`]+)`/g, '<mycode>$1</mycode>');
-          text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
-          text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-          text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-          text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
-          text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="messageimg">');
-          text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="messagea">$1</a>');
-          text = text.replace(/^\s*\*\s+(.*)$/gm, '<li class="messageli">$1</li>');
-          text = text.replace(/((?:<li>.*<\/li>\s*)+)/g, '<ul class="messageul">$1</ul>');
-          text = text.replace(/\n/g, '<br>');
-        
-          return text;
+          const html = marked.parse(text);
+          return html.replace(/<a href="/g, '<a class="messagea" href="')
+                    .replace(/<img/g, '<img class="messageimg"');
         }
 
         function createLoadingIndicator(currentlydoing)
