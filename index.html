@@ -20,10 +20,7 @@
       ({
         breaks: true,
         highlight: function(code) { return code; },
-        renderer: new marked.Renderer
-        ({
-          code(code, infostring) { return `<mypre><mycode>${code}</mycode></mypre>`; }
-        })
+        renderer: new marked.Renderer({})
       });
     </script>
 
@@ -205,6 +202,11 @@
             padding: 10px;
         }
         
+        .message div { padding: 0; margin: 0; }
+        .message table, .message th, .message td { margin: 0; padding: 0; text-align: left; border: 2px solid #fff; font-size: 13px; }
+        .message table { border-collapse: collapse; }
+        .message th, .message td { padding: 10px; }
+
         .message
         {
             position: relative;
