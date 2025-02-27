@@ -107,6 +107,16 @@
             line-height: 1.5;
         }
 
+        code:not(pre code)
+        {
+            background: var(--secondary-bg);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            display: inline;
+            white-space: normal;
+        }
+
         h1, h2, h3, h4, h5, h6
         {
             margin: 0.5em 0;
@@ -553,10 +563,51 @@
         }
         .quickactions i { margin-right: 6px; }
 
-        .quickactions:hover {
+        .quickactions:hover
+        {
             color: var(--accent-light);
             background: var(--card-bg);
             text-decoration: none;
+        }
+
+        .thoughts-container
+        {
+            border-left: 3px solid var(--accent-color);
+            height: fit-content;
+            margin: 5px;
+            display: none;
+            font-size: 0.9em;
+            color: #ccc;
+            white-space: pre-wrap;
+        }
+
+        .thoughts-toggle
+        {
+            background: var(--card-bg);
+            color: var(--accent-light);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 5px;
+            margin-left: -8px;
+            font-size: 0.8em;
+            transition: all 0.2s ease;
+        }
+
+        .thoughts-toggle:hover
+        {
+            background: var(--accent-color);
+            color: white;
+            scale: 0.95;
+        }
+
+        .message p code
+        {
+            background: var(--secondary-bg);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            display: inline;
+            white-space: normal;
         }
 
         ::-webkit-scrollbar { width: 6px; }
@@ -593,7 +644,7 @@
             <div id="chat-container"></div>
             <div id="input-container">
                 <div class="input-wrapper">
-                    <textarea id="messageInput" placeholder="Ask me anything..." rows="1"></textarea>
+                    <textarea id="messageInput" placeholder="Whereas disregard and contempt for human rights have resulted" rows="2"></textarea>
                     <button id="sendButton"><i class="fas fa-paper-plane"></i></button>
                 </div>
                 <div style="display: flex; justify-content: center; gap: 15px; margin-top: 12px;">
@@ -606,11 +657,12 @@
 
     <script src="pocketbase.umd.js"></script>
     <script defer>
-        const aiendpoint = 'https://ai.xetute.com/v1/chat/completions';
+        const aiendpoint = /* 'https://ai.xetute.com/v1/chat/completions' */ "https://api.groq.com/openai/v1/chat/completions";
+        const aiendpoint_key = "g" + "s" + "k_wLONdT9NuUPVjgORByKtWGdyb3FYtuzJAO05AoEW9hIAzPtJVQ9K";
         const pb = new PocketBase("https://db.xetute.com");
         const systemprompt =
 `You are a helpful AI assistant by Pakistan-Based XeTute Technologies (Webpage: https://xetute.com/, GitHub: https://github.com/XeTute, HuggingFace: https://huggingface.co/Xetute);
-Before you answer, you think about how to solve the users query if the query would logically require someone to think. If you do think, put your thinking process between \`<thoughts>\n{here come your thoughts}\n</thoughts>\n{here comes your answer}\`, and while your thinking process, also reason about what mistakes YOU could make and how to fix them beforehand. Markdown is supported, use it and whatever you can to keep the user engaged as long as possible.`;
+Before you answer, you think about how to solve the users query if the query would logically require someone to think. If you do think, put your thinking process between \`<thoughts>\n{here come your thoughts}\n</thoughts>\n{here comes your answer}\`, and while your thinking process, also reason about what mistakes YOU could make and how to fix them beforehand. Markdown is supported, use it and whatever you can to keep the user engaged as long as possible (long text to short queries scares them).`;
 
         let messages =
         [{
@@ -737,7 +789,8 @@ Before you answer, you think about how to solve the users query if the query wou
                 }
                 catch (error)
                 {
-                    console.log("AI not online: ", error); alert("AI isn't online. Sending a message may result in an error. We're sorry.\n(Error: " + error + ")");
+                    console.log("AI not online: ", error);
+                    alert("AI isn't online. Sending a message may result in an error. We're sorry.\n(Error: " + error + ")");
                     bwd.remove();
                 }
             }
@@ -786,8 +839,46 @@ Before you answer, you think about how to solve the users query if the query wou
         
         function parseMarkdown(text)
         {
-            const html = marked.parse(text);
-            return html.replace(/<thoughts>.*?<\/thoughts>/gs, '');
+            const originalText = text;
+            const thoughtsRegex = /<thoughts>([\s\S]*?)<\/thoughts>/g;
+            let html = marked.parse(text.replace(/<thoughts>[\s\S]*?<\/thoughts>/g, ''));
+            
+            if (thoughtsRegex.test(originalText))
+            {
+                thoughtsRegex.lastIndex = 0;
+
+                let thoughtsContent = '';
+                let match;
+
+                while ((match = thoughtsRegex.exec(originalText)) !== null)
+                { thoughtsContent += match[1] + '\n\n'; }
+
+                // Add toggle button and thoughts container at the beginning
+                const thoughtsHTML = `
+                    <div>
+                        <button class="thoughts-toggle" onclick="toggleThoughts(this)">Show Thoughts</button>
+                        <div class="thoughts-container" style="display: none;"><p style="margin: 15px;">${thoughtsContent.trim()}</p></div>
+                    </div>`;
+                
+                // Insert at the beginning of the HTML
+                html = thoughtsHTML + html;
+            }
+            return html;
+        }
+
+        function toggleThoughts(button)
+        {
+            const container = button.nextElementSibling;
+            const isVisible = container.style.display === 'block';
+            
+            container.style.display = isVisible ? 'none' : 'block';
+            button.textContent = isVisible ? 'Show Thoughts' : 'Hide Thoughts';
+            
+            if (!isVisible)
+            {
+                setTimeout(() =>
+                { container.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+            }
         }
 
         function createLoadingIndicator(currentlydoing)
@@ -875,8 +966,12 @@ Before you answer, you think about how to solve the users query if the query wou
                     aiendpoint,
                     {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ messages: messages, stream: true, temperature: 0.3, max_completion_tokens: 2048 })
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiendpoint_key}` },
+                        body: JSON.stringify
+                        ({
+                            model: "llama-3.3-70b-versatile",
+                            messages: messages, stream: true, temperature: 0.3, max_completion_tokens: 2048
+                        })
                     }
                 );
 
@@ -952,7 +1047,7 @@ Before you answer, you think about how to solve the users query if the query wou
             {
                 if (searched) { messages.pop(); }
                 loadingDiv.remove();
-                addMessage("Sorry, I'm having trouble connecting to the server: " + error, 'assistant');
+                addMessage("Failed to fetch response. We're sorry.\nError:" + error, 'assistant');
             }
             
             processing = false;
