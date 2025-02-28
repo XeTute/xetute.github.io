@@ -632,7 +632,7 @@
             <div style="padding: 0; margin-top: 50px; width: 100%;"></div>
 
             <h1 class="sidebartxt">Other</h1>
-            <button class="sidebarbtn" id="builtWithLLaMA" onclick="alert('The AI responses you get are powered by a custom version of Meta\'s LLaMA 3.1 8B.');">
+            <button class="sidebarbtn" id="builtWithLLaMA">
                 <i class="fas fa-microchip"></i> Built with LLaMA
             </button>
             <a class="sidebarbtn" href="./about/?https://xetute.com/">
@@ -663,6 +663,7 @@
         const systemprompt =
 `You are a helpful AI assistant by Pakistan-Based XeTute Technologies (Webpage: https://xetute.com/, GitHub: https://github.com/XeTute, HuggingFace: https://huggingface.co/Xetute);
 Before you answer, you think about how to solve the users query if the query would logically require someone to think. If you do think, put your thinking process between \`<thoughts>\n{here come your thoughts}\n</thoughts>\n{here comes your answer}\`, and while your thinking process, also reason about what mistakes YOU could make and how to fix them beforehand. Markdown is supported, use it and whatever you can to keep the user engaged as long as possible (long text to short queries scares them).`;
+        let modelname = "llama-3.3-70b-versatile";
 
         let messages =
         [{
@@ -689,8 +690,40 @@ Before you answer, you think about how to solve the users query if the query wou
             return returnval;
         }
 
+        function checkIfLLaMA(_elm_)
+        {
+            if (modelname.toLowerCase().search("llama") === -1) { _elm_.remove(); }
+            else
+            {
+                _elm_.textContent = `Built with ${(modelname.length > 8) ? (modelname.substr(0, 11) + '...') : modelname}`;
+                _elm_.setAttribute('onclick', `alert("The AI you're currently chatting with is powered by ${modelname}.");`);
+            }
+        }
+
+        async function seeIfAIonline()
+        {
+            // See if the AI endpoint is online or not
+            const bwd = document.getElementById('builtWithLLaMA');
+            if (aiendpoint === "https://ai.xetute.com/v1/chat/completions")
+            {
+                try
+                {
+                    const raw = await fetch("https://ai.xetute.com/api/v1/model");
+                    modelname = (await raw.json()).result;
+                }
+                catch (error)
+                {
+                    console.log("AI not online: ", error);
+                    alert("AI isn't online. Sending a message may result in an error. We're sorry.\n(Error: " + error + ")");
+                    bwd.remove();
+                }
+            }
+            checkIfLLaMA(bwd);
+        }
+
         async function authRefresh()
         {
+            await seeIfAIonline();
             const authprofile = document.getElementById('authprofile');
             try
             {
@@ -772,30 +805,6 @@ Before you answer, you think about how to solve the users query if the query wou
             }
         }
         authRefresh();
-
-        async function seeIfAIonline()
-        {
-            // See if the AI endpoint is online or not
-            if (aiendpoint === "https://ai.xetute.com/v1/chat/completions")
-            {
-                const bwd = document.getElementById('builtWithLLaMA');
-                try
-                {
-                    const raw = await fetch("https://ai.xetute.com/api/v1/model");
-                    const modelname = (await raw.json()).result;
-                    
-                    if (modelname.search("LLaMA") === -1) { bwd.remove(); }
-                    else { bwd.textContent = "Built with LLaMA"; }
-                }
-                catch (error)
-                {
-                    console.log("AI not online: ", error);
-                    alert("AI isn't online. Sending a message may result in an error. We're sorry.\n(Error: " + error + ")");
-                    bwd.remove();
-                }
-            }
-        }
-        seeIfAIonline();
 
         async function deleteChat(__id__)
         {
@@ -885,13 +894,13 @@ Before you answer, you think about how to solve the users query if the query wou
         {
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'loading';
-            loadingDiv.innerHTML = `
-                ${currentlydoing}
-                <div class="loading-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>`;
+            loadingDiv.innerHTML =
+            `${currentlydoing}
+            <div class="loading-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>`;
             return loadingDiv;
         }
         
@@ -947,19 +956,14 @@ Before you answer, you think about how to solve the users query if the query wou
 
             addMessage(message, 'user');
             messages.push({ role: 'user', content: message });
-            
-            let loadingDiv = createLoadingIndicator('Filtering a huge corpus of information');
-            chatContainer.appendChild(loadingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-
-            loadingDiv.remove();
-            loadingDiv = createLoadingIndicator('Thanks for your patience');
-            chatContainer.appendChild(loadingDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
 
             // Get normal message, no tools or modifications used in here
             try
             {
+                let loadingDiv = createLoadingIndicator('Thanks for your patience');
+                chatContainer.appendChild(loadingDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+
                 // Fetch raw response & tell the server to use streaming
                 const response = await fetch
                 (
@@ -969,8 +973,8 @@ Before you answer, you think about how to solve the users query if the query wou
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiendpoint_key}` },
                         body: JSON.stringify
                         ({
-                            model: "llama-3.3-70b-versatile",
-                            messages: messages, stream: true, temperature: 0.3, max_completion_tokens: 2048
+                            model: modelname,
+                            messages: messages, stream: true, temperature: 0.5, max_completion_tokens: 2048
                         })
                     }
                 );
