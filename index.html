@@ -633,7 +633,7 @@
 
             <h1 class="sidebartxt">Other</h1>
             <button class="sidebarbtn" id="builtWithLLaMA">
-                <i class="fas fa-microchip"></i> Built with LLaMA
+                <i class="fas fa-microchip"></i> 
             </button>
             <a class="sidebarbtn" href="./about/?https://xetute.com/">
                 <i class="fas fa-info-circle"></i> About Us
@@ -695,7 +695,7 @@ Before you answer, you think about how to solve the users query if the query wou
             if (modelname.toLowerCase().search("llama") === -1) { _elm_.remove(); }
             else
             {
-                _elm_.textContent = `Built with ${(modelname.length > 8) ? (modelname.substr(0, 11) + '...') : modelname}`;
+                _elm_.innerHTML += `Built with ${(modelname.length > 8) ? (modelname.substr(0, 11) + '...') : modelname}`;
                 _elm_.setAttribute('onclick', `alert("The AI you're currently chatting with is powered by ${modelname}.");`);
             }
         }
