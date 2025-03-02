@@ -9,7 +9,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="logo.jpg">
+
+    <!-- My links -->
+    <link rel="icon"       href="logo.jpg"    >
+    <link rel="stylesheet" href="css/vars.css">
+    <link rel="stylesheet" href="css/html.css">
     
     <!-- Add Marked.js library -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -50,92 +54,6 @@
     </script>
 
     <style>
-        :root
-        {
-            --primary-bg: #121212;
-            --secondary-bg: #1e1e1e;
-            --accent-color: #6e6e6e;
-            --accent-light: #c4c4c4;
-            --text-color: #f3f4f6;
-            --text-secondary: #a1a1aa;
-            --border-color: #2d2d2d;
-            --card-bg: #2a2a2a;
-            --input-bg: #242424;
-            --shadow-color: rgba(0, 0, 0, 0.3);
-            --sidebar-width: 280px;
-            --message-radius: 16px;
-            --transition-speed: 0.3s;
-        }
-
-        *
-        {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html, body
-        {
-            height: 100%;
-            font-family: 'Poppins', sans-serif;
-            background: var(--primary-bg);
-            color: var(--text-color);
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
-
-        pre
-        {
-            max-width: 100%;
-            padding: 12px 16px;
-            margin: 10px 0;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        code
-        {
-            font-family: 'Consolas', 'Monaco', monospace;
-            display: block;
-            white-space: pre-wrap;
-            word-break: break-word;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        code:not(pre code)
-        {
-            background: var(--secondary-bg);
-            padding: 2px 5px;
-            border-radius: 4px;
-            font-size: 0.9em;
-            display: inline;
-            white-space: normal;
-        }
-
-        h1, h2, h3, h4, h5, h6
-        {
-            margin: 0.5em 0;
-            color: var(--text-color);
-            font-weight: 600;
-        }
-
-        a
-        {
-            color: var(--accent-light);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-        a:hover
-        {
-            color: var(--accent-color);
-            text-decoration: underline;
-        }
-
         #chat-interface
         {
             width: 100%;
@@ -173,7 +91,7 @@
             height: 100vh;
         }
 
-        @media (min-width: 769px)
+        @media (orientation: landscape)
         {
             #sidebar
             {
@@ -214,7 +132,7 @@
             }
         }
         
-        @media (max-width: 768px)
+        @media (orientation: portrait)
         {
             #main-content { height: calc(var(--vh, 1vh) * 100); }
             
@@ -632,9 +550,6 @@
             <div style="padding: 0; margin-top: 50px; width: 100%;"></div>
 
             <h1 class="sidebartxt">Other</h1>
-            <button class="sidebarbtn" id="builtWithLLaMA">
-                <i class="fas fa-microchip"></i> 
-            </button>
             <a class="sidebarbtn" href="./about/?https://xetute.com/">
                 <i class="fas fa-info-circle"></i> About Us
             </a>
@@ -655,431 +570,337 @@
         </div>
     </div>
 
+    <script>
+        function updateVh()
+        {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        window.addEventListener('load', updateVh);
+        window.addEventListener('resize', updateVh);
+    </script>
     <script src="pocketbase.umd.js"></script>
     <script defer>
-        const aiendpoint = /* 'https://ai.xetute.com/v1/chat/completions' */ "https://api.groq.com/openai/v1/chat/completions";
-        const aiendpoint_key = "g" + "s" + "k_wLONdT9NuUPVjgORByKtWGdyb3FYtuzJAO05AoEW9hIAzPtJVQ9K";
-        const systemprompt = `You are a helpful AI assistant by Pakistan-Based XeTute Technologies (Webpage: https://xetute.com/, GitHub: https://github.com/XeTute, HuggingFace: https://huggingface.co/Xetute);\nBefore you answer, you think about how to solve the users query if the query would logically require someone to think. If you do think, put your thinking process between \`<thoughts>\n{here come your thoughts}\n</thoughts>\n{here comes your answer}\`, and while your thinking process, also reason about what mistakes YOU could make and how to fix them beforehand. Markdown is supported, use it and whatever you can to keep the user engaged as long as possible (long text to short queries scares them).`;
-        const pb = new PocketBase("https://db.xetute.com");
-        
-        let modelname = "llama-3.3-70b-versatile";
-        let lastgenerationtime = 0.0;
-
-        let messages =
-        [{
-            role: 'system',
-            content: systemprompt
-        }];
-
-        let chatid = window.location.search.substr(1);
-        let loggedin = false;
-        let auth = undefined;
-
-        function goToApex()
-        {
-            const mystr = window.location.href;
-            const questionMarkIndex = mystr.indexOf('?');
-            window.location.href = questionMarkIndex !== -1 ? mystr.substring(0, questionMarkIndex) : mystr;
-        }
-
-        function getApex()
-        {
-            const mystr = window.location.href;
-            const questionMarkIndex = mystr.indexOf('?');
-            const returnval = questionMarkIndex !== -1 ? mystr.substring(0, questionMarkIndex) : mystr;
-            return returnval;
-        }
-
-        function checkIfLLaMA(_elm_)
-        {
-            if (modelname.toLowerCase().search("llama") === -1) { _elm_.remove(); }
-            else
-            {
-                _elm_.innerHTML += `Built with ${(modelname.length > 8) ? (modelname.substr(0, 11) + '...') : modelname}`;
-                _elm_.setAttribute('onclick', `alert("The AI you're currently chatting with is powered by ${modelname}.");`);
-            }
-        }
-
-        async function seeIfAIonline()
-        {
-            // See if the AI endpoint is online or not
-            const bwd = document.getElementById('builtWithLLaMA');
-            if (aiendpoint === "https://ai.xetute.com/v1/chat/completions")
-            {
-                try
-                {
-                    const raw = await fetch("https://ai.xetute.com/api/v1/model");
-                    modelname = (await raw.json()).result;
-                }
-                catch (error)
-                {
-                    console.log("AI not online: ", error);
-                    alert("AI isn't online. Sending a message may result in an error. We're sorry.\n(Error: " + error + ")");
-                    bwd.remove();
-                }
-            }
-            checkIfLLaMA(bwd);
-        }
-
-        async function authRefresh()
-        {
-            await seeIfAIonline();
-            const authprofile = document.getElementById('authprofile');
-            try
-            {
-                // Check if logged in, if not, will throw an error => go to catch, if is logged in, will set let loggedin = true
-                auth = await pb.collection('accounts').authRefresh();
-                loggedin = true;
-
-                // Get username from databank, if none exists or formatting is wrong, will re-format and set to let name.
-                const sidebar = document.getElementById('sidebar');
-                let name = "Noname";
-
-                try { if (auth.record.data.username === undefined) { throw("Data was an undefined string."); } name = auth.record.data.username; }
-                catch (error)
-                {
-                    console.log(error);
-                    if (auth.record.data === null || auth.record.data === "")
-                    {
-                        try { auth.record = await pb.collection('accounts').update(pb.authStore.record.id, { "data": { "username": name } }); }
-                        catch (anothererror) { console.log(anothererror); }
-                    }
-                }
-                authprofile.innerHTML = `Logged in as ${name}`;
-                authprofile.style.color = '#ddd';
-                authprofile.href = `./account/?${window.location.href}`;
-                
-                try
-                {
-                    if (chatid)
-                    {
-                        if (auth.record.data.chat === undefined) { goToApex(); }
-                        if (chatid >= auth.record.data.chat.length) { goToApex(); }
-                        messages = auth.record.data.chat[chatid];
-
-                        if (messages[0]["content"] !== systemprompt)
-                        {
-                            messages[0]["content"] = systemprompt;
-                            try { auth.record = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
-                            catch { alert("Failed to update AI instructions. AI functionality may decline for this chat."); }
-                        }
-
-                        for (let i = 1; i < messages.length; ++i)
-                        { addMessage(messages[i].content, ((i % 2) === 0) ? 'assistant' : 'user'); }
-                    }
-
-                    if (auth.record.data.chat === undefined)
-                    {
-                        auth.record.data.chat = [];
-                        chatid = '0';
-                    }
-                    else
-                    {
-                        const chats = auth.record.data.chat.length;
-
-                        sidebar.innerHTML += "<h1 class=\"sidebartxt\">Recent Chats</h1>";
-                        let buffer = '<div style="display: flex; flex-direction: column; justify-content: flex-start; overflow-x: hidden; overflow-y: auto; max-height: 100%; gap: 10px; padding-bottom: 10px;">';
-                        
-                        for (let i = 0; i < chats; ++i)
-                        {
-                            const fulltitle = auth.record.data.chat[i][1]["content"];
-                            const title = (fulltitle.length > 11) ? (fulltitle.substring(0, 8) + '...') : (fulltitle);
-
-                            const buttonstart = `<div class="chathistorybtn"><button class="sidebarbtn" onclick="window.location.href=(getApex() + '?${i}');">`;
-                            const buttonend = `</button><button onclick="deleteChat('${i}');"><i class="fa fa-trash" aria-hidden="true"></i></button></div>`;
-                            buffer += `${buttonstart}— ${title}${buttonend}`;
-                        }
-                        buffer += "</div>";
-                        sidebar.innerHTML += buffer;
-
-                        if (chatid.length === 0) { chatid = String(chats); }
-                    }
-                }
-                catch (error) { alert("An unexpected error happened. We're sorry."); console.log(error); }
-            }
-            catch (error)
-            {
-                console.log(error);
-                authprofile.innerHTML = "Click me to log in";
-                authprofile.href = `./auth/?${window.location.href}`
-            }
-        }
-        authRefresh();
-
-        async function deleteChat(__id__)
-        {
-            const fulltitle = auth.record.data.chat[__id__][1]["content"];
-            const title = (fulltitle.length > 8) ? (fulltitle.substring(0, 8) + '...') : (fulltitle);
-            if (confirm(`Do you really want to delete CHATID-${__id__}(${title})? This can NOT be undone.`))
-            {
-                try
-                {
-                    auth.record.data.chat.splice(__id__, 1);
-                    if (auth.record.data.chat.length === 0) { delete auth.record.data.chat; }
-
-                    await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });
-                    alert(`Deleted CHATID-${__id__} successfully.`);
-                    goToApex();
-                }
-                catch { alert(`Failed to delete CHATID${__id__}. We're sorry.`); }
-            }
-            else { alert(`Didn't delete CHATID-${__id__} =)`); }
-        }
-
-        const chatContainer = document.getElementById('chat-container');
-        const messageInput = document.getElementById('messageInput');
-        const menuToggle = document.getElementById('menu-toggle');
+        // UI Elements
         const sidebar = document.getElementById('sidebar');
+        const chatContainer = document.getElementById('chat-container');
+        const menuToggle = document.getElementById('menu-toggle');
         const overlay = document.getElementById('overlay');
-        
-        function toggleSidebar()
+    
+        // Toggle sidebar for mobile
+        menuToggle.addEventListener('click', () => 
         {
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
-        }
-        
-        menuToggle.addEventListener('click', function(e)
-        {
-            e.stopPropagation();
-            toggleSidebar();
         });
-        
-        overlay.addEventListener('click', toggleSidebar);
-        
-        function countWords(countin) // Naive—will only see how many spaces + 1
+    
+        overlay.addEventListener('click', () => 
         {
-            let count = 1;
-            for (let x = 0; x < countin.length; ++x)
-            {
-                if (countin[x] === ' ')
-                    { ++count; }
-            }
-            return count;
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        });
+
+        document.getElementById('messageInput').addEventListener('input', function()
+        {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            if (this.scrollHeight > 150)
+            { this.style.height = '150px'; }
+        });
+    
+        // Backend constants
+        const date = new Date();
+        const pb = new PocketBase("https://db.xetute.com/");
+        let authenticated = false;
+        const completionendpoint = [ "https://ai.xetute.com/v1/chat/completions", "https://api.groq.com/openai/v1/chat/completions"];
+        const modelnameendpoint  = [ { url: "https://ai.xetute.com/api/v1/model", fromresponse: "result", key: '0', temp: 0.65 }, { preset: "llama-3.3-70b-versatile", key: "gs" + "k_wLONdT9NuUPVjgORByKtWGdyb3FYtuzJAO05AoEW9hIAzPtJVQ9K", temp: 1 }];
+    
+        // Backend vars
+        let config = { endpoint: "", modelname: "", key: "", temp: 0 };
+        let message = [];
+        let chatid = -1;
+        let newchat = -1;
+    
+        function generateFirstSystemPrompt(username)
+        {
+            let buffer = "You are a helpful AI assistant from Pakistan-Based XeTute Technologies.";
+    
+            buffer += "\nXeTute Technologies on Platforms:";
+            buffer += "\n- Webpage: https://xetute.com/";
+            buffer += "\n- HuggingFace: https://huggingface.co/XeTute";
+            buffer += "\n- BlueSky: https://bsky.app/profile/xetute.bsky.social";
+            buffer += "\n- YouTube: https://www.youtube.com/@XeTuteTechnologies";
+            buffer += "\nKo-Fi: https://ko-fi.com/XeTute";
+    
+            buffer += "\nBefore you answer, you think about how to solve the users query if the query would logically require someone to think."
+            buffer += "\nIf you do think, put your thinking process between `<thoughts>\n{here come your thoughts}\n</thoughts>\n{here comes your answer}`, and while your thinking process, also reason about what mistakes YOU could make and how to fix them beforehand."
+            buffer += "\nMarkdown is supported.";
+    
+            buffer += `\nThe user's name is ${username}.`;
+            buffer += `\nChat started: ${date.getDay()}.${date.getMonth()}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}.`;
+            buffer += `\nCurrent time: ${date.getHours()}:${date.getMinutes()} (updated dynamically).\n`;
+    
+            return buffer;
         }
-
-        function formatMessage(text)
+    
+        function updateSystemPrompt(prompt)
         {
-            const originalText = text;
-            const thoughtsRegex = /<thoughts>([\s\S]*?)<\/thoughts>/g;
-            const wordspersecond = (lastgenerationtime * 1000) / countWords(originalText);
-            let html = marked.parse(text.replace(/<thoughts>[\s\S]*?<\/thoughts>/g, ''));
-            
-            if (thoughtsRegex.test(originalText))
+            const updatedline = `Current time: ${date.getHours()}:${date.getMinutes()} (updated dynamically).\n`;
+            return prompt.substring(0, prompt.lastIndexOf('\n') + 1) + updatedline;
+        }
+    
+        async function testEndpoints()
+        {
+            let response;
+            let name = "";
+            let failed = false;
+    
+            for (let x = 0; x < modelnameendpoint.length; ++x)
             {
-                thoughtsRegex.lastIndex = 0;
-
-                let thoughtsContent = '';
-                let match;
-
-                while ((match = thoughtsRegex.exec(originalText)) !== null)
-                { thoughtsContent += match[1] + '\n\n'; }
-
-                // Add toggle button and thoughts container at the beginning
-                const thoughtsHTML = `
-                <div>
-                    <button class="thoughts-toggle" onclick="toggleThoughts(this)">Show Thoughts</button>
-                    <div class="thoughts-container" style="display: none;"><p style="margin: 15px;">${thoughtsContent.trim()}</p></div>
-                </div>`;
+                if (modelnameendpoint[x].preset)
+                {
+                    config.endpoint = completionendpoint[x];
+                    config.modelname = modelnameendpoint[x].preset;
+                    config.key = modelnameendpoint[x].key;
+                    config.temp = modelnameendpoint[x].temp;
+                    failed = true;
+                    break;
+                }
                 
-                html = thoughtsHTML + html;
+                try
+                {
+                    response = await fetch(modelnameendpoint[x].url);
+                    name = (await response.json())[modelnameendpoint[x].fromresponse];
+                    if (name.includes("koboldcpp/"))
+                        { name = name.split("koboldcpp/")[1]; }
+                }
+                catch (e)
+                {
+                    failed = true;
+                    console.error("Endpoint error:", e);
+                }
+    
+                if (!failed)
+                {
+                    config.endpoint = completionendpoint[x];
+                    config.modelname = name;
+                    config.key = modelnameendpoint[x].key;
+                    config.temp = modelnameendpoint[x].temp;
+                    break;
+                }
             }
-
-            if ((wordspersecond !== Infinity) && (wordspersecond !== 0))
-            {
-                html +=
-                `<em style="font-size: 0.8rem; font-color: #ccc;">
-                    Took ${String((lastgenerationtime / 1000)).substring(0, 1)}s; Generated ${String(wordspersecond).substring(0, 3)} Words per Second.
-                </em>`;
-            }
-
-            return html;
         }
-
-        function toggleThoughts(button)
+    
+        async function authAndDisplay()
         {
-            const container = button.nextElementSibling;
-            const isVisible = container.style.display === 'block';
-            
-            container.style.display = isVisible ? 'none' : 'block';
-            button.textContent = isVisible ? 'Show Thoughts' : 'Hide Thoughts';
-            
-            if (!isVisible)
+            const authprofile = document.getElementById('authprofile');
+            try
             {
-                setTimeout(() =>
-                { container.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+                await pb.collection('accounts').authRefresh();
+                authenticated = true;
+    
+                let auth = pb.authStore.record;
+                if (!auth.data?.username) 
+                    { auth.data.username = "Friend"; }
+                if (!auth.data?.chat) 
+                    { auth.data.chat = []; }
+    
+                authprofile.innerHTML = `<i class="fas fa-user"></i> ${auth.data.username}`;
+            }
+            catch
+            {
+                authenticated = false;
+                authprofile.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+                authprofile.href = `./auth/?${window.location.href}`;
             }
         }
-
-        function createLoadingIndicator(currentlydoing)
+    
+        function displayAllMessages()
         {
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'loading';
-            loadingDiv.innerHTML =
-            `${currentlydoing}
-            <div class="loading-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>`;
-            return loadingDiv;
+            chatContainer.innerHTML = '';
+            for (let x = 1; x < message.length; ++x)
+                { addMessage(message[x].role, message[x].content); }
         }
-        
-        function addMessage(content, sender)
+    
+        function getChatID()
+        {
+            const urlParams = new URLSearchParams(window.location.search);
+            chatid = urlParams.has('chat') ? parseInt(urlParams.get('chat')) : -1;
+    
+            try
+            {
+                if (authenticated && pb.authStore.record.data.chat[chatid])
+                {
+                    message = pb.authStore.record.data.chat[chatid];
+                    message[0].content = updateSystemPrompt(message[0].content);
+                    displayAllMessages();
+                    newchat = false;
+                }
+                else { throw new Error('Invalid chat ID'); }
+            }
+            catch (e)
+            {
+                message = [ { role: "system", content: generateFirstSystemPrompt(authenticated ? pb.authStore.record.data.username : "Friend") } ];
+                newchat = authenticated;
+                chatid = authenticated ? pb.authStore.record.data.chat.length : -1;
+            }
+            return { chatid, newchat };
+        }
+    
+        function ensureMaxChars(str, maxchars)
+        {
+            return str.length > maxchars ? str.substring(0, maxchars - 3) + '...' : str;
+        }
+    
+        function formatMessage(text) { return marked.parse(text); }
+    
+        function addMessage(role, content)
         {
             const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', `${sender}-message`);
-            
+            messageDiv.className = `message ${role === 'user' ? 'user-message' : 'assistant-message'}`;
+    
             const avatar = document.createElement('img');
             avatar.className = 'message-avatar';
-            avatar.src = sender === 'user' ? 'user.jpg' : 'logo.jpg';
-            
+            avatar.src = role === 'user' ? 'user.jpg' : 'logo.jpg';
+    
             const contentDiv = document.createElement('div');
             contentDiv.innerHTML = formatMessage(content);
             
-            if (window.MathJax) { try { MathJax.typeset([contentDiv]); } catch {} }
-            
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(contentDiv);
+            if (window.MathJax) 
+            { 
+                try { MathJax.typeset([contentDiv]); } 
+                catch (e) { console.error("MathJAX error:", e); } 
+            }
+    
+            messageDiv.append(avatar, contentDiv);
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
-        
-        async function getTopWebsearchResults(query)
+    
+        function createLoadingIndicator()
         {
-            const raw = await fetch
-            (
-                "https://ai.xetute.com/api/extra/websearch",
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 'q': query })
-                }
-            );
-            const normalized = await raw.json();
-            return normalized;
-
-            // Format: 
-            // [ { "title", "url", "desc", "content" }, {...}, {...} ];
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message assistant-message';
+    
+            const avatar = document.createElement('img');
+            avatar.className = 'message-avatar';
+            avatar.src = 'logo.jpg';
+    
+            const dots = document.createElement('div');
+            dots.className = 'loading-dots';
+            dots.innerHTML = '<span></span><span></span><span></span>';
+    
+            loadingDiv.append(avatar, dots);
+            return loadingDiv;
         }
-
+    
         let processing = false;
         async function sendMessage()
         {
             if (processing) return;
             processing = true;
-
-            const message = messageInput.value.trim();
-            if (!message) return;
-            
-            messageInput.value = '';
-            messageInput.setAttribute('rows', '1');
-
-            addMessage(message, 'user');
-            messages.push({ role: 'user', content: message });
-
-            // Get normal message, no tools or modifications used in here
+    
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+    
+            input.value = '';
+            message.push({ role: 'user', content: text });
+            addMessage('user', text);
+    
+            const loading = createLoadingIndicator();
+            chatContainer.appendChild(loading);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+    
             try
             {
-                let loadingDiv = createLoadingIndicator('Thanks for your patience');
-                chatContainer.appendChild(loadingDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-
-                // Fetch raw response & tell the server to use streaming
-                const response = await fetch
-                (
-                    aiendpoint,
+                const response = await fetch(config.endpoint, 
+                {
+                    method: 'POST',
+                    headers: 
                     {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiendpoint_key}` },
-                        body: JSON.stringify
-                        ({
-                            model: modelname,
-                            messages: messages, stream: true, temperature: 0.5, max_completion_tokens: 2048
-                        })
-                    }
-                );
-
-                // Extract reader from raw response, create decoder and a tmp str to store the most completed message
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${config.key}`
+                    },
+                    body: JSON.stringify
+                    ({
+                        model: config.modelname,
+                        messages: message,
+                        stream: true,
+                        temperature: config.temp,
+                        max_tokens: 2048
+                    })
+                });
+    
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
-                let assistantContent = '';
-                
-                // Create message div which will be filled with `assistantContent`
+                let buffer = '';
+                const startTime = Date.now();
+    
                 const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message', 'assistant-message');
-
-                // Create an avatar for the message div above
+                messageDiv.className = 'message assistant-message';
                 const avatar = document.createElement('img');
                 avatar.className = 'message-avatar';
                 avatar.src = 'logo.jpg';
-
-                // Append avatar
                 const contentDiv = document.createElement('div');
                 messageDiv.append(avatar, contentDiv);
-                
-                // And play loading animation till the tokens flow in
-                loadingDiv.replaceWith(messageDiv);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-                
-                // Check for tokens till server says it's over
-                const startedat = Date.now();
+    
+                loading.replaceWith(messageDiv);
+    
                 while (true)
                 {
                     const { done, value } = await reader.read();
-                    if (done) { break; }
-                    
+                    if (done) break;
+    
                     const chunk = decoder.decode(value);
                     const lines = chunk.split('\n').filter(l => l.trim());
                     
                     for (const line of lines)
                     {
-                        if (line === 'data: [DONE]') { break; }
-                        if (!line.startsWith('data: ')) { continue; }
-                        
+                        if (!line.startsWith('data: ')) continue;
                         try
                         {
                             const data = JSON.parse(line.slice(6));
-                            const token = data.choices[0].delta.content;
-                            if (token)
+                            if (data.choices[0].delta?.content)
                             {
-                                assistantContent += token;
-                                lastgenerationtime = Date.now() - startedat;
-                                contentDiv.innerHTML = formatMessage(assistantContent);
+                                buffer += data.choices[0].delta.content;
+                                contentDiv.innerHTML = formatMessage(buffer);
+                                
+                                if (window.MathJax)
+                                {
+                                    try { MathJax.typeset([contentDiv]); }
+                                    catch (e) { console.error("MathJAX error:", e); }
+                                }
                             }
-                        } catch (e) { console.error('Error parsing stream chunk:', e); }
+                        }
+                        catch (e) { console.error("Stream parse error:", e); }
                     }
-                    chatContainer.scrollTop = chatContainer.scrollHeight; // for scrolling while message is being generated
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
                 }
-
-                // After completing the message, re-render math if any
-                try { if (window.MathJax) { MathJax.typeset([messageDiv]); } }
-                catch (error) { console.log(error); }
-
-                // Save chat if logged in
-                messages.push({ role: 'assistant', content: assistantContent });
-                if (loggedin)
+    
+                message.push({ role: 'assistant', content: buffer });
+                if (authenticated)
                 {
-                    if (auth.record.data.chat === undefined) { auth.record.data["chat"] = [messages]; }
-                    else { auth.record.data.chat[chatid] = messages; }
-                    
-                    try { auth.record = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
-                    catch { alert("Failed to sync chat history to XeTute Technologies Authentication. We're sorry."); }
-
-                    if (messages.length === 3) { window.location.href += `?${chatid}`; }
+                    let data = pb.authStore.record.data;
+                    data.chat[chatid] = message;
+                    await pb.collection('accounts').update(pb.authStore.record.id, { data: data });
                 }
-                else { if ((((messages.length - 1) / 2) % 3) === 0) { alert("Your chat history is not being saved. To save future chats, please log in."); } }
             }
-            catch (error)
+            catch (e)
             {
-                if (searched) { messages.pop(); }
-                loadingDiv.remove();
-                addMessage("Failed to fetch response. We're sorry.\nError:" + error, 'assistant');
+                console.error("API Error:", e);
+                addMessage('assistant', `Error: ${e.message}`);
             }
-            
-            processing = false;
+            finally
+            {
+                processing = false;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
         }
-        
-        messageInput.addEventListener('keydown', function(e)
+    
+        // Event listeners
+        document.getElementById('sendButton').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keydown', (e) => 
         {
             if (e.key === 'Enter' && !e.shiftKey)
             {
@@ -1087,14 +908,66 @@
                 sendMessage();
             }
         });
-        
-        messageInput.addEventListener('input', function()
+    
+        async function deleteChat(index)
         {
-            messageInput.style.height = 'auto';
-            messageInput.style.height = messageInput.scrollHeight + 'px';
-        });
-        
-        document.getElementById('sendButton').addEventListener('click', sendMessage);
+            if (confirm('Delete this chat?'))
+            {
+                let data = pb.authStore.record.data;
+                data.chat.splice(index, 1);
+
+                try
+                {
+                    await pb.collection('accounts').update(pb.authStore.record.id, { data: data });
+                    alert("Deleted successfully.");
+                    window.location.reload();
+                }
+                catch { alert("Failed to delte. We're sorry."); }
+            }
+        }
+
+        // Initialization
+        async function initialize()
+        {
+            await testEndpoints();
+            await authAndDisplay();
+            getChatID();
+            
+            // Add model info to sidebar
+            const modelButton = document.createElement('button');
+            modelButton.className = 'sidebarbtn';
+            modelButton.innerHTML = `<i class="fas fa-microchip"></i> ${config.modelname}`;
+            sidebar.insertBefore(modelButton, document.querySelector('.sidebartxt').nextElementSibling);
+    
+            // Load chat history
+            if (authenticated && pb.authStore.record.data.chat?.length)
+            {
+                const historyHeader = document.createElement('h1');
+                historyHeader.className = 'sidebartxt';
+                historyHeader.textContent = 'Chat History';
+                sidebar.appendChild(historyHeader);
+    
+                pb.authStore.record.data.chat.forEach((chat, index) => 
+                {
+                    const chatItem = document.createElement('div');
+                    chatItem.className = 'chathistorybtn';
+                    
+                    const link = document.createElement('a');
+                    link.className = 'sidebarbtn';
+                    link.href = `?chat=${index}`;
+                    link.textContent = ensureMaxChars(chat[1]?.content || 'New Chat', 15);
+    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                    deleteBtn.onclick = () => { deleteChat(index); };
+    
+                    chatItem.append(link, deleteBtn);
+                    sidebar.appendChild(chatItem);
+                });
+            }
+        }
+    
+        initialize();
     </script>
   </body>
 </html>
