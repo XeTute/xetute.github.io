@@ -659,7 +659,7 @@
             buffer += "\nKo-Fi: https://ko-fi.com/XeTute";
     
             buffer += "\nBefore you answer, you think about how to solve the users query if the query would logically require someone to think."
-            buffer += "\nIf you do think, you may use extremely long chains of thought to deeply consider the problem and deliberate with yourself via systematic reasoning processes to help come to a correct solution prior to answering. You should enclose your thoughts and internal monologue inside <thoughts>\\n{your thoughts here}\\n</thoughts> tags, and then provide your solution or response to the problem."
+            buffer += "\nIf you do think, you may use extremely long chains of thought to deeply consider the problem and deliberate with yourself via systematic reasoning processes to help come to a correct solution prior to answering. You should enclose your thoughts and internal monologue inside <think>\\n{your thoughts here}\\n</think> tags, and then provide your solution or response to the problem."
             buffer += "\nMarkdown is supported.";
     
             buffer += `\nThe user's name is ${username}.`;
@@ -813,8 +813,8 @@
         function formatMessage(text)
         {
             const originalText = text;
-            const thoughtsRegex = /<thoughts>([\s\S]*?)<\/thoughts>/g;
-            let html = marked.parse(text.replace(/<thoughts>[\s\S]*?<\/thoughts>/g, ''));
+            const thoughtsRegex = /<think>([\s\S]*?)<\/think>/g;
+            let html = marked.parse(text.replace(/<think>[\s\S]*?<\/think>/g, ''));
 
             if (thoughtsRegex.test(originalText))
             {
