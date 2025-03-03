@@ -550,7 +550,7 @@
             <div style="padding: 0; margin-top: 50px; width: 100%;"></div>
 
             <h1 class="sidebartxt">Other</h1>
-            <a class="sidebarbtn" href="./about/?https://xetute.com/">
+            <a class="sidebarbtn" onclick="window.location.href = `./about/?${window.location.href}`;">
                 <i class="fas fa-info-circle"></i> About Us
             </a>
         </div>
@@ -700,12 +700,11 @@
                 authenticated = true;
     
                 let auth = pb.authStore.record;
-                if (!auth.data?.username) 
-                    { auth.data.username = "Friend"; }
-                if (!auth.data?.chat) 
-                    { auth.data.chat = []; }
+                if (!auth.data?.username) { auth.data.username = "Friend"; }
+                if (!auth.data?.chat) { auth.data.chat = []; }
     
                 authprofile.innerHTML = `<i class="fas fa-user"></i> ${auth.data.username}`;
+                authprofile.href = `./account/?${window.location.href}`;
             }
             catch
             {
@@ -752,7 +751,56 @@
             return str.length > maxchars ? str.substring(0, maxchars - 3) + '...' : str;
         }
     
-        function formatMessage(text) { return marked.parse(text); }
+        function ensureMaxDigits(x, maxdigits)
+        {
+            const xstr = String(x);
+            return ((xstr.length > maxdigits) ? ((xstr.substring(0, maxdigits)[maxdigits - 1] === '.') ? xstr.substring(0, maxdigits + 1) : xstr.substring(0, maxdigits)) : xstr);
+        }
+
+        function toggleThoughts(button)
+        {
+            const container = button.nextElementSibling;
+            const isVisible = container.style.display === 'block';
+
+            container.style.display = isVisible ? 'none' : 'block';
+            button.textContent = isVisible ? 'Show Thoughts' : 'Hide Thoughts';
+
+            if (!isVisible)
+            {
+                setTimeout(() =>
+                { container.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
+            }
+        }
+
+        function formatMessage(text)
+        {
+            const originalText = text;
+            const thoughtsRegex = /<thoughts>([\s\S]*?)<\/thoughts>/g;
+            let html = marked.parse(text.replace(/<thoughts>[\s\S]*?<\/thoughts>/g, ''));
+
+            if (thoughtsRegex.test(originalText))
+            {
+                thoughtsRegex.lastIndex = 0;
+
+                let thoughtsContent = '';
+                let match;
+
+                while ((match = thoughtsRegex.exec(originalText)) !== null)
+                { thoughtsContent += match[1] + '\n\n'; }
+
+                // Add toggle button and thoughts container at the beginning
+                const thoughtsHTML =
+                `<div>
+                    <button class="thoughts-toggle" onclick="toggleThoughts(this)">Show Thoughts</button>
+                    <div class="thoughts-container" style="display: none;"><p style="margin: 15px;">${thoughtsContent.trim()}</p></div>
+                </div>`;
+
+                // Insert at the beginning of the HTML
+                html = thoughtsHTML + html;
+            }
+
+            return html;
+        }
     
         function addMessage(role, content)
         {
@@ -795,6 +843,22 @@
         }
     
         let processing = false;
+        let generationtime = 0.0;
+
+        function countWords(text) // Naive, only counts spaces
+        {
+            let count = 1;
+            for (let x = 0; x < text.length; ++x)
+                { if (text[x] === ' ') { ++count; } }
+            return count;
+        }
+
+        function wordsPerSecond(countwords)
+        {
+            const x = countwords / (generationtime / 1000);
+            return x;
+        }
+
         async function sendMessage()
         {
             if (processing) return;
@@ -847,6 +911,7 @@
     
                 loading.replaceWith(messageDiv);
     
+                const startedat = Date.now();
                 while (true)
                 {
                     const { done, value } = await reader.read();
@@ -864,7 +929,9 @@
                             if (data.choices[0].delta?.content)
                             {
                                 buffer += data.choices[0].delta.content;
-                                contentDiv.innerHTML = formatMessage(buffer);
+
+                                generationtime = Date.now() - startedat;
+                                contentDiv.innerHTML = formatMessage(buffer) + `<em style="font-size: 0.7rem; color: #ccc;">Took ${ensureMaxDigits(generationtime / 1000, 3)}s | Generated ${ensureMaxDigits(wordsPerSecond(countWords(buffer)), 3)} Words per Second.</em>`;
                                 
                                 if (window.MathJax)
                                 {
@@ -934,10 +1001,12 @@
             getChatID();
             
             // Add model info to sidebar
-            const modelButton = document.createElement('button');
-            modelButton.className = 'sidebarbtn';
-            modelButton.innerHTML = `<i class="fas fa-microchip"></i> ${config.modelname}`;
-            sidebar.insertBefore(modelButton, document.querySelector('.sidebartxt').nextElementSibling);
+            const builtwith = document.createElement('button');
+                builtwith.className = 'sidebarbtn';
+                builtwith.innerHTML = '<i class="fas fa-microchip"></i>';
+                builtwith.textContent = `Built with ${ensureMaxChars(config.modelname, 12)}`;
+                builtwith.setAttribute('onclick', `alert("The AI you're chatting with is powered by ${config.modelname}.");`);
+            sidebar.insertBefore(builtwith, document.querySelector('.sidebartxt').nextElementSibling);
     
             // Load chat history
             if (authenticated && pb.authStore.record.data.chat?.length)

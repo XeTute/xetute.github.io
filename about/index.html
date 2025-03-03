@@ -7,11 +7,15 @@
     <meta name="keywords" content="Asadullah Hamzah, Hamzah Asadullah, AI Developer, Machine Learning, Pakistan, XeTute Technologies, AI Models, Software Engineer">
     <meta name="author" content="Asadullah Hamzah">
     <title>About Hamzah \\ XeTute Technologies</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="../basic.css">
+
+
+    <link rel="stylesheet" href="../css/vars.css">
+    <link rel="stylesheet" href="../css/html.css">
     <link rel="icon" href="../logo.jpg">
     
     <style>
@@ -23,6 +27,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            text-align: center;
+            line-height: 1.5rem;
         }
 
         a
@@ -31,6 +37,7 @@
             padding: 0;
             border: 0;
             border-radius: 0;
+            color: #fff;
 
             text-decoration: underline;
             text-decoration-color: rgba(105, 105, 255, 1);
@@ -50,16 +57,6 @@
             text-decoration-thickness: 2px;
         }
 
-        .notice
-	    {
-            padding: 10px;
-            margin: 10px 0;
-            border-left: 3px solid #006600;
-            background: #1A1A1A;
-            font-style: italic;
-            text-align: left;
-        }
-
         .center { margin: 20px; max-width: 600px; }
 
         .backbtn
@@ -76,33 +73,34 @@
             padding: 10px;
             
             border: 2px solid #666;
-            border-radius: 25px;
+            border-radius: 15px;
 
-            width: 35px;
-            height: 35px;
+            width: 50px;
+            height: 50px;
 
             text-decoration: none;
         }
     </style>
   </head>
   <body>
-    <a class="backbtn" id="backbutton">
+    <a class="backbtn" id="backbtn">
         <i class="fa fa-chevron-left" style="justify-self: center; align-self: center;" aria-hidden="true"></i>
     </a>
     <div class="center">
         <h1>Hello, Friend.</h1>
-        <p class="notice">
-            "XeTute Technologies" is a personal initiative I manage in my spare time to showcase my work to potential employers. While it is not a formal company, I am committed to maintaining my services. I welcome any feedback or suggestions for improvement!
-        </p>
         <p>
             XeTute Technologies is a one-person initiative led by me, Asadullah Hamzah. As a Pakistani developer, my goal is to create highly efficient and lightweight software libraries that benefit other Pakistanis. This is my way of contributing to the local tech ecosystem and economy.
         </p>
         <p>
-            You can explore ready-to-use AI/ML services <a href="https://xetute.com/">on my website</a>, access my AI/ML models on <a href="https://huggingface.co/Xetute">Hugging Face</a>, and browse my code—written in HTML, CSS, Vanilla JS, and primarily C++—on <a href="https://github.com/XeTute">GitHub</a>.
+            Following are Links you might want to check out.<br>
+            <a href="https://xetute.com/">Main Webpage</a><br>
+            <a href="https://huggingface.co/XeTute">AI/ML models, datasets on HuggingFace</a><br>
+            <a href="https://github.com/XeTute">Scripts in Py, HTML, CSS, JS and code in C++ through GitHub</a><br>
+            <a href="https://ko-fi.com/XeTute">Like what I'm doing? Consider supporting me =)</a>
         </p>
     </div>
     <script>
-        const backbtn = document.getElementById('backbutton');
+        const backbtn = document.getElementById('backbtn');
         const origin = window.location.search.substr(1);
         if (!origin) backbtn.remove();
         else backbtn.href = origin;
