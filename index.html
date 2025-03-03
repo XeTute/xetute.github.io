@@ -752,13 +752,17 @@
             const urlParams = new URLSearchParams(window.location.search);
             chatid = urlParams.has('chat') ? parseInt(urlParams.get('chat')) : -1;
     
-            let data = pb.authStore.record.data;
-            if ((data.chat === '') || (data.chat === undefined) || (data.chat === null))
+            try
             {
-                data.chat = [];
-                try { await pb.collection('accounts').update(pb.authStore.record.id, { data: data }); }
-                catch (e) { console.log(e); }
+                let data = pb.authStore.record.data;
+                if ((data.chat === '') || (data.chat === undefined) || (data.chat === null))
+                {
+                    data.chat = [];
+                    try { await pb.collection('accounts').update(pb.authStore.record.id, { data: data }); }
+                    catch (e) { console.log(e); }
+                }
             }
+            catch (e) { console.log(e); }
 
             try
             {
