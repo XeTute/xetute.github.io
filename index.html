@@ -950,8 +950,28 @@
                 {
                     let data = pb.authStore.record.data;
                     data.chat[chatid] = message;
-                    await pb.collection('accounts').update(pb.authStore.record.id, { data: data });
+                    try { await pb.collection('accounts').update(pb.authStore.record.id, { data: data }); }
+                    catch { alert("Failed to sync chat with XeTute Technologies Cloud. We're sorry."); }
+
+                    if (message.length === 3)
+                    {
+                        const chatItem = document.createElement('div');
+                        chatItem.className = 'chathistorybtn';
+                        
+                        const link = document.createElement('a');
+                        link.className = 'sidebarbtn';
+                        link.href = `?chat=${chatid}`;
+                        link.textContent = ensureMaxChars(message[1].content || 'New Chat', 15);
+                        
+                        const deleteBtn = document.createElement('button');
+                        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                        deleteBtn.onclick = () => { deleteChat(chatid); };
+                        
+                        chatItem.append(link, deleteBtn);
+                        sidebar.appendChild(chatItem);
+                    }
                 }
+                else if (((message.length - 1) % 6) === 0) { alert("Your chat isn't being saved. To save future chats, log in."); }
             }
             catch (e)
             {
