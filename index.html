@@ -659,19 +659,19 @@
             buffer += "\nKo-Fi: https://ko-fi.com/XeTute";
     
             buffer += "\nBefore you answer, you think about how to solve the users query if the query would logically require someone to think."
-            buffer += "\nIf you do think, put your thinking process between `<thoughts>\n{here come your thoughts}\n</thoughts>\n{here comes your answer}`, and while your thinking process, also reason about what mistakes YOU could make and how to fix them beforehand."
+            buffer += "\nIf you do think, you may use extremely long chains of thought to deeply consider the problem and deliberate with yourself via systematic reasoning processes to help come to a correct solution prior to answering. You should enclose your thoughts and internal monologue inside <thoughts>\\n{your thoughts here}\\n</thoughts> tags, and then provide your solution or response to the problem."
             buffer += "\nMarkdown is supported.";
     
             buffer += `\nThe user's name is ${username}.`;
             buffer += `\nChat started: ${date.getDay()}.${date.getMonth()}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}.`;
-            buffer += `\nCurrent time: ${date.getHours()}:${date.getMinutes()} (updated dynamically).\n`;
+            buffer += `\nCurrent time: ${date.getHours()}:${date.getMinutes()} (this line is updated dynamically).\n`;
     
             return buffer;
         }
     
         function updateSystemPrompt(prompt)
         {
-            const updatedline = `Current time: ${date.getHours()}:${date.getMinutes()} (updated dynamically).\n`;
+            const updatedline = `Current time: ${date.getHours()}:${date.getMinutes()} (this line is updated dynamically).\n`;
             return prompt.substring(0, prompt.lastIndexOf('\n') + 1) + updatedline;
         }
     
