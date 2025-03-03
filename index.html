@@ -15,8 +15,9 @@
     <link rel="stylesheet" href="css/vars.css">
     <link rel="stylesheet" href="css/html.css">
     
-    <!-- Add Marked.js library -->
+    <!-- Add Marked.js & MatHJAX library -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
       // Configure Marked.js
       marked.setOptions
@@ -41,7 +42,6 @@
       }
     };
     </script>
-    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <script>
       function updateVh()
@@ -824,7 +824,7 @@
                 let match;
 
                 while ((match = thoughtsRegex.exec(originalText)) !== null)
-                { thoughtsContent += match[1] + '\n\n'; }
+                    { thoughtsContent += match[1] + '\n\n'; }
 
                 // Add toggle button and thoughts container at the beginning
                 const thoughtsHTML =
