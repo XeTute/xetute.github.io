@@ -661,15 +661,15 @@
             buffer += "\nMarkdown is supported.";
     
             buffer += `\nThe user's name is ${username}.`;
-            buffer += `\nChat started: ${date.getDay()}.${date.getMonth()}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}.`;
-            buffer += `\nCurrent time: ${date.getHours()}:${date.getMinutes()} (this line is updated dynamically).\n`;
+            buffer += `\nChat started: ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}.`; // Fuck you JS devs 💀💀
+            buffer += `\nCurrent time: ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()} (this line is updated dynamically).\n`;
     
             return buffer;
         }
     
         function updateSystemPrompt(prompt)
         {
-            const updatedline = `Current time: ${date.getHours()}:${date.getMinutes()} (this line is updated dynamically).\n`;
+            const updatedline = `Current time: ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()} (this line is updated dynamically).\n`;
             return prompt.substring(0, prompt.lastIndexOf('\n') + 1) + updatedline;
         }
     
@@ -749,10 +749,10 @@
         {
             const urlParams = new URLSearchParams(window.location.search);
             chatid = urlParams.has('chat') ? parseInt(urlParams.get('chat')) : -1;
+            let data = pb.authStore?.record?.data;
     
             try
             {
-                let data = pb.authStore.record.data;
                 if ((data.chat === '') || (data.chat === undefined) || (data.chat === null))
                 {
                     data.chat = [];
@@ -810,6 +810,16 @@
 
         function formatMessage(text)
         {
+            let jaxedtext = document.createElement('div');
+            jaxedtext.innerHTML = text;
+
+            if (window.MathJax)
+            {
+                try { MathJax.typeset([jaxedtext]); }
+                catch (e) { console.error("MathJAX error:", e); }
+            }
+            text = jaxedtext.innerHTML;
+
             const originalText = text;
             const thoughtsRegex = /<think>([\s\S]*?)<\/think>/g;
             let html = marked.parse(text.replace(/<think>[\s\S]*?<\/think>/g, ''));
@@ -848,13 +858,12 @@
             avatar.src = role === 'user' ? 'user.jpg' : 'logo.jpg';
     
             const contentDiv = document.createElement('div');
-            contentDiv.innerHTML = formatMessage(content);
-            
             if (window.MathJax) 
             { 
                 try { MathJax.typeset([contentDiv]); } 
                 catch (e) { console.error("MathJAX error:", e); } 
             }
+            contentDiv.innerHTML = formatMessage(content);
     
             messageDiv.append(avatar, contentDiv);
             chatContainer.appendChild(messageDiv);
@@ -870,11 +879,17 @@
             avatar.className = 'message-avatar';
             avatar.src = 'logo.jpg';
     
+            const text = document.createElement('p');
+            text.textContent = "Thanks for your patience";
+            text.style.margin = '10px';
+            text.style.alignSelf = 'center';
+            text.style.color = '#ddd';
+
             const dots = document.createElement('div');
             dots.className = 'loading-dots';
             dots.innerHTML = '<span></span><span></span><span></span>';
     
-            loadingDiv.append(avatar, dots);
+            loadingDiv.append(avatar, text, dots);
             return loadingDiv;
         }
     
@@ -965,15 +980,8 @@
                             if (data.choices[0].delta?.content)
                             {
                                 buffer += data.choices[0].delta.content;
-
                                 generationtime = Date.now() - startedat;
                                 contentDiv.innerHTML = formatMessage(buffer) + `<em style="font-size: 0.7rem; color: #ccc;">Took ${ensureMaxDigits(generationtime / 1000, 3)}s | Generated ${ensureMaxDigits(wordsPerSecond(countWords(buffer)), 3)} Words per Second.</em>`;
-                                
-                                if (window.MathJax)
-                                {
-                                    try { MathJax.typeset([contentDiv]); }
-                                    catch (e) { console.error("MathJAX error:", e); }
-                                }
                             }
                         }
                         catch (e) { console.error("Stream parse error:", e); }

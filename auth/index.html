@@ -82,6 +82,8 @@
 <script defer>
     const referto = (window.location.search.substr(1) ? window.location.search.substr(1) : '../'); 
     const pb = new PocketBase('https://db.xetute.com');
+    let newaccount = false;
+
     async function authRefresh() { try { await pb.collection('accounts').authRefresh(); window.location.href = referto; } catch { console.log('Not currently logged in.'); } };
     authRefresh();
 
@@ -110,8 +112,19 @@
         const email = document.getElementById('signinemail').value.toLowerCase();
         const password = document.getElementById('signinpassword').value;
 
+        const signinnotice = document.getElementById('signinnotice');
+        signinnotice.textContent = "Authorizing...";
+
         try { await pb.collection('accounts').authWithPassword(email, password); window.location.href = referto; }
-        catch { document.getElementById('signinnotice').textContent = 'Failed to Authenticate'; }
+        catch
+        {
+            signinnotice.textContent = "Failed to Authenticate.";
+            if (newaccount)
+            {
+                signinnotice.textContent = "If you just signed up, you may still need to verify your E-Mail.";
+                alert(signinnotice.textContent + " \nIf you didn't already, please check your E-Mail and verify to activate authorisation.");
+            }
+        }
     }
 
     async function signUp()
@@ -133,11 +146,14 @@
             return;
         }
 
+        newaccount = true;
         try
         {
+            notice.textContent = "Sending E-Mail verification...";
             await pb.collection('accounts').create({ "email": email, "password": password0, "passwordConfirm": password1 });
             await pb.collection('accounts').requestVerification(email);
             notice.innerHTML = `<button onclick="switchForms();">We sent an verification E-Mail to ${email}. After verification, click me.</button>`;
+            alert(`We sent an verification E-Mail to ${email}. After verification, you may log in to authorize.`); // For people who don't bother to read the above notice.
             
             document.getElementById('signinemail').value = email;
             document.getElementById('signinpassword').value = password0;
