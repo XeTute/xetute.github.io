@@ -637,7 +637,7 @@
         const pb = new PocketBase("https://db.xetute.com/");
         let authenticated = false;
         const completionendpoint = [ "https://ai.xetute.com/v1/chat/completions", "https://api.groq.com/openai/v1/chat/completions"];
-        const modelnameendpoint  = [ { url: "https://ai.xetute.com/api/v1/model", fromresponse: "result", key: '0', temp: 0.65 }, { preset: "llama-3.3-70b-versatile", key: "gs" + "k_wLONdT9NuUPVjgORByKtWGdyb3FYtuzJAO05AoEW9hIAzPtJVQ9K", temp: 1 }];
+        const modelnameendpoint  = [ { url: "https://ai.xetute.com/api/v1/model", fromresponse: "result", key: '0', temp: 0.65 }, { preset: "deepseek-r1-distill-qwen-32b", key: "gs" + "k_wLONdT9NuUPVjgORByKtWGdyb3FYtuzJAO05AoEW9hIAzPtJVQ9K", temp: 1 }];
     
         // Backend vars
         let config = { endpoint: "", modelname: "", key: "", temp: 0 };
@@ -655,9 +655,6 @@
             buffer += "\n- BlueSky: https://bsky.app/profile/xetute.bsky.social";
             buffer += "\n- YouTube: https://www.youtube.com/@XeTuteTechnologies";
             buffer += "\nKo-Fi: https://ko-fi.com/XeTute";
-    
-            buffer += "\nBefore you answer, you think about how to solve the users query if the query would logically require someone to think."
-            buffer += "\nIf you do think, you may use extremely long chains of thought to deeply consider the problem and deliberate with yourself via systematic reasoning processes to help come to a correct solution prior to answering. You should enclose your thoughts and internal monologue inside <think>\\n{your thoughts here}\\n</think> tags, and then provide your solution or response to the problem."
             buffer += "\nMarkdown is supported.";
     
             buffer += `\nThe user's name is ${username}.`;
