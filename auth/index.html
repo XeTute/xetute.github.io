@@ -152,9 +152,20 @@
             notice.textContent = "Sending E-Mail verification...";
             await pb.collection('accounts').create({ "email": email, "password": password0, "passwordConfirm": password1 });
             await pb.collection('accounts').requestVerification(email);
-            notice.innerHTML = `<button onclick="switchForms();">We sent an verification E-Mail to ${email}. After verification, click me.</button>`;
-            alert(`We sent an verification E-Mail to ${email}. After verification, you may log in to authorize.`); // For people who don't bother to read the above notice.
+            notice.innerHTML = `We sent an verification E-Mail to ${email}.`;
+            alert(`We sent an verification E-Mail to ${email}.`); // For people who don't bother to read the above notice.
             
+            while (true)
+            {
+                await new Promise(r => setTimeout(r, 1000));
+                try
+                { 
+                    await pb.collection('accounts').authWithPassword(email, password0);
+                    window.location.reload();
+                }
+                catch {}
+            }
+
             document.getElementById('signinemail').value = email;
             document.getElementById('signinpassword').value = password0;
         }

@@ -724,14 +724,17 @@
                 authenticated = true;
     
                 let auth = pb.authStore.record;
-                if (!auth.data?.username) { auth.data.username = "Friend"; }
-                if (!auth.data?.chat) { auth.data.chat = []; }
-    
+                let updated = false;
+                if (!auth.data || (auth.data === null) || (auth.data === "") || (auth.data === undefined)) { auth.data = {}; updated = true; }
+                if (!auth.data.username) { auth.data.username = "Friend"; updated = true; }
+                if (!auth.data?.chat) { auth.data.chat = []; updated = true; }
+                if (updated) { try { await pb.collection('accounts').update(auth.id, { data: auth.data }); } catch (e) { console.log("Error updating record: ", e); } }
+
                 authprofile.innerHTML = `<i class="fas fa-user"></i> ${auth.data.username}`;
                 authprofile.href = `./account/?${window.location.href}`;
             }
-            catch
-            {
+            catch (e)
+            { console.log("Error while authRefresh:", e);
                 authenticated = false;
                 authprofile.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
                 authprofile.href = `./auth/?${window.location.href}`;
