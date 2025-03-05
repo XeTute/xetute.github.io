@@ -16,6 +16,7 @@
     
     <style>
         body, html { display: flex; justify-content: center; }
+        button, a { color: #fff; }
         cdiv
         {
             border: 2px solid #555;
@@ -99,6 +100,20 @@
     </cdiv>
 
     <cdiv>
+        <p class="underline">E-Mail</p>
+        <rdiv>
+            <p id="email"></p>
+            <line style="width: 2px; height: 2rem;"></line>
+            <button onclick="updateEmail();">Update</button>
+        </rdiv>
+    </cdiv>
+
+    <cdiv>
+        <p class="underline">Password</p>
+        <button onclick="updatePassword();">Update Password</button>
+    </cdiv>
+
+    <cdiv>
         <p class="underline">Authorisation</p>
         <rdiv class="dangerous">
             <p>Logged In</p>
@@ -118,6 +133,9 @@
     const backbtn = document.getElementById('backbutton');
     const origin = window.location.search.substr(1);
 
+    const username = document.getElementById('username');
+    const email = document.getElementById('email');
+
     if (!origin) { backbtn.remove(); }
     else { backbtn.href = origin; }
 
@@ -132,11 +150,12 @@
 
         if ((auth.record.data === undefined) || (auth.record.data === ""))
         {
-            auth.record.data = { "username": "Noname" };
+            auth.record.data = { "username": "Friend" };
             auth.record.data = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });
         }
 
-        document.getElementById('username').textContent = auth.record.data.username;
+        username.textContent = auth.record.data.username;
+        email.textContent = auth.record.email;
     }
     authRefresh();
 
@@ -150,7 +169,26 @@
             try { auth.record = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
             catch { alert("Failed to update your Username. We're sorry."); }
 
-            document.getElementById('username').textContent = auth.record.data.username;
+            username.textContent = auth.record.data.username;
+        }
+    }
+
+    async function updateEmail()
+    {
+        if (confirm("Update Email?"))
+        {
+            const newemail = prompt("Type in your new E-Mail (you'll have to verify it)...");
+            try { await pb.collection('accounts').requestEmailChange(newemail); alert(`We sent a confirmation to ${newemail}.`); }
+            catch (e) { alert(`Failed to sent E-Mail to ${newemail}. We're sorry. \nError: ${e}`); console.log("Failed to sent confirmation E-Mail: ", e); }
+        }
+    }
+
+    async function updatePassword()
+    {
+        if (confirm("Update Password?"))
+        {
+            try { await pb.collection('accounts').requestPasswordReset(auth.record.email); alert(`Send instructions to ${auth.record.email}.`); }
+            catch { alert("Failed to send instructions to your E-Mail."); }
         }
     }
 
