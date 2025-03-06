@@ -89,6 +89,12 @@
             height: 100vh;
         }
 
+        #input-container
+        {
+            position: relative !important;
+            bottom: auto !important;
+        }
+        
         @media (orientation: landscape)
         {
             #sidebar
@@ -498,7 +504,7 @@
             color: white;
         }
 
-        .quickactions
+        .info
         {
             display: flex;
             justify-content: center;
@@ -513,9 +519,9 @@
             border: 2px solid var(--border-color);
             border-radius: 25px;
         }
-        .quickactions i { margin-right: 6px; }
+        .info i { margin-right: 6px; }
 
-        .quickactions:hover
+        .info:hover
         {
             color: var(--accent-light);
             background: var(--card-bg);
@@ -572,11 +578,9 @@
     <div id="chat-interface">
         <div id="sidebar">
             <div style="padding: 0; margin-top: 50px; width: 100%;"></div>
-
-            <h1 class="sidebartxt">Other</h1>
-            <a class="sidebarbtn" onclick="window.location.href = `./about/?${window.location.href}`;">
-                <i class="fas fa-info-circle"></i> About Us
-            </a>
+            <h1 class="sidebartxt">Quick Actions</h1>
+            <a href="https://xetute.com/" class="sidebarbtn"><i class="fas fa-plus-circle"></i> New Chat</a>
+            <a id="authprofile" class="sidebarbtn"><i class="fas fa-user"></i> Loading...</a>
         </div>
         
         <div id="main-content">
@@ -586,9 +590,10 @@
                     <textarea id="messageInput" placeholder="Whereas disregard and contempt for human rights have resulted" rows="2"></textarea>
                     <button id="sendButton"><i class="fas fa-paper-plane"></i></button>
                 </div>
-                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 12px;">
-                    <a href="https://xetute.com/" class="quickactions"><i class="fas fa-plus-circle"></i> New Chat</a>
-                    <a id="authprofile" class="quickactions"><i class="fas fa-user"></i> Loading...</a>
+                <div style="display: flex; justify-content: center; gap: 15px; margin-top: 12px;" id="info">
+                    <a class="info" onclick="window.location.href = `./about/?${window.location.href}`;">
+                        <i class="fas fa-info-circle"></i> About Us
+                    </a>
                 </div>
             </div>
         </div>
@@ -629,7 +634,7 @@
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
             if (this.scrollHeight > 150)
-            { this.style.height = '150px'; }
+                { this.style.height = '150px'; }
         });
     
         // Backend constants
@@ -922,6 +927,7 @@
             if (!text) return;
     
             input.value = '';
+            input.style.height = 'auto';
             message.push({ role: 'user', content: text });
             addMessage('user', text);
     
@@ -1033,6 +1039,8 @@
             }
             finally
             {
+                if (loading && loading.parentNode && !loading.parentNode.isSameNode(chatContainer))
+                    { loading.parentNode.removeChild(loading); }
                 processing = false;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
@@ -1073,13 +1081,12 @@
             await authAndDisplay();
             await getChatID();
             
-            // Add model info to sidebar
+            // Add model info
             const builtwith = document.createElement('button');
-                builtwith.className = 'sidebarbtn';
-                builtwith.innerHTML = '<i class="fas fa-microchip"></i>';
-                builtwith.textContent = `Built with ${ensureMaxChars(config.modelname, 12)}`;
+                builtwith.className = 'info';
+                builtwith.innerHTML = `<i class="fa fa-microchip" aria-hidden="true"></i> Built with ${ensureMaxChars(config.modelname, 12)}`;
                 builtwith.setAttribute('onclick', `alert("The AI you're chatting with is powered by ${config.modelname}.");`);
-            sidebar.insertBefore(builtwith, document.querySelector('.sidebartxt').nextElementSibling);
+            document.getElementById('info').appendChild(builtwith);
     
             // Load chat history
             if (authenticated && pb.authStore.record.data.chat?.length)
