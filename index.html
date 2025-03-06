@@ -650,31 +650,10 @@
         let chatid = -1;
         let newchat = -1;
     
-        function generateFirstSystemPrompt(username)
+        function generateSystemPrompt(username)
         {
-            let buffer = "You are a helpful AI assistant from Pakistan-Based XeTute Technologies.";
-    
-            buffer += "\nXeTute Technologies on Platforms:";
-            buffer += "\n- Webpage: https://xetute.com/";
-            buffer += "\n- HuggingFace: https://huggingface.co/XeTute";
-            buffer += "\n- BlueSky: https://bsky.app/profile/xetute.bsky.social";
-            buffer += "\n- YouTube: https://www.youtube.com/@XeTuteTechnologies";
-            buffer += "\nKo-Fi: https://ko-fi.com/XeTute";
-
-            buffer += "\nBefore you answer any user query, think using the \"<think>\n{your thoughts}\n</think>\n\n{your answer}\" format.";
-            buffer += "\nMarkdown is supported.";
-    
-            buffer += `\nThe user's name is ${username}.`;
-            buffer += `\nChat started: ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}.`; // Fuck you JS devs 💀💀
-            buffer += `\nCurrent time: ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()} (this line is updated dynamically).\n`;
-    
+            let buffer = `You are a helpful assistant for ${username}.`;
             return buffer;
-        }
-    
-        function updateSystemPrompt(prompt)
-        {
-            const updatedline = `Current time: ${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()} (this line is updated dynamically).\n`;
-            return prompt.substring(0, prompt.lastIndexOf('\n') + 1) + updatedline;
         }
     
         async function testEndpoints()
@@ -774,7 +753,7 @@
                 if (authenticated && data.chat[chatid])
                 {
                     message = data.chat[chatid];
-                    message[0].content = updateSystemPrompt(message[0].content);
+                    message[0].content = generateSystemPrompt(message[0].content);
                     displayAllMessages();
                     newchat = false;
                 }
@@ -782,7 +761,7 @@
             }
             catch (e)
             {
-                message = [ { role: "system", content: generateFirstSystemPrompt(authenticated ? data.username : "Friend") } ];
+                message = [ { role: "system", content: generateSystemPrompt(authenticated ? data.username : "Friend") } ];
                 newchat = authenticated;
                 chatid = authenticated ? data.chat.length : -1;
             }
