@@ -62,21 +62,22 @@
         
         #sidebar
         {
-            background: var(--secondary-bg);
-            width: var(--sidebar-width);
-            height: 100vh;
+            background: var(--primary-bg);
             display: flex;
             flex-direction: column;
+            width: var(--sidebar-width);
+            height: 100vh;
             gap: 10px;
             position: fixed;
             left: calc(-1 * var(--sidebar-width));
             transition: left var(--transition-speed) ease-in-out;
             z-index: 1000;
-            box-shadow: 2px 0 10px var(--shadow-color);
             overflow-y: auto;
             padding-top: 20px;
+            filter: brightness(80%);
+            transition: 0.2s ease-in-out;
         }
-        
+        #sidebar:hover, #sidebar:focus { filter: brightness(100%); }
         #sidebar.active { left: 0; }
         
         #main-content
@@ -290,7 +291,7 @@
         
         .user-message
         {
-            background-color: var(--accent-color);
+            background-color: var(--secondary-bg);
             color: white;
             margin-left: auto;
             margin-right: 2px;
@@ -302,7 +303,6 @@
 
         .assistant-message
         {
-            background-color: var(--card-bg);
             margin-right: auto;
             margin-left: 2px;
             border-top-left-radius: 4px;
@@ -536,12 +536,12 @@
 
         .thoughts-toggle
         {
-            background: var(--card-bg);
             color: var(--accent-light);
             border: 2px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 5px;
             padding: 5px;
-            margin-left: -8px;
+            margin: 10px;
+            margin-left: -5px;
             font-size: 0.8em;
             transition: all 0.2s ease;
         }
@@ -563,7 +563,7 @@
         ::-webkit-scrollbar-thumb:hover { background: var(--accent-light); }
     </style>
   </head>
-  <body>
+  <body onload="updateVh();">
     <button id="menu-toggle">
         <i class="fas fa-bars"></i>
     </button>
@@ -574,7 +574,7 @@
         <div id="sidebar">
             <div style="padding: 0; margin-top: 50px; width: 100%;"></div>
             <h1 class="sidebartxt">Quick Actions</h1>
-            <a href="https://xetute.com/" class="sidebarbtn"><i class="fas fa-plus-circle"></i> New Chat</a>
+            <a onclick="window.location.href = '?chat=-1';" class="sidebarbtn"><i class="fas fa-plus-circle"></i> New Chat</a>
             <a id="authprofile" class="sidebarbtn"><i class="fas fa-user"></i> Loading...</a>
         </div>
         
@@ -602,6 +602,7 @@
         }
         window.addEventListener('load', updateVh);
         window.addEventListener('resize', updateVh);
+        updateVh();
     </script>
     <script src="pocketbase.umd.js"></script>
     <script defer>
@@ -822,7 +823,6 @@
             if (fromassistant)
             {
                 const begin = text.search("<think>");
-                console.log(begin);
                 if (begin !== -1)
                 {
                     const end = text.search("</think>");
@@ -841,7 +841,6 @@
                         </div>`;
                         html = thoughtsHTML + html; 
                     }
-                    console.log(end, thoughts);
                 }
 
                 if (processing)
@@ -1114,7 +1113,6 @@
                 });
             }
         }
-    
         initialize();
     </script>
   </body>
