@@ -84,9 +84,10 @@
             flex: 1;
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            width: 100%;
             position: relative;
             min-height: 0;
-            height: 100vh;
         }
 
         #input-container
@@ -105,12 +106,7 @@
             }
             
             #menu-toggle { display: none; }
-            
-            #main-content
-            {
-                margin-left: var(--sidebar-width);
-                height: 100vh;
-            }
+            #main-content { height: 100vh; }
             
             #chat-container
             {
@@ -195,6 +191,7 @@
             position: relative;
             max-width: 90%;
             margin: 12px 0;
+            padding: 10px;
             border-radius: var(--message-radius);
             line-height: 1.6;
             overflow-wrap: break-word;
@@ -309,10 +306,8 @@
             margin-right: auto;
             margin-left: 2px;
             border-top-left-radius: 4px;
-            padding: 16px 18px;
         }
 
-        .user-message { padding: 16px 18px; }
         .user-message pre, .user-message code { text-align: left; }
         .user-message .message-avatar
         {
@@ -798,17 +793,6 @@
         let generationtime = 0.0;
         function formatMessage(text)
         {
-            let jaxedtext = document.createElement('div');
-            jaxedtext.innerHTML = text;
-
-            if (window.MathJax)
-            {
-                try { MathJax.typeset([jaxedtext]); }
-                catch (e) { console.error("MathJAX error:", e); }
-            }
-            text = jaxedtext.innerHTML;
-            let html = marked.parse(text.replace(/<think>[\s\S]*?<\/think>/g, ''));
-
             let fromassistant = false;
             try
             {
@@ -823,30 +807,41 @@
             }
             catch (e) { console.log("Failed to search `text` in message[]: ", e); }
 
+            let jaxedtext = document.createElement('div');
+            jaxedtext.innerHTML = text;
+
+            if (window.MathJax)
+            {
+                try { MathJax.typeset([jaxedtext]); }
+                catch (e) { console.error("MathJAX error:", e); }
+            }
+            text = jaxedtext.innerHTML;
+
+            let html = marked.parse(text.replace(/<think>[\s\S]*?<\/think>/g, ''));
+
             if (fromassistant)
             {
-                const originalText = text;
-                const thoughtsRegex = /<think>([\s\S]*?)<\/think>/g;
-
-                if (thoughtsRegex.test(originalText))
+                const begin = text.search("<think>");
+                console.log(begin);
+                if (begin !== -1)
                 {
-                    thoughtsRegex.lastIndex = 0;
+                    const end = text.search("</think>");
+                    let thoughts = '';
+                    
+                    if (end === -1) { thoughts = text; }
+                    else { thoughts = text.substring(begin + "<think>".length, end); }
+                    thoughts = thoughts.trim();
 
-                    let thoughtsContent = '';
-                    let match;
-
-                    while ((match = thoughtsRegex.exec(originalText)) !== null)
-                        { thoughtsContent += match[1] + '\n\n'; }
-
-                    if (thoughtsContent.trim().length > 0)
+                    if (thoughts.length > 0)
                     {
                         const thoughtsHTML =
                         `<div>
                             <button class="thoughts-toggle" onclick="toggleThoughts(this)">Show Thoughts</button>
-                            <div class="thoughts-container" style="display: none;"><p style="margin: 15px;">${thoughtsContent.trim()}</p></div>
+                            <div class="thoughts-container" style="display: none;"><p style="margin: 15px;">${thoughts}</p></div>
                         </div>`;
                         html = thoughtsHTML + html; 
                     }
+                    console.log(end, thoughts);
                 }
 
                 if (processing)
@@ -1009,7 +1004,7 @@
                     try { await pb.collection('accounts').update(pb.authStore.record.id, { data: data }); }
                     catch { alert("Failed to sync chat with XeTute Technologies Cloud. We're sorry."); }
 
-                    if (message.length === 3)
+                    if (data.chat.length === 3)
                     {
                         // If new & first chat in list, add header
                         const historyHeader = document.createElement('h1');
