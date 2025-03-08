@@ -647,7 +647,7 @@
     
         function generateSystemPrompt(username)
         {
-            let buffer = `You are a helpful assistant for ${username}.`;
+            let buffer = `You are a helpful assistant for ${username}.\nYou may think through the "<think>{thoughts}</think>{answer}" format.`;
             return buffer;
         }
     
