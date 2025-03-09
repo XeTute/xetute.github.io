@@ -900,6 +900,36 @@
             return loadingDiv;
         }
 
+        function addChatsToSidebar()
+        {
+            const html = sidebar.innerHTML;
+            const searchindex = html.search("Chat History");
+            if (searchindex !== -1) { html = html.substring(0, searchindex + "Chat History".length); }
+
+            const historyHeader = document.createElement('h1');
+            historyHeader.className = 'sidebartxt';
+            historyHeader.textContent = 'Chat History';
+            sidebar.appendChild(historyHeader);
+    
+            pb.authStore.record.data.chat.forEach((chat, index) => 
+            {
+                const chatItem = document.createElement('div');
+                chatItem.className = 'chathistorybtn';
+                
+                const link = document.createElement('a');
+                link.className = 'sidebarbtn';
+                link.href = `?chat=${index}`;
+                link.textContent = ensureMaxChars(chat[1]?.content || 'New Chat', 15);
+    
+                const deleteBtn = document.createElement('button');
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                deleteBtn.onclick = () => { deleteChat(index); };
+    
+                chatItem.append(link, deleteBtn);
+                sidebar.appendChild(chatItem);
+            });
+        }
+
         function countWords(text) // Naive, only counts spaces
         {
             let count = 1;
@@ -1002,31 +1032,7 @@
                     data.chat[chatid] = message;
                     try { await pb.collection('accounts').update(pb.authStore.record.id, { data: data }); }
                     catch { alert("Failed to sync chat with XeTute Technologies Cloud. We're sorry."); }
-
-                    if (data.chat.length === 3)
-                    {
-                        // If new & first chat in list, add header
-                        const historyHeader = document.createElement('h1');
-                        historyHeader.className = 'sidebartxt';
-                        historyHeader.textContent = 'Chat History';
-                        sidebar.appendChild(historyHeader);
-
-                        // If new chat, add to the sidebar (reloading is annoying for the user)
-                        const chatItem = document.createElement('div');
-                        chatItem.className = 'chathistorybtn';
-                        
-                        const link = document.createElement('a');
-                        link.className = 'sidebarbtn';
-                        link.href = `?chat=${chatid}`;
-                        link.textContent = ensureMaxChars(message[1].content || 'New Chat', 15);
-                        
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-                        deleteBtn.onclick = () => { deleteChat(chatid); };
-                        
-                        chatItem.append(link, deleteBtn);
-                        sidebar.appendChild(chatItem);
-                    }
+                    if (data.chat.length === 1) { addChatsToSidebar(); }
                 }
                 else if (((message.length - 1) % 6) === 0) { alert("Your chat isn't being saved. To save future chats, log in."); }
             }
@@ -1087,31 +1093,7 @@
             document.getElementById('info').appendChild(builtwith);
     
             // Load chat history
-            if (authenticated && pb.authStore.record.data.chat?.length)
-            {
-                const historyHeader = document.createElement('h1');
-                historyHeader.className = 'sidebartxt';
-                historyHeader.textContent = 'Chat History';
-                sidebar.appendChild(historyHeader);
-    
-                pb.authStore.record.data.chat.forEach((chat, index) => 
-                {
-                    const chatItem = document.createElement('div');
-                    chatItem.className = 'chathistorybtn';
-                    
-                    const link = document.createElement('a');
-                    link.className = 'sidebarbtn';
-                    link.href = `?chat=${index}`;
-                    link.textContent = ensureMaxChars(chat[1]?.content || 'New Chat', 15);
-    
-                    const deleteBtn = document.createElement('button');
-                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-                    deleteBtn.onclick = () => { deleteChat(index); };
-    
-                    chatItem.append(link, deleteBtn);
-                    sidebar.appendChild(chatItem);
-                });
-            }
+            if (authenticated && pb.authStore.record.data.chat?.length) { addChatsToSidebar(); }
         }
         initialize();
     </script>
