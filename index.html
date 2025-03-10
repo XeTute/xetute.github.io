@@ -44,11 +44,8 @@
     </script>
 
     <script>
-      function updateVh()
-      {
-        document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-      }
-      window.addEventListener('resize', updateVh);
+        function updateVh() { document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`); }
+        window.addEventListener('resize', updateVh);
     </script>
 
     <style>
@@ -73,9 +70,8 @@
             transition: left var(--transition-speed) ease-in-out;
             z-index: 1000;
             overflow-y: auto;
-            padding-top: 20px;
-            filter: brightness(80%);
-            transition: 0.2s ease-in-out;
+            filter: brightness(90%);
+            transition: 0.5s ease-in-out;
         }
         #sidebar:hover, #sidebar:focus { filter: brightness(100%); }
         #sidebar.active { left: 0; }
@@ -104,6 +100,7 @@
                 position: relative;
                 left: 0;
                 height: 100%;
+                padding: 0 0 0 0;
             }
             
             #menu-toggle { display: none; }
@@ -136,7 +133,8 @@
         @media (orientation: portrait)
         {
             #main-content { height: calc(var(--vh, 1vh) * 100); }
-            
+            #sidebar { padding-top: 70px; }
+
             #chat-container
             {
                 flex: 1;
@@ -153,7 +151,7 @@
                 z-index: 100;
             }
             
-            #menu-toggle { top: calc(20px + env(safe-area-inset-top)); }
+            #menu-toggle { top: calc(20px + env(safe-area-inset-top)); display: flex; }
         }
 
         #menu-toggle
@@ -170,7 +168,6 @@
             border-radius: 50%;
             width: 45px;
             height: 45px;
-            display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 2px 8px var(--shadow-color);
@@ -190,24 +187,20 @@
             display: flex;
             align-items: center;
             position: relative;
-            max-width: 90%;
-            margin: 12px 0;
-            padding: 10px;
-            border-radius: var(--message-radius);
+            padding: 15px;
             line-height: 1.6;
             overflow-wrap: break-word;
             word-break: break-word;
-            animation: fadeIn 0.4s ease-in-out;
+            animation: fadeIn 0.5s ease-in-out;
+            color: #ebebeb;
         }
+        .message hr { display: block; height: 2px; border: 0; border-top: 2px solid #666; margin: 1rem 0; padding: 0; }
 
         .message div
         {
             padding: 0;
             margin: 0;
         }
-
-        .message p { margin-bottom: 0.8em; }
-        .message p:last-child { margin-bottom: 0; }
 
         .message p code
         {
@@ -218,6 +211,8 @@
             display: inline;
             white-space: normal;
         }
+        .message p { margin: 0; }
+        .message p:last-child { margin-bottom: 0; }
 
         .message a
         {
@@ -247,9 +242,11 @@
 
         .message img
         {
-            max-width: 100%;
-            border-radius: 8px;
-            margin: 8px 0;
+            max-width: 80%;
+            border-radius: 15px;
+            margin: 5px;
+            margin-left: 0;
+            border: 1px solid #000;
         }
 
         .message table
@@ -275,45 +272,28 @@
         .message ul, .message ol
         {
             padding-left: 20px;
-            margin: 10px 0;
+            margin: 5px;
         }
-        
-        .message-avatar
-        {
-            width: 36px;
-            height: 36px;
-            border-radius: 50% !important;
-            object-fit: cover;
-            flex-shrink: 0;
-            margin: 10px !important;
-            border: 2px solid var(--accent-color);
-        }
-        
-        .user-message
-        {
-            background-color: var(--secondary-bg);
-            color: white;
-            margin-left: auto;
-            margin-right: 2px;
-            border-top-right-radius: 4px;
-            text-align: right;
-            justify-content: flex-end;
-        }
-        .user-message div, .user-message img { text-align: right; align-items: right; }
 
         .assistant-message
         {
+            max-width: 95%;
             margin-right: auto;
-            margin-left: 2px;
-            border-top-left-radius: 4px;
         }
 
-        .user-message pre, .user-message code { text-align: left; }
-        .user-message .message-avatar
+        .user-message
         {
-            order: 2;
-            border-color: white;
+            background-color: var(--secondary-bg);
+            margin-left: auto;
+            border-radius: 20px;
+            border-top-right-radius: 0;
+            text-align: right;
+            justify-content: flex-end;
+            width: fit-content;
+            max-width: 80%;
         }
+        .user-message div, .user-message img { text-align: right; align-items: right; }
+        .user-message pre, .user-message code { text-align: left; }
         
         #input-container
         {
@@ -379,7 +359,7 @@
             max-width: 800px;
             margin: 10px auto;
             background: var(--card-bg);
-            border-radius: var(--message-radius);
+            border-radius: 10px;
             animation: fadeIn 0.3s ease-in-out;
         }
         
@@ -427,8 +407,20 @@
             backdrop-filter: blur(2px);
             animation: fadeIn 0.3s ease-in-out;
         }
-        
         #overlay.active { display: block; }
+
+        #chatloading
+        {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #ccc;
+            padding: 30px;
+        }
 
         .sidebartxt
         {
@@ -572,14 +564,15 @@
 
     <div id="chat-interface">
         <div id="sidebar">
-            <div style="padding: 0; margin-top: 50px; width: 100%;"></div>
             <h1 class="sidebartxt">Quick Actions</h1>
             <a onclick="window.location.href = '?chat=-1';" class="sidebarbtn"><i class="fas fa-plus-circle"></i> New Chat</a>
             <a id="authprofile" class="sidebarbtn"><i class="fas fa-user"></i> Loading...</a>
         </div>
         
         <div id="main-content">
-            <div id="chat-container"></div>
+            <div id="chat-container">
+                <p id="chatloading">You're not chatting with a human. Consider verifying important information.</p>
+            </div>
             <div id="input-container">
                 <div class="input-wrapper">
                     <textarea id="messageInput" placeholder="Whereas disregard and contempt for human rights have resulted" rows="2"></textarea>
@@ -602,9 +595,9 @@
         }
         window.addEventListener('load', updateVh);
         window.addEventListener('resize', updateVh);
-        updateVh();
     </script>
     <script src="pocketbase.umd.js"></script>
+    <script src="common.js"></script>
     <script defer>
         // UI Elements
         const sidebar = document.getElementById('sidebar');
@@ -637,8 +630,9 @@
         const date = new Date();
         const pb = new PocketBase("https://db.xetute.com/");
         let authenticated = false;
-        const completionendpoint = [ "https://ai.xetute.com/v1/chat/completions", "https://api.groq.com/openai/v1/chat/completions"];
-        const modelnameendpoint  = [ { url: "https://ai.xetute.com/api/v1/model", fromresponse: "result", key: '0', temp: 0.65 }, { preset: "deepseek-r1-distill-qwen-32b", key: "gs" + "k_wLONdT9NuUPVjgORByKtWGdyb3FYtuzJAO05AoEW9hIAzPtJVQ9K", temp: 1 }];
+        let currentendpoint = 0;
+        const completionendpoint = [ "https://ai.xetute.com/v1/chat/completions", "https://text.pollinations.ai/openai", "https://api.groq.com/openai/v1/chat/completions"];
+        const modelnameendpoint  = [ { url: "https://ai.xetute.com/api/v1/model", fromresponse: "result", key: '0', temp: 0.65 }, { preset: "openai-large", key: '', temp: 0.65 }, { preset: "deepseek-r1-distill-llama-70b-specdec", key: "gs" + "k_wLONdT9NuUPVjgORByKtWGdyb3FYtuzJAO05AoEW9hIAzPtJVQ9K", temp: 1 }];
     
         // Backend vars
         let config = { endpoint: "", modelname: "", key: "", temp: 0 };
@@ -646,27 +640,53 @@
         let chatid = -1;
         let newchat = -1;
     
-        function generateSystemPrompt(username)
+        function addMLPowered()
         {
-            let buffer = `You are a helpful assistant for ${username}.\nYou may think through the "<think>{thoughts}</think>{answer}" format.`;
-            return buffer;
+            try { document.getElementById('mlpowerednotice').remove(); }
+            catch {}
+
+            const mlpowered = document.createElement('button');
+            mlpowered.className = 'info';
+            mlpowered.id = 'mlpowerednotice';
+            if (config.modelname.search("LLaMA") === -1)
+            {
+                mlpowered.innerHTML = `<i class="fa fa-microchip" aria-hidden="true"></i> ML-Powered`;
+                mlpowered.setAttribute('onclick', `alert("The person you're chatting with is not a human; the responses are a direct result of the concept of Machine Learning. Verify important information.");`);
+            }
+            else
+            {
+                mlpowered.innerHTML = `<i class="fa fa-microchip" aria-hidden="true"></i> Built with ${ensureMaxChars(config.modelname, 12)}`;
+                mlpowered.setAttribute('onclick', `alert("The AI you're chatting with is powered by ${config.modelname}.");`);
+            }
+            document.getElementById('info').appendChild(mlpowered);
         }
-    
+
+        function setNextPreset()
+        {
+            ++currentendpoint;
+            if (modelnameendpoint.length <= currentendpoint) { return; }
+            if (modelnameendpoint[currentendpoint].preset)
+            {
+                config.endpoint = completionendpoint[currentendpoint];
+                config.modelname = modelnameendpoint[currentendpoint].preset;
+                config.key = modelnameendpoint[currentendpoint].key;
+                config.temp = modelnameendpoint[currentendpoint].temp;
+            }
+            addMLPowered();
+        }
+
         async function testEndpoints()
         {
             let response;
             let name = "";
-            let failed = false;
     
             for (let x = 0; x < modelnameendpoint.length; ++x)
             {
+                currentendpoint = x;
                 if (modelnameendpoint[x].preset)
                 {
-                    config.endpoint = completionendpoint[x];
-                    config.modelname = modelnameendpoint[x].preset;
-                    config.key = modelnameendpoint[x].key;
-                    config.temp = modelnameendpoint[x].temp;
-                    failed = true;
+                    --currentendpoint;
+                    setNextPreset();
                     break;
                 }
                 
@@ -676,21 +696,14 @@
                     name = (await response.json())[modelnameendpoint[x].fromresponse];
                     if (name.includes("koboldcpp/"))
                         { name = name.split("koboldcpp/")[1]; }
-                }
-                catch (e)
-                {
-                    failed = true;
-                    console.error("Endpoint error:", e);
-                }
-    
-                if (!failed)
-                {
+                    
                     config.endpoint = completionendpoint[x];
                     config.modelname = name;
                     config.key = modelnameendpoint[x].key;
                     config.temp = modelnameendpoint[x].temp;
                     break;
                 }
+                catch (e) { console.error("Endpoint error:", e); }
             }
         }
     
@@ -713,16 +726,17 @@
                 authprofile.href = `./account/?${window.location.href}`;
             }
             catch (e)
-            { console.log("Error while authRefresh:", e);
+            {   console.log("Error while authRefresh():", e);
                 authenticated = false;
                 authprofile.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
                 authprofile.href = `./auth/?${window.location.href}`;
             }
         }
     
+        function removeloading() { document.getElementById('chatloading').remove(); }
         function displayAllMessages()
         {
-            chatContainer.innerHTML = '';
+            removeloading();
             for (let x = 1; x < message.length; ++x)
                 { addMessage(message[x].role, message[x].content); }
         }
@@ -763,92 +777,58 @@
             }
             return { chatid, newchat };
         }
-    
-        function ensureMaxChars(str, maxchars)
-        {
-            return str.length > maxchars ? str.substring(0, maxchars - 3) + '...' : str;
-        }
-    
-        function ensureMaxDigits(x, maxdigits)
-        {
-            const xstr = String(x);
-            return ((xstr.length > maxdigits) ? ((xstr.substring(0, maxdigits)[maxdigits - 1] === '.') ? xstr.substring(0, maxdigits + 1) : xstr.substring(0, maxdigits)) : xstr);
-        }
-
-        function toggleThoughts(button)
-        {
-            const container = button.nextElementSibling;
-            const isVisible = container.style.display === 'block';
-
-            container.style.display = isVisible ? 'none' : 'block';
-            button.textContent = isVisible ? 'Show Thoughts' : 'Hide Thoughts';
-
-            if (!isVisible)
-            {
-                setTimeout(() =>
-                { container.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 100);
-            }
-        }
 
         let processing = false;
         let generationtime = 0.0;
+
         function formatMessage(text)
         {
             let fromassistant = false;
-            try
+            for (let x = (message.length - 1); x >= 0; --x)
             {
-                for (let x = (message.length - 1); x >= 0; --x)
+                if ((message[x].content === text) && (message[x].role === "assistant"))
                 {
-                    if ((message[x].content === text) && (message[x].role === "assistant"))
-                    {
-                        fromassistant = true;
-                        break;
-                    }
+                    fromassistant = true;
+                    break;
                 }
             }
-            catch (e) { console.log("Failed to search `text` in message[]: ", e); }
-
+            
             let jaxedtext = document.createElement('div');
             jaxedtext.innerHTML = text;
-
             if (window.MathJax)
             {
                 try { MathJax.typeset([jaxedtext]); }
                 catch (e) { console.error("MathJAX error:", e); }
             }
-            text = jaxedtext.innerHTML;
-
-            let html = marked.parse(text.replace(/<think>[\s\S]*?<\/think>/g, ''));
+            html = marked.parse(jaxedtext.innerHTML.replace(/<think>[\s\S]*?<\/think>/g, ''));
 
             if (fromassistant)
             {
-                const begin = text.search("<think>");
-                if (begin !== -1)
-                {
-                    const end = text.search("</think>");
-                    let thoughts = '';
-                    
-                    if (end === -1) { thoughts = text; }
-                    else { thoughts = text.substring(begin + "<think>".length, end); }
-                    thoughts = thoughts.trim();
-
-                    if (thoughts.length > 0)
-                    {
-                        const thoughtsHTML =
-                        `<div>
-                            <button class="thoughts-toggle" onclick="toggleThoughts(this)">Show Thoughts</button>
-                            <div class="thoughts-container" style="display: none;"><p style="margin: 15px;">${thoughts}</p></div>
-                        </div>`;
-                        html = thoughtsHTML + html; 
-                    }
-                }
-
                 if (processing)
                 {
                     html +=
                     `<em style="font-size: 0.7rem; color: #ccc;">
                         Took ${ensureMaxDigits(generationtime / 1000, 3)}s | Generated ${ensureMaxDigits(wordsPerSecond(countWords(text)), 3)} Words per Second.
                     </em>`;
+                }
+
+                const begin = text.search("<think>");
+                if (begin !== -1)
+                {
+                    const end = text.search("</think>");
+                    const thoughts = text.substring(begin + 7, end).trim();
+                    if (thoughts.length > 0)
+                    {
+                        if (text.length === (end + 8)) { text = `<p style="color: #ccc;">${thoughts}</p>` + text; }
+                        else
+                        {
+                            html =
+                            `<div>
+                                <button class="thoughts-toggle" onclick="toggleThoughts(this)">Show Thoughts</button>
+                                <div class="thoughts-container" style="display: none;"><p style="margin: 15px;">${thoughts}</p></div>
+                            </div>` + html;
+                        }
+                    }
                 }
             }
 
@@ -859,11 +839,6 @@
         {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role === 'user' ? 'user-message' : 'assistant-message'}`;
-    
-            const avatar = document.createElement('img');
-            avatar.className = 'message-avatar';
-            avatar.src = role === 'user' ? 'user.jpg' : 'logo.jpg';
-    
             const contentDiv = document.createElement('div');
             if (window.MathJax) 
             { 
@@ -871,8 +846,7 @@
                 catch (e) { console.error("MathJAX error:", e); } 
             }
             contentDiv.innerHTML = formatMessage(content);
-    
-            messageDiv.append(avatar, contentDiv);
+            messageDiv.append(contentDiv);
             chatContainer.appendChild(messageDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -881,10 +855,6 @@
         {
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'message assistant-message';
-    
-            const avatar = document.createElement('img');
-            avatar.className = 'message-avatar';
-            avatar.src = 'logo.jpg';
     
             const text = document.createElement('p');
             text.textContent = "Thanks for your patience";
@@ -896,15 +866,15 @@
             dots.className = 'loading-dots';
             dots.innerHTML = '<span></span><span></span><span></span>';
     
-            loadingDiv.append(avatar, text, dots);
+            loadingDiv.append(text, dots);
             return loadingDiv;
         }
 
         function addChatsToSidebar()
         {
-            const html = sidebar.innerHTML;
+            let html = sidebar.innerHTML;
             const searchindex = html.search("Chat History");
-            if (searchindex !== -1) { html = html.substring(0, searchindex + "Chat History".length); }
+            if (searchindex !== -1) { html = html.substring(0, searchindex + 12); }
 
             const historyHeader = document.createElement('h1');
             historyHeader.className = 'sidebartxt';
@@ -928,14 +898,6 @@
                 chatItem.append(link, deleteBtn);
                 sidebar.appendChild(chatItem);
             });
-        }
-
-        function countWords(text) // Naive, only counts spaces
-        {
-            let count = 1;
-            for (let x = 0; x < text.length; ++x)
-                { if (text[x] === ' ') { ++count; } }
-            return count;
         }
 
         function wordsPerSecond(countwords)
@@ -978,9 +940,10 @@
                         messages: message,
                         stream: true,
                         temperature: config.temp,
-                        max_tokens: 2048
+                        max_tokens: 8192
                     })
                 });
+                if (!response.ok) { throw("Server didn't send back a valid response. Maybe someone is trying to feel cool?"); }
     
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
@@ -988,11 +951,8 @@
     
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message assistant-message';
-                const avatar = document.createElement('img');
-                avatar.className = 'message-avatar';
-                avatar.src = 'logo.jpg';
                 const contentDiv = document.createElement('div');
-                messageDiv.append(avatar, contentDiv);
+                messageDiv.append(contentDiv);
     
                 loading.replaceWith(messageDiv);
                 message.push({ role: "assistant", content: "" });
@@ -1014,7 +974,7 @@
                         try
                         {
                             const data = JSON.parse(line.slice(6));
-                            if (data.choices[0].delta?.content)
+                            if (data.choices[0]?.delta?.content)
                             {
                                 message[index].content += data.choices[0].delta.content;
                                 generationtime = Date.now() - startedat;
@@ -1025,21 +985,23 @@
                     }
                     chatContainer.scrollTop = chatContainer.scrollHeight;
                 }
-    
+
+                if (message.length === 3) { removeloading(); }
                 if (authenticated)
                 {
                     let data = pb.authStore.record.data;
                     data.chat[chatid] = message;
                     try { await pb.collection('accounts').update(pb.authStore.record.id, { data: data }); }
                     catch { alert("Failed to sync chat with XeTute Technologies Cloud. We're sorry."); }
-                    if (data.chat.length === 1) { addChatsToSidebar(); }
+                    if ((data.chat.length === 1) && (message.length === 3)) { addChatsToSidebar(); }
                 }
-                else if (((message.length - 1) % 6) === 0) { alert("Your chat isn't being saved. To save future chats, log in."); }
+                else if (message.length === 3) { alert("Your chat isn't being saved. To save future chats, log in."); }
             }
             catch (e)
             {
+                loading.remove();
                 console.error("API Error:", e);
-                addMessage('assistant', `Error: ${e.message}`);
+                addMessage('assistant', `Error: ${e}`);
             }
             finally
             {
@@ -1085,14 +1047,7 @@
             await authAndDisplay();
             await getChatID();
             
-            // Add model info
-            const builtwith = document.createElement('button');
-                builtwith.className = 'info';
-                builtwith.innerHTML = `<i class="fa fa-microchip" aria-hidden="true"></i> Built with ${ensureMaxChars(config.modelname, 12)}`;
-                builtwith.setAttribute('onclick', `alert("The AI you're chatting with is powered by ${config.modelname}.");`);
-            document.getElementById('info').appendChild(builtwith);
-    
-            // Load chat history
+            addMLPowered();
             if (authenticated && pb.authStore.record.data.chat?.length) { addChatsToSidebar(); }
         }
         initialize();
