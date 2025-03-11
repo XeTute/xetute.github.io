@@ -161,7 +161,7 @@
             left: 20px;
             z-index: 1001;
             background: var(--card-bg);
-            border: none;
+            border: 0;
             color: var(--text-color);
             cursor: pointer;
             padding: 10px;
@@ -246,7 +246,7 @@
             border-radius: 15px;
             margin: 5px;
             margin-left: 0;
-            border: 1px solid #000;
+            border: 1px solid var(--border-color);
         }
 
         .message table
@@ -323,7 +323,7 @@
             box-sizing: border-box;
             resize: none;
             overflow-y: hidden;
-            border: none;
+            border: 0;
             border-radius: 24px 0 0 24px;
             padding: 15px 20px;
             background: transparent;
@@ -338,7 +338,7 @@
         {
             height: auto;
             width: 50px;
-            border: none;
+            border: 0;
             background: var(--accent-color);
             color: white;
             display: flex;
@@ -445,7 +445,7 @@
             gap: 10px;
             font-size: 14px;
             transition: all 0.2s ease;
-            border: 1px solid transparent;
+            border: 0;
             cursor: pointer;
             text-decoration: none;
         }
@@ -478,7 +478,7 @@
             align-items: center;
             justify-content: center;
             background: var(--card-bg);
-            border: none;
+            border: 0;
             border-radius: 8px;
             margin-left: 5px;
             color: #ffa8a8;
@@ -543,6 +543,30 @@
             background: var(--accent-color);
             color: white;
             scale: 0.95;
+        }
+
+        .msgoptions
+        {
+            display: flex;
+            flex-direction: row;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2px;
+            margin: 0;
+            width: fit-content;
+            height: fit-content;
+        }
+
+        .msgoptionsbtn
+        {
+            font-size: 10px;
+            width: fit-content;
+            height: fit-content;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            margin: 4px;
         }
 
         ::-webkit-scrollbar { width: 6px; }
@@ -707,6 +731,12 @@
             }
         }
     
+        async function syncData(newdata)
+        {
+            try { await pb.collection('accounts').update(pb.authStore.record.id, { data: newdata }); }
+            catch { alert("Failed to sync data with XeTute Technologies Cloud. We're sorry."); }
+        }
+
         async function authAndDisplay()
         {
             const authprofile = document.getElementById('authprofile');
@@ -720,7 +750,7 @@
                 if (!auth.data || (auth.data === null) || (auth.data === "") || (auth.data === undefined)) { auth.data = {}; updated = true; }
                 if (!auth.data.username) { auth.data.username = "Friend"; updated = true; }
                 if (!auth.data?.chat) { auth.data.chat = []; updated = true; }
-                if (updated) { try { await pb.collection('accounts').update(auth.id, { data: auth.data }); } catch (e) { console.log("Error updating record: ", e); } }
+                if (updated) { await syncData(auth.data); }
 
                 authprofile.innerHTML = `<i class="fas fa-user"></i> ${auth.data.username}`;
                 authprofile.href = `./account/?${window.location.href}`;
@@ -752,8 +782,7 @@
                 if ((data.chat === '') || (data.chat === undefined) || (data.chat === null))
                 {
                     data.chat = [];
-                    try { await pb.collection('accounts').update(pb.authStore.record.id, { data: data }); }
-                    catch (e) { console.log(e); }
+                    await syncData(data);
                 }
             }
             catch (e) { console.log(e); }
@@ -778,17 +807,30 @@
             return { chatid, newchat };
         }
 
+        function copyLast()
+        {
+            try { navigator.clipboard.writeText(message.at(-1).content); alert("Copied!"); }
+            catch (e) { alert("Failed to copy. We're sorry."); console.log("Failed to copy to clipboard: ", e); }
+        }
+
         let processing = false;
         let generationtime = 0.0;
+
+        async function regenerateLast()
+        {
+
+        }
 
         function formatMessage(text)
         {
             let fromassistant = false;
+            let lastmessage = false;
             for (let x = (message.length - 1); x >= 0; --x)
             {
                 if ((message[x].content === text) && (message[x].role === "assistant"))
                 {
                     fromassistant = true;
+                    if (x === (message.length - 1)) { lastmessage = true; }
                     break;
                 }
             }
@@ -810,6 +852,23 @@
                     `<em style="font-size: 0.7rem; color: #ccc;">
                         Took ${ensureMaxDigits(generationtime / 1000, 3)}s | Generated ${ensureMaxDigits(wordsPerSecond(countWords(text)), 3)} Words per Second.
                     </em>`;
+                }
+                else if (lastmessage)
+                {
+                    html +=
+                    // `<div class="msgoptions">
+                    //     <button onclick="regenerateLast();" class="msgoptionsbtn">
+                    //         <i class="fa fa-refresh" aria-hidden="true"></i>
+                    //     </button>
+                    //     <button onclick="copyLast();" class="msgoptionsbtn">
+                    //         <i class="fa-solid fa-copy"></i>
+                    //     </button>
+                    // </div>`;
+                    `<div class="msgoptions">
+                        <button onclick="copyLast();" class="msgoptionsbtn">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>`;
                 }
 
                 const begin = text.search("<think>");
@@ -840,11 +899,6 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role === 'user' ? 'user-message' : 'assistant-message'}`;
             const contentDiv = document.createElement('div');
-            if (window.MathJax) 
-            { 
-                try { MathJax.typeset([contentDiv]); } 
-                catch (e) { console.error("MathJAX error:", e); } 
-            }
             contentDiv.innerHTML = formatMessage(content);
             messageDiv.append(contentDiv);
             chatContainer.appendChild(messageDiv);
@@ -872,9 +926,8 @@
 
         function addChatsToSidebar()
         {
-            let html = sidebar.innerHTML;
-            const searchindex = html.search("Chat History");
-            if (searchindex !== -1) { html = html.substring(0, searchindex + 12); }
+            const searchindex = sidebar.innerHTML.search("Chat History");
+            if (searchindex !== -1) { sidebar.innerHTML = sidebar.innerHTML.substring(0, searchindex - "<h1 class=\"sidebartxt\">".length); }
 
             const historyHeader = document.createElement('h1');
             historyHeader.className = 'sidebartxt';
@@ -943,7 +996,7 @@
                         max_tokens: 8192
                     })
                 });
-                if (!response.ok) { throw("Server didn't send back a valid response. Maybe someone is trying to feel cool?"); }
+                if (!response.ok) { throw("Server didn't send back a valid response."); }
     
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
@@ -991,11 +1044,10 @@
                 {
                     let data = pb.authStore.record.data;
                     data.chat[chatid] = message;
-                    try { await pb.collection('accounts').update(pb.authStore.record.id, { data: data }); }
-                    catch { alert("Failed to sync chat with XeTute Technologies Cloud. We're sorry."); }
-                    if ((data.chat.length === 1) && (message.length === 3)) { addChatsToSidebar(); }
+                    await syncData(data);
+                    if (message.length === 3) { addChatsToSidebar(); }
                 }
-                else if (message.length === 3) { alert("Your chat isn't being saved. To save future chats, log in."); }
+                else if (message.length === 5) { alert("Your chat isn't being saved. To save future chats, log in."); }
             }
             catch (e)
             {
@@ -1029,14 +1081,7 @@
             {
                 let data = pb.authStore.record.data;
                 data.chat.splice(index, 1);
-
-                try
-                {
-                    await pb.collection('accounts').update(pb.authStore.record.id, { data: data });
-                    alert("Deleted successfully.");
-                    window.location.reload();
-                }
-                catch { alert("Failed to delte. We're sorry."); }
+                await syncData(data);
             }
         }
 

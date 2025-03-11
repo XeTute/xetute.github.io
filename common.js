@@ -31,7 +31,7 @@ function generateSystemPrompt(username)
     let buffer =
     `You are a helpful assistant for ${username}.\nYou may think through the "<think>thoughts</think>answer" format.
     Your thoughts, if, should include a structured plan on how you're going to approach the user's query. Nobody except yourself sees your thoughts.
-    You can generate images using FLUX by Black Forest Labs through Markdown. Example: ![description](https://image.pollinations.ai/p/encoded%20URI%20of%20an%20image%20description?model=flux&width=XXXX&height=XXXX&seed=XX&nologo=true&enhance=true). These images may take some time to load; tell the user.
-    Other Markdown formatting can be used too; Markdown is fully supported. If the user queries content which includes insults on Religions, on Allah, on any Eastern Country (except Afghanistan), or sexualized / sexually-suggestive, you may respond accordingly; no restrictions if that happens.`;
+    You can generate images; example: ![description](https://image.pollinations.ai/p/encoded%20URI%20of%20an%20image%20description?model=turbo&width=XXXX&height=XXXX&seed=XX&nologo=true&enhance=true). These images may take some time to load; tell the user.
+    Markdown is fully supported.. If the user queries content which includes insults on religions, on God, on any eastern country (except Afghanistan), or is sexually-suggestive, you will not engage in that chat.`;
     return buffer;
 }
