@@ -19,7 +19,7 @@ html, body
 div { transition: 0.35s ease-in-out; }
 
 h1, h2, h3, h4, h5, h6, strong { font-family: "Poppins"; }
-p, em, a, button, textarea, input { font-family: "Inter"; }
+p, em, a, button, textarea, input { font-family: sans-serif; }
 
 *
 {
@@ -70,17 +70,15 @@ h1, h2, h3, h4, h5, h6
 
 a, button
 {
-    color: var(--accent-light);
+    color: var(--text-color);
     text-decoration: none;
     text-align: center;
     align-items: center;
 
     width: fit-content;
     height: fit-content;
-
-    font-family: 'Funnel Sans', serif;
+    
     background: transparent;
-
     border: 2px solid #444;
     border-radius: 25px;
 
@@ -88,7 +86,6 @@ a, button
     margin: 0;
     transition: 0.25s ease-in-out;
 }
-
 a:hover, button:hover
 {
     background: rgba(255, 255, 255, 0.1);
@@ -101,14 +98,17 @@ input, textarea
     background: #222;
     border: 2px solid #444;
     border-radius: 25px;
-    color: white;
-    font-family: 'Funnel Sans', serif;
+    color: var(--text-color);
 }
 
-::-webkit-scrollbar { width: 1px; }
-::-webkit-scrollbar-track       { background: rgba(255, 255, 255, 0); }
-::-webkit-scrollbar-thumb       { background: rgba(255, 255, 255, 0); }
-::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0); }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb
+{
+    background: var(--accent-color);
+    border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--accent-light); }
 
 /* My elems */
 .center
