@@ -41,12 +41,12 @@
 
                 document.getElementById('greeting').textContent = `Hello, ${username}`;
                 authlink.textContent = "do you want to edit your profile?";
-                authlink.href = `./auth/?${window.location.href}`;
+                authlink.href = `./account/?${window.location.href}`;
             }
             catch
             {
                 authlink.textContent = "do you want to sign-up?";
-                authlink.href = `./account/?${window.location.href}`;
+                authlink.href = `./auth/?${window.location.href}`;
             }
         }
         load();
