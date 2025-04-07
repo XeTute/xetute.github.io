@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Long live the Islamic Republic of Pakistan.">
+    <title>Authentication \\ Xetute Technologies</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="../css/vars.css">
+    <link rel="stylesheet" href="../css/html.css">
+    <link rel="icon" href="../logo.jpg">
+    
+    <style>
+        body, html { display: flex; justify-content: center; }
+        button, a { color: #fff; }
+        cdiv
+        {
+            border: 2px solid #555;
+            border-radius: 25px;
+            margin: 10px;
+            padding: 10px;
+
+            display: flex;
+            flex-direction: column;
+
+            justify-content: center;
+            align-items: center;
+
+            width: fit-content;
+            height: fit-content;
+        }
+
+        rdiv
+        {
+            margin-top: -10px;
+            padding: 10px;
+
+            display: flex;
+            flex-direction: row;
+
+            justify-content: center;
+            align-items: center;
+
+            width: fit-content;
+            height: fit-content;
+        }
+
+        line { background: #fff; margin: 10px; }
+
+        .underline
+        {
+            text-decoration: underline;
+            text-decoration-color: #999; 
+            text-decoration-thickness: 2px;
+            margin: 10px;
+        }
+
+        .dangerous > p { color: rgba(255, 100, 100, .85); }
+        .dangerous > button { background: rgba(255, 150, 150, .2); border: 0; }
+
+        .backbtn
+        {
+            display: flex;
+            flex-direction: row;
+
+            justify-content: center;
+            align-items: center;
+
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            padding: 10px;
+            
+            border: 2px solid #666;
+            border-radius: 15px;
+
+            width: 50px;
+            height: 50px;
+
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <a class="backbtn" id="backbutton">
+        <i class="fa fa-chevron-left" style="justify-self: center; align-self: center;" aria-hidden="true"></i>
+    </a>
+    <h1>Your Account</h1>
+    <cdiv>
+        <p class="underline">Username</p>
+        <rdiv>
+            <p id="username">Authorizing...</p>
+            <line style="width: 2px; height: 2rem;"></line>
+            <button onclick="updateUsername();">Update</button>
+        </rdiv>
+    </cdiv>
+
+    <cdiv>
+        <p class="underline">E-Mail</p>
+        <rdiv>
+            <p id="email">Authorizing...</p>
+            <line style="width: 2px; height: 2rem;"></line>
+            <button onclick="updateEmail();">Update</button>
+        </rdiv>
+    </cdiv>
+
+    <cdiv>
+        <p class="underline">Password</p>
+        <button onclick="updatePassword();">Update Password</button>
+    </cdiv>
+
+    <cdiv>
+        <p class="underline">Authorisation</p>
+        <rdiv class="dangerous">
+            <p>Logged In</p>
+            <line style="width: 2px; height: 2rem;"></line>
+            <button onclick="logOut();">Log Out</button>
+        </rdiv>
+        <rdiv class="dangerous">
+            <p>Record</p>
+            <line style="width: 2px; height: 2rem;"></line>
+            <button onclick="deleteAccount();">Delete Account</button>
+        </rdiv>
+    </cdiv>
+</body>
+<script src="../pocketbase.umd.js"></script>
+<script defer>
+    const pb = new PocketBase('https://db.xetute.com/');
+    const backbtn = document.getElementById('backbutton');
+    const origin = window.location.search.substr(1);
+
+    const username = document.getElementById('username');
+    const email = document.getElementById('email');
+
+    if (!origin) { backbtn.remove(); }
+    else { backbtn.href = origin; }
+
+    let auth;
+
+    function refreshPage() { window.location.href = window.location.href; }
+
+    async function authRefresh()
+    {
+        try { auth = await pb.collection('accounts').authRefresh(); }
+        catch { window.location.href = "../auth/?../account/"; }
+
+        if ((auth.record.data === undefined) || (auth.record.data === ""))
+        {
+            auth.record.data = { "username": "Friend" };
+            auth.record.data = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data });
+        }
+
+        username.textContent = auth.record.data.username;
+        email.textContent = auth.record.email;
+    }
+    authRefresh();
+
+    async function updateUsername()
+    {
+        if (confirm("Update Username?"))
+        {
+            const newname = prompt("Type in your desired Username...");
+            auth.record.data["username"] = newname;
+            
+            try { auth.record = await pb.collection('accounts').update(auth.record.id, { "data": auth.record.data }); }
+            catch { alert("Failed to update your Username. We're sorry."); }
+
+            username.textContent = auth.record.data.username;
+        }
+    }
+
+    async function updateEmail()
+    {
+        if (confirm("Update Email?"))
+        {
+            const newemail = prompt("Type in your new E-Mail (you'll have to verify it)...");
+            try { await pb.collection('accounts').requestEmailChange(newemail); alert(`We sent a confirmation to ${newemail}.`); }
+            catch (e) { alert(`Failed to sent E-Mail to ${newemail}. We're sorry. \nError: ${e}`); console.log("Failed to sent confirmation E-Mail: ", e); }
+        }
+    }
+
+    async function updatePassword()
+    {
+        if (confirm("Update Password?"))
+        {
+            try { await pb.collection('accounts').requestPasswordReset(auth.record.email); alert(`Send instructions to ${auth.record.email}.`); }
+            catch { alert("Failed to send instructions to your E-Mail."); }
+        }
+    }
+
+    async function logOut()
+    {
+        if (confirm("Log Out? You'll be able to Log In afterwards."))
+        {
+            pb.authStore.clear();
+            refreshPage();
+        }
+    }
+
+    async function deleteAccount()
+    {
+        if (confirm("Delete Account? Bad things will happen if you do that, this action cannot be undone."))
+        {
+            try { await pb.collection('accounts').delete(auth.record.id); window.location.href = "https://xetute.com/"; }
+            catch { alert("Failed to delete your account. Maybe that's a sign?"); }
+        }
+    }
+</script>
