@@ -37,6 +37,7 @@
                 overflow: auto;
                 padding: 5px;
                 padding-bottom: 10vh;
+                max-width: 90% !important;
             }
 
             .recent-chats
@@ -294,6 +295,7 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
             const key = "0";
             const workingcompletion = 1;
 
+            let authorized = false;
             let processing = false;
             let messages = [ { "role": "system", "content": systemprompt } ];
             let chatid = -1;
@@ -312,12 +314,14 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                 msgcontainer.style.justifyContent = "center";
                 msgcontainer.appendChild(txtelem);
 
-                if (pb.authStore.record) chatid = pb.authStore.record.data.MyZara.chats.length;
+                if (authorized) chatid = pb.authStore.record.data.MyZara.chats.length;
                 else chatid = -1;
+
                 messages = [ { "role": "system", "content": systemprompt } ];
 
                 if (document.querySelector(".chat").style.display === "none")
                     showSidebar();
+                reloadallchatui = true;
             }
 
             function showSidebar()
@@ -358,31 +362,36 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
             {
                 const recentchats = document.getElementById("recent-chats-header");
                 const authbtn = document.getElementById("authbtn");
-                if (await isAuthorized(pb))
+                if ((authorized = await isAuthorized(pb)))
                 {
                     if (pb.authStore.record.data.MyZara?.chats === undefined)
                     {
-                        if (!(await updateData({ ...pb.authStore.record.data, MyZara: { chats: [] } }, pb)))
+                        if (!(await updateData({ ...pb.authStore.record.data, MyZara: { chats: [] } }, { pb: pb })))
                             alert("Your data seems to be corrupted. Expect errors, report them to x3tut3@gmail.com if they occur.");
                     }
-                    if (pb.authStore.record.data.chats?.length)
+                    if (pb.authStore.record.data.MyZara?.chats?.length > -1) // Check if it exists, not how long it is
                     {
-                        recentchats.textContent = "Recent Chats";
-                        loadChats(pb.authStore.record.data.chats);
                         chatid = new URLSearchParams(window.location.search.substr(1)).get("chatid");
-                        if ((chatid >= 0) && (chatid < pb.authStore.record.data.chats))
+                        if ((chatid >= 0) && (chatid < pb.authStore.record.data.MyZara?.chats))
                         {
-                            messages = pb.authStore.record.data.chats[chatid];
+                            messages = pb.authStore.record.data.MyZara?.chats[chatid];
                             loadChat(messages);
                             reloadallchatui = false;
                         }
-                        else chatid = pb.authStore.record.data.chats.length;
+                        else chatid = pb.authStore.record.data.MyZara?.chats.length;
+
+                        if (chatid >= 0) recentchats.remove();
+                        else
+                        {
+                            recentchats.textContent = "Recent Chats";
+                            loadChats(pb.authStore.record.data.MyZara?.chats);
+                        }
                     }
                     else recentchats.style.display = "none";
                     if (!pb.authStore.record.data.username)
                     {
                         let newname = prompt("You don't currently have an username. Set one here.");
-                        if (await updateData({ ...pb.authStore.record.data, username: newname }, pb)) alert(`Welcome, ${newdata.username}!`);
+                        if (await updateData({ ...pb.authStore.record.data, username: newname }, { pb: pb })) alert(`Welcome, ${newdata.username}!`);
                         else alert(`We failed to update your data. We're sorry, ${newdata.username}.`);
                     }
                     authbtn.getElementsByTagName('p')[0].textContent = pb.authStore.record.data.username;
@@ -403,18 +412,31 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                 {
                     const btn = document.createElement("labeledbutton");
                     const title = document.createElement("p");
-                    const iconwrapper = document.createElement("iwrapper");
-                    const icon = document.createElement("i");
+                    const iconwrappertrash = document.createElement("iwrapper");
+                    const icontrash = document.createElement("i");
 
-                    btn.setAttribute("onclick", `loadChat(${x})`);
-                    title.textContent = maxchars(chats[x].title, 12);
-                    iconwrapper.setAttribute("onclick", `renameChat(${x})`);
-                    icon.className = "fa fa-pencil-square-o";
-                    
+                    btn.setAttribute("id", `recentchat${x}`);
+                    title.setAttribute("onclick", `loadChatFromID([${x}])`);
+                    title.textContent = maxchars(chats[x][1].content, 12);
+
+                    icontrash.classList = "fa fa-trash";
+                    iconwrappertrash.setAttribute("onclick", `deleteChat(${x})`);
+                    iconwrappertrash.appendChild(icontrash);
+
                     btn.appendChild(title);
-                    iconwrapper.appendChild(icon);
-                    btn.appendChild(iconwrapper);
+                    btn.appendChild(iconwrappertrash);
                     container.appendChild(btn);
+                }
+            }
+
+            async function deleteChat(id)
+            {
+                if (confirm("You can't recover a chat after deleting it. Continue?"))
+                {
+                    let newdata = pb.authStore.record.data;
+                    newdata.MyZara.chats.splice(id, 1);
+                    if (!(await updateData(newdata, { pb: pb }))) alert("Failed to delete Chat.");
+                    else document.getElementById(`recentchat${x}`).remove();
                 }
             }
 
@@ -440,7 +462,10 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     for (msg of chat) addMsgToContainer(msg);
                 }
                 else addMsgToContainer(chat.at(-1));
+                if (document.querySelector(".chat").style.display === "none")
+                    showSidebar();
             }
+            function loadChatFromID(id) { loadChat(pb.authStore.record.data.MyZara.chats[id]); }
 
             async function generateNextTurn()
             {
@@ -478,11 +503,11 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     messages.pop();
                 }
 
-                if (pb.authStore.record)
+                if (authorized)
                 {
                     let data = pb.authStore.record.data;
-                    data.MyZara.chats[chatid] = messages;
-                    if (!updateData(data)) console.error("Failed to update to latest messages.");
+                    data.MyZara.chats[chatid] = [...messages];
+                    if (!(await updateData(data, { pb: pb }))) alert("Failed to sync last message with the cloud.");
                 }
 
                 loadingindic.remove();
