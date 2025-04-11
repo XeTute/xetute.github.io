@@ -380,7 +380,7 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                         }
                         else chatid = pb.authStore.record.data.MyZara?.chats.length;
 
-                        if (chatid >= 0) recentchats.remove();
+                        if (chatid <= 0) recentchats.remove();
                         else
                         {
                             recentchats.textContent = "Recent Chats";
