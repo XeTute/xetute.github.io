@@ -124,18 +124,22 @@
             .msg
             {
                 width: fit-content;
-                height: fit-content;
                 max-width: 80%;
+                height: fit-content;
+
+                box-sizing: border-box;
+                word-wrap: break-word;
 
                 border: 2px solid var(--border-color-dark-mode);
                 border-radius: 16px;
 
                 padding: 12px;
+                margin: 20px;
                 box-shadow: 0 0 8px var(--border-color-dark-mode);
                 color: var(--color-dark-mode);
                 line-height: 1.4;
             }
-            .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { text-decoration: underline; font-family: "Codystar", "Inria Sans" !important; font-weight: 700; width: 100%; }
+            .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { text-decoration: underline; font-family: "Codystar", "Inria Sans" !important; font-weight: 700; }
             .msg a, .msg button { text-decoration: underline; color: inherit; }
             .msg img, .msg video
             {
@@ -147,22 +151,27 @@
             .msg pre
             {
                 margin: 16px !important;
-                margin-left: 8 !important;
-                margin-right: auto !important;
                 padding: 8px !important;
-                font-family: 'Codystar', "Inria Sans", sans-serif;
+                font-family: 'Courier New', Courier, monospace;
                 text-align: left;
                 border: 2px solid var(--border-color-dark-mode);
                 border-radius: 16px;
             }
+            .msg pre, .msg code
+            {
+                white-space: pre-wrap !important;
+                word-break: break-word !important;
+                max-width: 85% !important;
+                overflow-x: auto !important;
+            }
 
-            .usermsg { text-align: right; margin: 0 20px 20px auto; }
+            .usermsg { text-align: right; margin-left: auto; align-items: flex-end; }
             .usermsg p, .usermsg em, .usermsg strong, .usermsg b, .usermsg i, .usermsg mark, .usermsg small, .usermsg del, .usermsg ins,
             .usermsg sub, .usermsg sup, .usermsg h1, .usermsg h2, .usermsg h3, .usermsg h4, .usermsg h5, .usermsg h6, .usermsg blockquote,
-            .usermsg ol, .usermsg ul, .usermsg pre { text-align: right !important; padding: 0; margin: 0; }
+            .usermsg ol, .usermsg ul { text-align: right !important; padding: 0; margin: 0; }
             .usermsg ol, .usermsg ul { padding-left: 15px; }
 
-            .assistantmsg { text-align: left; margin: 0 auto 20px 20px; }
+            .assistantmsg { text-align: left; margin-right: auto; align-items: flex-start; }
             .assistantmsg p, .assistantmsg em, .assistantmsg strong, .assistantmsg b, .assistantmsg i, .assistantmsg mark, .assistantmsg small,
             .assistantmsg del, .assistantmsg ins, .assistantmsg sub, .assistantmsg sup, .assistantmsg h1, .assistantmsg h2, .assistantmsg h3,
             .assistantmsg h4, .assistantmsg h5, .assistantmsg h6, .assistantmsg blockquote, .assistantmsg ul, .assistantmsg ol, .assistantmsg pre
@@ -369,18 +378,20 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                         if (!(await updateData({ ...pb.authStore.record.data, MyZara: { chats: [] } }, { pb: pb })))
                             alert("Your data seems to be corrupted. Expect errors, report them to x3tut3@gmail.com if they occur.");
                     }
-                    if (pb.authStore.record.data.MyZara?.chats?.length > -1) // Check if it exists, not how long it is
+
+                    const nchats = pb.authStore.record.data.MyZara.chats.length;
+                    if (nchats > -1) // Check if it exists, not how long it is
                     {
                         chatid = new URLSearchParams(window.location.search.substr(1)).get("chatid");
-                        if ((chatid >= 0) && (chatid < pb.authStore.record.data.MyZara?.chats))
+                        if ((chatid >= 0) && (chatid < nchats) && (chatid !== null))
                         {
-                            messages = pb.authStore.record.data.MyZara?.chats[chatid];
+                            messages = pb.authStore.record.data.MyZara.chats[chatid];
                             loadChat(messages);
                             reloadallchatui = false;
                         }
-                        else chatid = pb.authStore.record.data.MyZara?.chats.length;
+                        else chatid = nchats;
 
-                        if (chatid <= 0) recentchats.remove();
+                        if (nchats <= 0) recentchats.remove();
                         else
                         {
                             recentchats.textContent = "Recent Chats";
@@ -416,7 +427,7 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     const icontrash = document.createElement("i");
 
                     btn.setAttribute("id", `recentchat${x}`);
-                    title.setAttribute("onclick", `loadChatFromID([${x}])`);
+                    title.setAttribute("onclick", `loadChatFromID(${x})`);
                     title.textContent = maxchars(chats[x][1].content, 12);
 
                     icontrash.classList = "fa fa-trash";
@@ -465,7 +476,12 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                 if (document.querySelector(".chat").style.display === "none")
                     showSidebar();
             }
-            function loadChatFromID(id) { loadChat(pb.authStore.record.data.MyZara.chats[id]); }
+            function loadChatFromID(id)
+            {
+                loadChat(pb.authStore.record.data.MyZara.chats[id]);
+                chatid = id;
+                history.pushState(null, "", `?${new URLSearchParams({ chatid: chatid }).toString()}`);
+            }
 
             async function generateNextTurn()
             {
