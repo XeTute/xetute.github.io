@@ -15,6 +15,8 @@
         <style>
             .sidebar
             {
+                min-height: 99.9%;
+                max-height: 100%;
                 padding: 20px;
                 padding-top: 40px;
                 justify-content: flex-start;
@@ -32,8 +34,6 @@
 
             .messages
             {
-                min-height: 80%;
-                max-height: 85%;
                 overflow: auto;
                 padding: 5px;
                 padding-bottom: 15vh;
@@ -71,6 +71,12 @@
                 border: 0;
                 padding: 22px;
                 background: var(--color-dark-mode);
+            }
+
+            .chat
+            {
+                min-height: 99.9%;
+                max-height: 100%;
             }
 
             .notifier
@@ -127,16 +133,18 @@
                 max-width: 100%;
                 min-height: min-content;
                 max-height: max-content;
-                padding: 15px;
-                margin: 0;
+                padding: 5px 15px 5px 15px;
+                margin: 5px;
                 overflow-y: auto;
                 overflow-x: hidden;
                 flex-direction: column;
                 justify-content: flex-start;
                 line-height: 1.45;
+                transition: 0.2s ease-in-out;
             }
-            .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg code, .msg ins, .msg sub, .msg sup { margin: 0; padding: 0; height: fit-content; }
+            .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg code, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; }
             .msg p { margin: 5px; margin-left: 0; }
+            .msg a { color: var(--color-dark-mode); text-decoration: underline; transition: 0.2s ease-in-out; } .msg a:hover { text-shadow: 0 0 8px var(--color-dark-mode); }
             .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { margin-top: 10px; margin-bottom: 5px; font-family: "Codystar", "Inria Sans"; font-size: 18px; font-weight: 800; }
             .msg pre
             {
@@ -162,6 +170,7 @@
                 max-width: 80%;
                 width: fit-content;
             }
+            .usermsg:hover { box-shadow: 0 0 8px var(--border-color-dark-mode); }
             .usermsg pre { text-align: left; }
             .assistantmsg { align-items: flex-start; text-align: left; }
 
@@ -229,7 +238,7 @@
             }
         </style>
     </head>
-    <body>
+    <body style="max-height: 100%; overflow: hidden;">
         <div style="flex-direction: row;">
             <div class="sidebar">
                 <h2>Quick Actions</h2>
@@ -260,7 +269,7 @@
             </div><iwrapper class="sidebarbtn"><i class="fa fa-ellipsis-h" onclick="showSidebar()"></i></iwrapper>
             <div class="chat">
                 <div class="messages">
-                    <p style="display: flex; justify-content: center; align-items: center; text-align: center; max-width: 95%; flex: 1; color: var(--suble-color-text-dark-mode);">
+                    <p style="display: flex; justify-content: center; align-items: center; text-align: center; min-width: 95%; flex: 1; color: var(--suble-color-text-dark-mode);">
                         Send a message to start chatting with Zara.<br>
                         Zara is an AI assistant designed by Hamzah.<br>
                         — Consider verifying important information.
@@ -298,7 +307,7 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
             let authorized = false;
             let processing = false;
             let messages = [ { "role": "system", "content": systemprompt } ];
-            let chatid; setChatID(-1);
+            let chatid = -1;
             let reloadallchatui = true;
             let loadlastmessages = 64;
 
@@ -474,7 +483,7 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     div.innerHTML = marked.parse(msg.content);
                     div.classList = "msg " + ((msg.role === "user") ? "usermsg" : "assistantmsg");
                     container.appendChild(div);
-                    div.scrollIntoView({ behavior: "smooth" });
+                    container.scrollTo(0, container.scrollHeight);
                 }
             }
 
@@ -485,7 +494,8 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                 {
                     container.innerHTML = "";
                     container.style.justifyContent = "flex-start";
-                    for (msg of chat) addMsgToContainer(msg);
+                    if ((chat.length - 1) < loadlastmessages) for (msg of chat) addMsgToContainer(msg);
+                    else for (let x = loadlastmessages + 1; x < chat.length; ++x) addMsgToContainer(chat[x]);
                 }
                 else addMsgToContainer(chat.at(-1));
                 if (document.querySelector(".chat").style.display === "none")
@@ -525,10 +535,12 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     });
                     const generated = (await response.json()).choices[0].message.content;
                     messages.push({ role: "assistant", content: generated });
+                    loadingindic.remove()
                     loadChat(messages);
                 }
                 catch (e)
                 {
+                    loadingindic.remove();
                     loadChat([...messages, { "role": "assistant", "content": "Zara is not responding...\n" + e }]);
                     messages.pop();
                 }
@@ -540,7 +552,6 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     if (!(await updateData(data, { pb: pb }))) alert("Failed to sync last message with the cloud.");
                 }
 
-                loadingindic.remove();
                 if (messages.length === 3) reloadallchatui = false;
             }
         </script>
