@@ -36,8 +36,10 @@
                 max-height: 85%;
                 overflow: auto;
                 padding: 5px;
-                padding-bottom: 10vh;
-                max-width: 90% !important;
+                padding-bottom: 15vh;
+                min-width: 70%;
+                max-width: 80% !important;
+                justify-content: flex-start;
             }
 
             .recent-chats
@@ -51,15 +53,13 @@
             {
                 position: absolute;
                 bottom: 20px;
-                max-height: 10vh;
-                flex-direction: row;
-                gap: 10px;
-                max-width: 9%;
+                max-height: fit-content;
             }
             .sidebarnotes p
             {
                 border: 2px solid var(--border-color-dark-mode);
                 padding: 20px;
+                margin: 5px;
                 border-radius: 25px;
                 text-align: center;
                 transition: 0.2s ease-in-out;
@@ -123,60 +123,47 @@
 
             .msg
             {
-                width: fit-content;
-                max-width: 80%;
-                height: fit-content;
-
-                box-sizing: border-box;
-                word-wrap: break-word;
-
-                border: 2px solid var(--border-color-dark-mode);
-                border-radius: 16px;
-
-                padding: 12px;
-                margin: 20px;
-                box-shadow: 0 0 8px var(--border-color-dark-mode);
-                color: var(--color-dark-mode);
-                line-height: 1.4;
+                min-width: 99%;
+                max-width: 100%;
+                min-height: min-content;
+                max-height: max-content;
+                padding: 15px;
+                margin: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+                flex-direction: column;
+                justify-content: flex-start;
+                line-height: 1.45;
             }
-            .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { text-decoration: underline; font-family: "Codystar", "Inria Sans" !important; font-weight: 700; }
-            .msg a, .msg button { text-decoration: underline; color: inherit; }
-            .msg img, .msg video
-            {
-                max-width: 95%;
-                margin: 15px;
-                border: 2px solid var(--border-color-dark-mode);
-                border-radius: 16px;
-            }
+            .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg code, .msg ins, .msg sub, .msg sup { margin: 0; padding: 0; height: fit-content; }
+            .msg p { margin: 5px; margin-left: 0; }
+            .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { margin-top: 10px; margin-bottom: 5px; font-family: "Codystar", "Inria Sans"; font-size: 18px; font-weight: 800; }
             .msg pre
             {
-                margin: 16px !important;
-                padding: 8px !important;
-                font-family: 'Courier New', Courier, monospace;
-                text-align: left;
+                border: 2px solid var(--border-color-dark-mode);
+                border-radius: 25px;
+                color: rgba(255, 255, 255, 0.7);
+                padding: 15px;
+                margin: 5px;
+                max-width: 100%;
+                max-height: 256px;
+                overflow: auto;
+            }
+
+            .usermsg
+            {
+                align-items: flex-end;
+                align-self: flex-end;
+                text-align: right;
                 border: 2px solid var(--border-color-dark-mode);
                 border-radius: 16px;
+                border-top-right-radius: 0;
+                min-width: min-content !important;
+                max-width: 80%;
+                width: fit-content;
             }
-            .msg pre, .msg code
-            {
-                white-space: pre-wrap !important;
-                word-break: break-word !important;
-                max-width: 85% !important;
-                overflow-x: auto !important;
-            }
-
-            .usermsg { text-align: right; margin-left: auto; align-items: flex-end; }
-            .usermsg p, .usermsg em, .usermsg strong, .usermsg b, .usermsg i, .usermsg mark, .usermsg small, .usermsg del, .usermsg ins,
-            .usermsg sub, .usermsg sup, .usermsg h1, .usermsg h2, .usermsg h3, .usermsg h4, .usermsg h5, .usermsg h6, .usermsg blockquote,
-            .usermsg ol, .usermsg ul { text-align: right !important; padding: 0; margin: 0; }
-            .usermsg ol, .usermsg ul { padding-left: 15px; }
-
-            .assistantmsg { text-align: left; margin-right: auto; align-items: flex-start; }
-            .assistantmsg p, .assistantmsg em, .assistantmsg strong, .assistantmsg b, .assistantmsg i, .assistantmsg mark, .assistantmsg small,
-            .assistantmsg del, .assistantmsg ins, .assistantmsg sub, .assistantmsg sup, .assistantmsg h1, .assistantmsg h2, .assistantmsg h3,
-            .assistantmsg h4, .assistantmsg h5, .assistantmsg h6, .assistantmsg blockquote, .assistantmsg ul, .assistantmsg ol, .assistantmsg pre
-            { text-align: left !important; margin: 5px auto 0 0; }
-            .assistantmsg ol, .assistantmsg ul { padding-left: 15px; }
+            .usermsg pre { text-align: left; }
+            .assistantmsg { align-items: flex-start; text-align: left; }
 
             .loadingindic
             {
@@ -225,15 +212,19 @@
             {
                 .sidebar { display: none; padding-top: 8rem; }
                 .sidebarbtn { position: absolute; top: 5px; left: 5px; }
+                .sidebarnotes { flex-direction: row; max-width: 99%; }
+                .chat { width: 100%; max-width: 100%; }
                 .notifier { width: 100%; }
                 .userinput { width: 70% !important; max-width: 70% !important; }
             }
 
             @media (orientation: landscape)
             {
-                .sidebar { max-width: 16%; border-right: 2px solid rgba(0, 0, 0, 0.5); }
+                .sidebar { max-width: 15%; border-right: 2px solid rgba(0, 0, 0, 0.5); }
                 .sidebarbtn { display: none; }
-                .notifier { width: 90%; }
+                .sidebarnotes { flex-direction: column; max-width: 14%; }
+                .chat { width: 85%; max-width: 85%; }
+                .notifier { width: 85%; }
                 .userinput { width: 65% !important; max-width: 65% !important; }
             }
         </style>
@@ -269,7 +260,7 @@
             </div><iwrapper class="sidebarbtn"><i class="fa fa-ellipsis-h" onclick="showSidebar()"></i></iwrapper>
             <div class="chat">
                 <div class="messages">
-                    <p style="text-align: center; max-width: 85%; color: var(--suble-color-text-dark-mode);">
+                    <p style="display: flex; justify-content: center; align-items: center; text-align: center; max-width: 95%; flex: 1; color: var(--suble-color-text-dark-mode);">
                         Send a message to start chatting with Zara.<br>
                         Zara is an AI assistant designed by Hamzah.<br>
                         — Consider verifying important information.
@@ -307,24 +298,30 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
             let authorized = false;
             let processing = false;
             let messages = [ { "role": "system", "content": systemprompt } ];
-            let chatid = -1;
+            let chatid; setChatID(-1);
             let reloadallchatui = true;
             let loadlastmessages = 64;
+
+            function setChatID(newid)
+            {
+                chatid = newid;
+                history.pushState(null, "", `?${new URLSearchParams({ chatid: chatid }).toString()}`);
+            }
 
             function createNewChat()
             {
                 const msgcontainer = document.querySelector(".messages");
                 const txtelem = document.createElement("p");
 
-                txtelem.setAttribute("style", "text-align: center; max-width: 85%; color: var(--suble-color-text-dark-mode);");
+                txtelem.setAttribute("style", "display: flex; justify-content: center; align-items: center; text-align: center; max-width: 95%; flex: 1; color: var(--suble-color-text-dark-mode);");
                 txtelem.innerHTML = "Send a message to start chatting with Zara.<br>Zara is an AI assistant designed by Hamzah.<br> — Consider verifying important information.";
 
                 msgcontainer.innerHTML = "";
                 msgcontainer.style.justifyContent = "center";
                 msgcontainer.appendChild(txtelem);
 
-                if (authorized) chatid = pb.authStore.record.data.MyZara.chats.length;
-                else chatid = -1;
+                if (authorized) setChatID(pb.authStore.record.data.MyZara.chats.length);
+                else setChatID(-1);
 
                 messages = [ { "role": "system", "content": systemprompt } ];
 
@@ -365,6 +362,8 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
 
                 await generateNextTurn();
                 processing = false;
+
+                if (messages.length === 3) loadChats(pb.authStore.record.data.MyZara.chats);
             }
 
             async function load()
@@ -382,16 +381,20 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     const nchats = pb.authStore.record.data.MyZara.chats.length;
                     if (nchats > -1) // Check if it exists, not how long it is
                     {
-                        chatid = new URLSearchParams(window.location.search.substr(1)).get("chatid");
-                        if ((chatid >= 0) && (chatid < nchats) && (chatid !== null))
+                        try
                         {
-                            messages = pb.authStore.record.data.MyZara.chats[chatid];
-                            loadChat(messages);
-                            reloadallchatui = false;
+                            setChatID(Number(new URLSearchParams(window.location.search.substr(1)).get("chatid")));
+                            if ((chatid >= 0) && (chatid < nchats) && (chatid !== null))
+                            {
+                                messages = pb.authStore.record.data.MyZara.chats[chatid];
+                                loadChat(messages);
+                                reloadallchatui = false;
+                            }
+                            else setChatID(nchats);
                         }
-                        else chatid = nchats;
+                        catch { setChatID(nchats); }
 
-                        if (nchats <= 0) recentchats.remove();
+                        if (nchats <= 0) recentchats.style.display = "none";
                         else
                         {
                             recentchats.textContent = "Recent Chats";
@@ -401,9 +404,9 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     else recentchats.style.display = "none";
                     if (!pb.authStore.record.data.username)
                     {
-                        let newname = prompt("You don't currently have an username. Set one here.");
-                        if (await updateData({ ...pb.authStore.record.data, username: newname }, { pb: pb })) alert(`Welcome, ${newdata.username}!`);
-                        else alert(`We failed to update your data. We're sorry, ${newdata.username}.`);
+                        const newname = prompt("You don't currently have an username. Set one here.");
+                        if (await updateData({ ...pb.authStore.record.data, username: newname }, { pb: pb })) alert(`Welcome, ${newname}!`);
+                        else alert(`We failed to update your data. We're sorry, ${newname}.`);
                     }
                     authbtn.getElementsByTagName('p')[0].textContent = pb.authStore.record.data.username;
                 }
@@ -419,6 +422,11 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
             function loadChats(chats)
             {
                 const container = document.getElementById("recent-chats");
+                const header = document.getElementById("recent-chats-header");
+                container.innerHTML = "";
+                
+                if (chats.length === 0) header.style.display = "none";
+                else header.style.display = "block";
                 for (let x = 0; x < chats.length; ++x)
                 {
                     const btn = document.createElement("labeledbutton");
@@ -447,7 +455,13 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     let newdata = pb.authStore.record.data;
                     newdata.MyZara.chats.splice(id, 1);
                     if (!(await updateData(newdata, { pb: pb }))) alert("Failed to delete Chat.");
-                    else document.getElementById(`recentchat${x}`).remove();
+                    else
+                    {
+                        document.getElementById(`recentchat${id}`).remove();
+                        if (pb.authStore.record.data.MyZara.chats.length === 0)
+                            document.getElementById("recent-chats-header").style.display = "none";
+                        if (chatid === id) createNewChat();
+                    }
                 }
             }
 
@@ -460,6 +474,7 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
                     div.innerHTML = marked.parse(msg.content);
                     div.classList = "msg " + ((msg.role === "user") ? "usermsg" : "assistantmsg");
                     container.appendChild(div);
+                    div.scrollIntoView({ behavior: "smooth" });
                 }
             }
 
@@ -479,8 +494,7 @@ Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](ht
             function loadChatFromID(id)
             {
                 loadChat(pb.authStore.record.data.MyZara.chats[id]);
-                chatid = id;
-                history.pushState(null, "", `?${new URLSearchParams({ chatid: chatid }).toString()}`);
+                setChatID(id);
             }
 
             async function generateNextTurn()
