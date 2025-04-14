@@ -163,7 +163,7 @@
                 max-height: 256px;
                 overflow: auto;
             }
-            .msg img { border-radius: 15px; max-width: 100%; margin: 10px; }
+            .msg img { border-radius: 15px; max-width: 80%; margin: 10px; box-shadow: 0 0 8px var(--border-color-dark-mode); }
 
             .usermsg
             {
@@ -262,7 +262,7 @@
                     </iwrapper>
                 </labeledbutton>
 
-                <h2 style="margin-top: 30px;" id="recent-chats-header">Loading...</h2>
+                <h2 style="margin-top: 30px;" id="recent-chats-header">Recent Chats</h2>
                 <div id="recent-chats" class="recent-chats"></div>
 
                 <div class="sidebarnotes">
@@ -368,6 +368,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
             {
                 const inputfield = document.querySelector(".userinput");
                 const input = inputfield.value.trim();
+
                 if (processing) return;
                 processing = true;
 
@@ -391,6 +392,13 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 await generateNextTurn();
                 processing = false;
 
+                if (authorized)
+                {
+                    let data = pb.authStore.record.data;
+                    data.MyZara.chats[chatid] = [...messages];
+                    if (!(await updateData(data, { pb: pb }))) alert("Failed to sync last message with the cloud.");
+                }
+
                 if (messages.length === 3) loadChats(pb.authStore.record.data.MyZara.chats);
             }
 
@@ -398,6 +406,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
             {
                 const recentchats = document.getElementById("recent-chats-header");
                 const authbtn = document.getElementById("authbtn");
+
                 if ((authorized = await isAuthorized(pb)))
                 {
                     if (pb.authStore.record.data.MyZara?.chats === undefined)
@@ -614,13 +623,6 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                     loadingindic.remove();
                     loadChat([...messages, { "role": "assistant", "content": "Zara is not responding...\n" + e }]);
                     messages.pop();
-                }
-
-                if (authorized)
-                {
-                    let data = pb.authStore.record.data;
-                    data.MyZara.chats[chatid] = [...messages];
-                    if (!(await updateData(data, { pb: pb }))) alert("Failed to sync last message with the cloud.");
                 }
 
                 if (messages.length === 3) reloadallchatui = false;
