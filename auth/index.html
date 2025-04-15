@@ -1,176 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Long live the Islamic Republic of Pakistan.">
-    <title>Authentication \\ Xetute Technologies</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alumni+Sans+Pinstripe:ital@0;1&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" href="../css/vars.css">
-    <link rel="stylesheet" href="../css/html.css">
-    <link rel="icon" href="../logo.jpg">
-    
-    <style>
-        div
+        <title>Authenticate \\ XeTute Technologies</title>
+
+        <link rel="stylesheet" href="../main.css">
+        <link rel="icon" href="../favicon.ico">
+
+        <style>
+            input { max-height: fit-content; max-width: fit-content; margin: 5px; }
+            button { font-size: 16px; background: rgba(0, 0, 0, 0.05); }
+            button:hover, input:hover { scale: 1.05; }
+            #header { margin: 5px; padding: 5px; border-bottom: 2px solid var(--border-color-dark-mode); }
+            #switchform { position: absolute; margin-top: calc(100vh - 60px); }
+        </style>
+    </head>
+    <body>
+        <h2 id="header"></h2>
+        <p id="loading">Thanks for your patience...</p>
+
+        <input id="email"        placeholder="Email"    type="email"    autocomplete="offf"/>
+        <input id="password"     placeholder="Password" type="password" />
+        <input id="passconfirm"  placeholder="Password" type="password" />
+
+        <button id="button"></button>
+        <button id="switchform" onclick="loadForm();"></button>
+    </body>
+    <script src="../pocketbase.umd.js"></script>
+    <script src="../main.js"></script>
+    <script defer>
+        const from = new URLSearchParams(window.location.search.substr(1)).get("origin");
+        const pb = new PocketBase("https://db.xetute.com/");
+
+        const header = document.getElementById("header");
+        const loading = document.getElementById("loading"); loading.style.display = "none";
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const passconfirm = document.getElementById("passconfirm");
+
+        const button = document.getElementById("button");
+        const switchform = document.getElementById("switchform");
+
+        async function load()
         {
-            display: flex;
-            flex-direction: column;
-
-            width: 100%;
-            height: 100%;
-
-            justify-content: center;
-            align-items: center;
-        }
-
-        line
-        {
-            background: #fff;
-            margin: 10px;
-        }
-
-        input
-        {
-            margin: 10px;
-        }
-        
-        button
-        {
-            margin: 15px;
-            font-size: 16px;
-            color: #eeeeee;
-        }
-
-        #signinnotice, #signupnotice
-        {
-            color: #999;
-            margin: 0;
-            max-width: 75%;
-        }
-
-        #orbtn
-        {
-            position: absolute;
-            bottom: 20px;
-        }
-    </style>
-</head>
-<body>
-    <div id="signin">
-        <h1 style="margin-bottom: 0;">Authenticate</h1>
-        <line style="width: 6rem; height: 3px;"></line>
-        <input autocomplete="off" type="email"    id="signinemail"    placeholder="E-Mail"/>
-        <input autocomplete="off" type="password" id="signinpassword" placeholder="Password"/>
-        <p id="signinnotice"></p>
-        <button onclick="signIn()">Submit</button>
-    </div>
-    <div id="signup" style="display: none;">
-        <h1 style="margin-bottom: 0;">Authenticate</h1>
-        <line style="width: 6rem; height: 3px;"></line>
-        <input autocomplete="off" type="email"    id="signupemail"     placeholder="E-Mail"/>
-        <input autocomplete="off" type="password" id="signuppassword0" placeholder="Password"/>
-        <input autocomplete="off" type="password" id="signuppassword1" placeholder="Password"/>
-        <p id="signupnotice"></p>
-        <button onclick="signUp()">Submit</button>
-    </div>
-    <button id="orbtn" onclick="switchForms();">Or, create an Account.</button>
-</body>
-<script src="../pocketbase.umd.js"></script>
-<script defer>
-    const referto = (window.location.search.substr(1) ? window.location.search.substr(1) : '../'); 
-    const pb = new PocketBase('https://db.xetute.com');
-    let newaccount = false;
-
-    async function authRefresh() { try { await pb.collection('accounts').authRefresh(); window.location.href = referto; } catch { console.log('Not currently logged in.'); } };
-    authRefresh();
-
-    function switchForms()
-    {
-        const signin = document.getElementById('signin');
-        const signup = document.getElementById('signup');
-        const btn = document.getElementById('orbtn');
-
-        if (signin.style.display === 'none')
-        {
-            signin.style.display = 'flex';
-            signup.style.display = 'none';
-            btn.textContent = 'Or, create an Account.';
-        }
-        else
-        {
-            signin.style.display = 'none';
-            signup.style.display = 'flex';
-            btn.textContent = 'Or, use an existing Account.';
-        }
-    }
-
-    async function signIn()
-    {
-        const email = document.getElementById('signinemail').value.toLowerCase();
-        const password = document.getElementById('signinpassword').value;
-
-        const signinnotice = document.getElementById('signinnotice');
-        signinnotice.textContent = "Authorizing...";
-
-        try { await pb.collection('accounts').authWithPassword(email, password); window.location.href = referto; }
-        catch
-        {
-            signinnotice.textContent = "Failed to Authenticate.";
-            if (newaccount)
+            if (await isAuthorized(pb))
             {
-                signinnotice.textContent = "If you just signed up, you may still need to verify your E-Mail.";
-                alert(signinnotice.textContent + " \nIf you didn't already, please check your E-Mail and verify to activate authorisation.");
-            }
-        }
-    }
-
-    async function signUp()
-    {
-        const notice = document.getElementById('signupnotice');
-        const email = document.getElementById('signupemail').value.toLowerCase();
-        const password0 = document.getElementById('signuppassword0').value;
-        const password1 = document.getElementById('signuppassword1').value;
-
-        if (password0 !== password1)
-        {
-            notice.textContent = "Passwords don't match";
-            return;
-        }
-
-        if (password0.length > 32)
-        {
-            notice.textContent = "The maximum allowed length for passwords is 32 characters";
-            return;
-        }
-
-        newaccount = true;
-        try
-        {
-            notice.textContent = "Sending E-Mail verification...";
-            await pb.collection('accounts').create({ "email": email, "password": password0, "passwordConfirm": password1 });
-            await pb.collection('accounts').requestVerification(email);
-            notice.innerHTML = `We sent an verification E-Mail to ${email}.`;
-            alert(`We sent an verification E-Mail to ${email}.`); // For people who don't bother to read the above notice.
-            
-            while (true)
-            {
-                await new Promise(r => setTimeout(r, 1000));
-                try
-                { 
-                    await pb.collection('accounts').authWithPassword(email, password0);
-                    window.location.reload();
-                }
-                catch {}
+                if (confirm("You're already authorized. Go back?"))
+                    window.location.href = from;
             }
 
-            document.getElementById('signinemail').value = email;
-            document.getElementById('signinpassword').value = password0;
         }
-        catch { notice.textContent = "Failed to authenticate. Maybe you already have an account?"; }
-    }
 
-</script>
+        let form = "signin";
+        function loadForm()
+        {
+            if (form === "signin")
+            {
+                header.textContent = "Sign in";
+
+                button.textContent = header.textContent;
+                button.setAttribute("onclick", "signin();");
+
+                switchform.textContent = "Or, sign in";
+                form = "signup";
+
+                passconfirm.style.display = "none";
+            }
+            else
+            {
+                header.textContent = "Sign up";
+
+                button.textContent = header.textContent;
+                button.setAttribute("onclick", "signup();");
+
+                switchform.textContent = "Or, sign up";
+                form = "signin";
+
+                passconfirm.style.display = "flex";
+            }
+        }
+        loadForm();
+
+        async function signin()
+        {
+            try
+            {
+                loading.style.display = "flex";
+                console.log(await pb.collection("accounts").authWithPassword(email.value, password.value));
+                window.location.href = from;
+            }
+            catch (e) { loading.style.display = "none"; myAlert(`Failed to sign in.\nError: ${e}`); }
+        }
+
+        async function signup()
+        {
+            if (password.value != passconfirm.value) { myAlert("Your passwords don't match."); return; }
+            try
+            {
+                loading.style.display = "flex";
+                await pb.collection("accounts").create({ "password": password.value, "passwordConfirm": passconfirm, "email": email.value });
+                await pb.collection("accounts").requestVerification(email.value);
+                loading.style.display = "none";
+                loadForm();
+                myAlert("Sent a verification to " + email.value + ".\nYou will be able to use your accounts after verifying your email.");
+            }
+            catch (e) { loading.style.display = "none"; myAlert(`Failed to sign up.\nError: ` + e); }
+        }
+    </script>
 </html>

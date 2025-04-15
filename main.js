@@ -19,7 +19,7 @@ function myAlert(message)
     overlay.style.left = 0;
     overlay.style.textAlign = "center";
     overlay.style.background = "var(--background-color-dark-mode)";
-    overlay.style.opacity = 0.8;
+    overlay.style.opacity = 0.9;
 
     text.textContent = message;
     text.style.margin = "15px";
@@ -53,7 +53,7 @@ function myConfirm(message)
     overlay.style.left = 0;
     overlay.style.textAlign = "center";
     overlay.style.background = "var(--background-color-dark-mode)";
-    overlay.style.opacity = 0.8;
+    overlay.style.opacity = 0.9;
 
     btns.style.flexDirection = "row";
     btns.style.maxHeight = "fit-content";
@@ -95,7 +95,7 @@ function myPrompt(message)
     overlay.style.left = 0;
     overlay.style.textAlign = "center";
     overlay.style.background = "var(--background-color-dark-mode)";
-    overlay.style.opacity = 0.8;
+    overlay.style.opacity = 0.9;
 
     input.placeholder = message;
     input.style.margin = "5px";

@@ -4,11 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-        <title id="mytitle">MyZara \\ XeTute Technologies</title>
+        <title>MyZara \\ XeTute Technologies</title>
 
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Codystar:wght@300;400&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="main.css">
         <link rel="icon" href="favicon.ico">
 
@@ -38,7 +35,6 @@
                 overflow-x: hidden;
                 padding: 5px;
                 padding-top: 20px;
-                padding-bottom: 20vh;
                 min-width: 70%;
                 max-width: 80% !important;
                 justify-content: flex-start;
@@ -56,6 +52,7 @@
                 margin-bottom: 20px;
                 margin-top: auto;
                 max-height: fit-content;
+                min-height: min-content;
             }
             .sidebarnotes p
             {
@@ -151,7 +148,7 @@
             .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg code, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
             .msg p { margin: 5px; margin-left: 0; color: var(--color-dark-mode); }
             .msg a { text-decoration: underline; transition: 0.2s ease-in-out; } .msg a:hover { text-shadow: 0 0 8px var(--color-dark-mode); }
-            .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { margin-top: 10px; margin-bottom: 5px; font-family: "Codystar", "Inria Sans"; font-size: 18px; font-weight: 800; }
+            .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { margin-top: 10px; margin-bottom: 5px; font-family: "Inria Sans"; font-size: 18px; font-weight: 800; }
             .msg pre
             {
                 border: 2px solid var(--border-color-dark-mode);
@@ -163,6 +160,9 @@
                 max-height: 256px;
                 overflow: auto;
             }
+            .msg ol, .msg ul { margin: 10px 5px 10px 5px; padding: 0; }
+            .msg table { overflow: auto; margin: 10px 5px 10px 5px; }
+            .msg th, .msg td { border: 1px solid var(--border-color-dark-mode); margin: 0; padding: 5px; }
             .msg img { border-radius: 15px; max-width: 85%; margin: 10px; box-shadow: 0 0 8px var(--border-color-dark-mode); }
 
             .usermsg
@@ -329,11 +329,12 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 const msgcontainer = document.querySelector(".messages");
                 const txtelem = document.createElement("p");
 
-                txtelem.setAttribute("style", "display: flex; justify-content: center; align-items: center; text-align: center; max-width: 95%; flex: 1; color: var(--suble-color-text-dark-mode);");
-                txtelem.innerHTML = "Send a message to start chatting with Zara.<br>Zara is an AI assistant designed by Hamzah.<br> — Consider verifying important information.";
+                txtelem.setAttribute("style", "display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; color: var(--suble-color-text-dark-mode); font-size: 14px;");
+                txtelem.innerHTML = "Zara is an AI assistant designed by Hamzah.<br>Verify important information.";
 
                 msgcontainer.innerHTML = "";
                 msgcontainer.style.justifyContent = "center";
+                msgcontainer.style.paddingBottom = 0;
                 msgcontainer.appendChild(txtelem);
 
                 if (authorized) setChatID(pb.authStore.record.data.MyZara.chats.length);
@@ -372,7 +373,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 if (processing) return;
                 processing = true;
 
-                if (input)
+                if (input || imagetosend.length)
                 {
                     if (imagetosend.length)
                     {
@@ -420,7 +421,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                     {
                         try
                         {
-                            setChatID(Number(new URLSearchParams(window.location.search.substr(1)).get("chatid")));
+                            setChatID(Number(new SearchParams(window.location.search.substr(1)).get("chatid")));
                             if ((chatid >= 0) && (chatid < nchats) && (chatid !== null))
                             {
                                 messages = pb.authStore.record.data.MyZara.chats[chatid];
@@ -432,11 +433,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                         catch { setChatID(nchats); }
 
                         if (nchats <= 0) recentchats.style.display = "none";
-                        else
-                        {
-                            recentchats.textContent = "Recent Chats";
-                            loadChats(pb.authStore.record.data.MyZara?.chats);
-                        }
+                        else loadChats(pb.authStore.record.data.MyZara?.chats);
                     }
                     else recentchats.style.display = "none";
                     if (!pb.authStore.record.data.username)
@@ -586,6 +583,8 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 {
                     container.innerHTML = "";
                     container.style.justifyContent = "flex-start";
+                    container.style.paddingBottom = "50vh";
+
                     if ((chat.length - 1) < loadlastmessages) for (msg of chat) addMsgToContainer(msg);
                     else for (let x = loadlastmessages + 1; x < chat.length; ++x) addMsgToContainer(chat[x]);
                 }
