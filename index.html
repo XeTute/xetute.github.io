@@ -163,7 +163,7 @@
                 max-height: 256px;
                 overflow: auto;
             }
-            .msg img { border-radius: 15px; max-width: 80%; margin: 10px; box-shadow: 0 0 8px var(--border-color-dark-mode); }
+            .msg img { border-radius: 15px; max-width: 85%; margin: 10px; box-shadow: 0 0 8px var(--border-color-dark-mode); }
 
             .usermsg
             {
@@ -266,10 +266,10 @@
                 <div id="recent-chats" class="recent-chats"></div>
 
                 <div class="sidebarnotes">
-                    <p onclick="alert(pakistantxt);">
+                    <p onclick="myAlert(pakistantxt);">
                         Long live Pakistan.
                     </p>
-                    <p onclick="alert(hamzahtxt);">
+                    <p onclick="myAlert(hamzahtxt);">
                         Made by Hamzah.
                     </p>
                 </div>
@@ -374,11 +374,12 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
 
                 if (input)
                 {
-                    if (imagetosend)
+                    if (imagetosend.length)
                     {
                         let data = [];
-                        data.push({ "type": "image_url", "image_url": { "url": imagetosend } });
-                        imagetosend = "";
+                        for (img of imagetosend)
+                            data.push({ "type": "image_url", "image_url": { "url": img } });
+                        imagetosend = [];
                         data.push({ "type": "text", "text": input });
                         messages.push({ "role": "user", "content": data });
                     }
@@ -396,10 +397,9 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 {
                     let data = pb.authStore.record.data;
                     data.MyZara.chats[chatid] = [...messages];
-                    if (!(await updateData(data, { pb: pb }))) alert("Failed to sync last message with the cloud.");
+                    if (!(await updateData(data, { pb: pb }))) myAlert("Failed to sync last message with the cloud.");
+                    if (messages.length === 3) loadChats(pb.authStore.record.data.MyZara.chats);
                 }
-
-                if (messages.length === 3) loadChats(pb.authStore.record.data.MyZara.chats);
             }
 
             async function load()
@@ -412,7 +412,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                     if (pb.authStore.record.data.MyZara?.chats === undefined)
                     {
                         if (!(await updateData({ ...pb.authStore.record.data, MyZara: { chats: [] } }, { pb: pb })))
-                            alert("Your data seems to be corrupted. Expect errors, report them to x3tut3@gmail.com if they occur.");
+                        myAlert("Your data seems to be corrupted. Expect errors, report them to x3tut3@gmail.com if they occur.");
                     }
 
                     const nchats = pb.authStore.record.data.MyZara.chats.length;
@@ -441,9 +441,9 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                     else recentchats.style.display = "none";
                     if (!pb.authStore.record.data.username)
                     {
-                        const newname = prompt("You don't currently have an username. Set one here.");
-                        if (await updateData({ ...pb.authStore.record.data, username: newname }, { pb: pb })) alert(`Welcome, ${newname}!`);
-                        else alert(`We failed to update your data. We're sorry, ${newname}.`);
+                        const newname = await myPrompt("Set your username...");
+                        if (await updateData({ ...pb.authStore.record.data, username: newname }, { pb: pb })) myAlert(`Welcome, ${newname}!`);
+                        else myAlert(`We failed to update your data. We're sorry, ${newname}.`);
                     }
                     authbtn.getElementsByTagName('p')[0].textContent = pb.authStore.record.data.username;
                 }
@@ -475,12 +475,16 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                     btn.setAttribute("id", `recentchat${x}`);
                     title.setAttribute("onclick", `loadChatFromID(${x})`);
 
-                    try
+                    if (chats[x].length < 2) title.textContent = "Unnamed";
+                    else
                     {
-                        if (chats[x][1].content[0].image_url !== undefined) title.textContent = maxchars(chats[x][1].content[1].text, 12)
-                        else title.textContent = maxchars(chats[x][1].content, 12);
+                        try
+                        {
+                            if (chats[x][1].content[0].image_url !== undefined) title.textContent = maxchars(chats[x][1].content[1].text, 12)
+                            else title.textContent = maxchars(chats[x][1].content, 12);
+                        }
+                        catch { title.textContent = maxchars(chats[x][1].content, 12); }
                     }
-                    catch { title.textContent = maxchars(chats[x][1].content, 12); }
 
                     icontrash.classList = "fa fa-trash";
                     iconwrappertrash.setAttribute("onclick", `deleteChat(${x})`);
@@ -494,11 +498,11 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
 
             async function deleteChat(id)
             {
-                if (confirm("You can't recover a chat after deleting it. Continue?"))
+                if (await myConfirm("You can't recover a chat after deleting it. Continue?"))
                 {
                     let newdata = pb.authStore.record.data;
                     newdata.MyZara.chats.splice(id, 1);
-                    if (!(await updateData(newdata, { pb: pb }))) alert("Failed to delete Chat.");
+                    if (!(await updateData(newdata, { pb: pb }))) myAlert("Failed to delete Chat.");
                     else
                     {
                         document.getElementById(`recentchat${id}`).remove();
@@ -519,9 +523,16 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                     try
                     {
                         if (msg.content[0].image_url === undefined) div.innerHTML = marked.parse(msg.content);
-                        else div.innerHTML = `<img src="${msg.content[0].image_url.url}"/>` + marked.parse(msg.content[1].text);
+                        else
+                        {
+                            for (content of msg.content)
+                            {
+                                if (content.type === "image_url") div.innerHTML += `<img src="${content.image_url.url}"/>`;
+                                else if (content.type === "text") div.innerHTML += marked.parse(content.text);
+                            }
+                        }
                     }
-                    catch { div.innerHTML = marked.parse(msg.content); }
+                    catch (e) { console.error(e); div.innerHTML = marked.parse(msg.content); }
 
                     div.classList = "msg " + ((msg.role === "user") ? "usermsg" : "assistantmsg");
                     container.appendChild(div);
@@ -529,7 +540,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 }
             }
 
-            let imagetosend = "";
+            let imagetosend = [];
             function attachImg()
             {
                 const fileinput = document.createElement('input');
@@ -547,7 +558,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
 
                         if (file.size > 5 * 1024 * 1024)
                         {
-                            alert('Image size too large. Please select an image under 5MB.');
+                            myAlert('Image size too large. Please select an image under 5MB.');
                             document.body.removeChild(fileinput);
                             return;
                         }
@@ -557,11 +568,12 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                             const reader = new FileReader();
                             reader.onload = function(e)
                             {
-                                imagetosend = e.target.result;
+                                imagetosend.push(e.target.result);
                                 document.querySelector('.userinput').focus();
                             };
                             reader.readAsDataURL(file);
-                        } catch (error) { alert('Error attaching image: ' + error.message); }
+                            myAlert("Attached image.");
+                        } catch (error) { myAlert('Error attaching image: ' + error.message); }
                         finally { document.body.removeChild(fileinput); }
                     }
                 });
