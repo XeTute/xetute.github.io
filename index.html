@@ -135,14 +135,14 @@
                 width: fit-content;
                 min-height: min-content;
                 max-height: max-content;
-                padding: 5px 15px 5px 15px;
-                margin: 5px;
                 overflow-y: auto;
                 overflow-x: hidden;
                 flex-direction: column;
                 justify-content: flex-start;
                 line-height: 1.45;
                 transition: 0.2s ease-in-out;
+                margin:  5px 0 5px 0;
+                padding: 10px 0 10px 0;
                 border-bottom: 2px solid var(--border-color-dark-mode);
             }
             .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg code, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
@@ -408,7 +408,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 const recentchats = document.getElementById("recent-chats-header");
                 const authbtn = document.getElementById("authbtn");
 
-                if ((authorized = await isAuthorized(pb)))
+                if ((authorized = await isAuthorized({ pb: pb })))
                 {
                     if (pb.authStore.record.data.MyZara?.chats === undefined)
                     {
@@ -419,18 +419,22 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                     const nchats = pb.authStore.record.data.MyZara.chats.length;
                     if (nchats > -1) // Check if it exists, not how long it is
                     {
-                        try
+                        if (window.location.search.substr(1))
                         {
-                            setChatID(Number(new SearchParams(window.location.search.substr(1)).get("chatid")));
-                            if ((chatid >= 0) && (chatid < nchats) && (chatid !== null))
+                            try
                             {
-                                messages = pb.authStore.record.data.MyZara.chats[chatid];
-                                loadChat(messages);
-                                reloadallchatui = false;
+                                setChatID(Number(new URLSearchParams(window.location.search.substr(1)).get("chatid")));
+                                if ((chatid >= 0) && (chatid < nchats))
+                                {
+                                    messages = pb.authStore.record.data.MyZara.chats[chatid];
+                                    loadChat(messages);
+                                    reloadallchatui = false;
+                                }
+                                else setChatID(nchats);
                             }
-                            else setChatID(nchats);
+                            catch (e) { setChatID(nchats); }
                         }
-                        catch { setChatID(nchats); }
+                        else setChatID(nchats);
 
                         if (nchats <= 0) recentchats.style.display = "none";
                         else loadChats(pb.authStore.record.data.MyZara?.chats);
@@ -462,6 +466,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 
                 if (chats.length === 0) header.style.display = "none";
                 else header.style.display = "block";
+
                 for (let x = 0; x < chats.length; ++x)
                 {
                     const btn = document.createElement("labeledbutton");
@@ -522,10 +527,11 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                         if (msg.content[0].image_url === undefined) div.innerHTML = marked.parse(msg.content);
                         else
                         {
-                            for (content of msg.content)
+                            for (let x = 0; x < msg.content.length; ++x)
                             {
-                                if (content.type === "image_url") div.innerHTML += `<img src="${content.image_url.url}"/>`;
-                                else if (content.type === "text") div.innerHTML += marked.parse(content.text);
+                                const cont = msg.content[x];
+                                if (cont.type === "image_url") div.innerHTML += `<button onclick="myAlertImage('${cont.image_url.url}');">Image ${x + 1}</a>`;
+                                else if (cont.type === "text") div.innerHTML += marked.parse(cont.text);
                             }
                         }
                     }
@@ -540,6 +546,8 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
             let imagetosend = [];
             function attachImg()
             {
+                if (imagetosend.length >= 6) { myAlert("Maximum allowed amount of images per message is six."); return; }
+
                 const fileinput = document.createElement('input');
                 fileinput.type = 'file';
                 fileinput.accept = 'image/jpeg,image/png,image/webp,image/gif';
@@ -569,7 +577,10 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                                 document.querySelector('.userinput').focus();
                             };
                             reader.readAsDataURL(file);
-                            myAlert("Attached image.");
+
+                            const input = document.querySelector(".userinput");
+                            input.placeholder = "Attached " + (imagetosend.length + 1) + " images.";
+                            input.focus();
                         } catch (error) { myAlert('Error attaching image: ' + error.message); }
                         finally { document.body.removeChild(fileinput); }
                     }

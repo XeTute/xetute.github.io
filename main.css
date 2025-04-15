@@ -48,7 +48,7 @@ button
     border-radius: 8px;
     padding: 8px;
     margin: 8px;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.05);
     color: var(--color-dark-mode);
     font-size: 18px;
     display: flex;
@@ -62,7 +62,7 @@ button
 input, textarea
 {
     flex-grow: 1;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.05);
     color: var(--color-dark-mode);
     border: 2px solid var(--border-color-dark-mode);
     border-radius: 12px;

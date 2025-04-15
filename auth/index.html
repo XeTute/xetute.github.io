@@ -11,7 +11,7 @@
 
         <style>
             input { max-height: fit-content; max-width: fit-content; margin: 5px; }
-            button { font-size: 16px; background: rgba(0, 0, 0, 0.05); }
+            button { font-size: 16px; }
             button:hover, input:hover { scale: 1.05; }
             #header { margin: 5px; padding: 5px; border-bottom: 2px solid var(--border-color-dark-mode); }
             #switchform { position: absolute; margin-top: calc(100vh - 60px); }
@@ -45,7 +45,7 @@
 
         async function load()
         {
-            if (await isAuthorized(pb))
+            if (await isAuthorized({ pb: pb }))
             {
                 if (confirm("You're already authorized. Go back?"))
                     window.location.href = from;
