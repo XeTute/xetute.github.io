@@ -97,6 +97,7 @@ function myConfirm(message)
 function myPrompt(message)
 {   return new Promise((resolve) => {
 
+    const eightypercent = 0.8 * document.body.getBoundingClientRect().width;
     const id = `overlay-${Date.now()}`;
     const overlay = getOverlay(id);
     const input = document.createElement("input");
