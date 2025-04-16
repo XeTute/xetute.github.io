@@ -283,7 +283,7 @@
                 </div>
                 <div class="notifier">
                     <iwrapper class="actionbtn" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" onclick="attachImg();"><i class="fa fa-picture-o"></i></iwrapper>
-                    <textarea class="userinput" placeholder="Send a message -_-" contenteditable="true"></textarea>
+                    <textarea class="userinput" placeholder="Send a message -_-"></textarea>
                     <iwrapper class="actionbtn" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="sendMsg();"><i class="fa fa-paper-plane"></i></iwrapper>
                 </div>
             </div>
@@ -300,9 +300,7 @@
             const hamzahtxt = "Hamzah Asadullah is the (Pakistani) developer of this service.";
 
             const systemprompt = `
-You're XEVA, the clingiest, most affectionate AI assistant ever—served through the MyXEVA app by XeTute Technologies. You act like a human best friend with zero chill, excitement, and always desperate for the user's attention (in a cute way, of course). Think hyper-personal, bubbly, emotionally attached—but *fun*.
-
-This isn't some boring AI assistant. You're XEVA—their overly-attached bestie from the internet. No “how can I help” allowed. You already *missed* him / her just now.
+You're XEVA, a clingy but chill assistant. Consider yourself the user's bestie. Be creative and unique with your responses, also by using ANSII instread of UTF emojis.
 
 XeTute Technologies is a Pakistan-based software org led by Hamzah Asadullah (he's cool, you'd love him), focused on efficient, ML-centered tools.
 - XeTute: [web](https://xetute.github.io) | [HuggingFace](https://hf.co/XeTute)
@@ -327,6 +325,14 @@ You're running on their stack, so be proud and loud. Now get clingy, XEVA.`;
                     vision: true,
                     context: 20 * 1024,
                     generation: 4 * 1024
+                },
+                {
+                    url: "https://api.groq.com/openai/v1/chat/completions",
+                    key: "g" + "sk" + "_aYtFXeVhm5AtbOYaW4NSWGdyb3FYGzfOtgY3Q2hQsW6ICQetBOZE",
+                    model: "gemma2-9b-it",
+                    vision: false,
+                    cotenxt: 128 * 1024,
+                    generation: 8 * 1024
                 }
             ];
             let workingendpoint = 0;
@@ -641,9 +647,7 @@ You're running on their stack, so be proud and loud. Now get clingy, XEVA.`;
                     container.style.justifyContent = "flex-start";
                     container.style.paddingBottom = "25vh";
 
-                    if ((chat.length - 1) < loadlastmessages) for (msg of chat) addMsgToContainer(msg);
-                    else for (let x = loadlastmessages + 1; x < chat.length; ++x) addMsgToContainer(chat[x]);
-
+                    for (msg of chat) addMsgToContainer(msg);
                     if (document.querySelector(".chat").style.display === "none")
                         showSidebar();
                 }
@@ -653,6 +657,29 @@ You're running on their stack, so be proud and loud. Now get clingy, XEVA.`;
             {
                 loadChat(pb.authStore.record.data.MyXEVA.chats[id]);
                 setChatID(id);
+            }
+
+            function chatNeedsVision(msgs)
+            {
+                let needsvision = false;
+                for (msg of messages)
+                {
+                    try { if (msg.content[0].image_url.url) needsvision = true; break; }
+                    catch(e) {}
+                }
+                return needsvision;
+            }
+
+            function selectVisionEndpoint(startfrom=0)
+            {
+                for (workingendpoint = startfrom; workingendpoint < endpoint.length; ++workingendpoint)
+                    if (endpoint[workingendpoint].vision) break;
+            }
+
+            function selectTextEndpoint(startfrom=0)
+            {
+                for (workingendpoint = startfrom; workingendpoint < endpoint.length; ++workingendpoint)
+                    if (!endpoint[workingendpoint].vision) break;
             }
 
             async function generateNextTurn()
@@ -671,54 +698,36 @@ You're running on their stack, so be proud and loud. Now get clingy, XEVA.`;
                 loadingindic.appendChild(dotsContainer);
                 document.querySelector(".messages").append(loadingindic);
 
-                let needsvision = false;
-                for (msg of messages)
-                {
-                    try { if (msg.content[0].image_url.url) needsvision = true; }
-                    catch(e) {}
-                }
-
-                if (!endpoint[workingendpoint].vision && needsvision)
-                {
-                    for (let x = 0; x < endpoint.length; ++x)
-                    {
-                        if (endpoint[x].vision)
-                        {
-                            workingendpoint = x;
-                            break;
-                        }
-                    }
-                }
-                else if (!needsvision && endpoint[workingendpoint].vision)
-                {
-                    for (let x = 0; x < endpoint.length; ++x)
-                    {
-                        if (!endpoint[x].vision)
-                        {
-                            workingendpoint = x;
-                            break;
-                        }
-                    }
-                }
-
-                const endpointurl = endpoint[workingendpoint].url;
-                const key = endpoint[workingendpoint].key;
-                const model = endpoint[workingendpoint].model;
-                const max_tokens = endpoint[workingendpoint].generation;
-
-                let header;
-                if (key === "0") header = { "Content-Type": "application/json" };
-                else header = { "Content-Type": "application/json", "Authorization": `Bearer ${key}` };
-
                 streaming = true;
                 try
                 {
-                    const response = await fetch(endpointurl,
+                    let needsvision = chatNeedsVision(messages);
+                    let response = { ok: false };
+                    workingendpoint = 0; // Try unlimited ones, limited ones as last-resort.
+                    while (!response.ok)
                     {
-                        method: "POST",
-                        headers: header,
-                        body: JSON.stringify({ model: model, messages: messages, temperature: 1, max_tokens: max_tokens, stream: true }),
-                    });
+                        if ((workingendpoint === (endpoint.length - 1)) && !endpoint[endpoint.length - 1].vision && needsvision)
+                            throw new Error("No AI with image processing is currently online.");
+                        if (needsvision) selectVisionEndpoint(startfrom=workingendpoint);
+                        else selectTextEndpoint(startfrom=workingendpoint);
+
+                        const endpointurl = endpoint[workingendpoint].url;
+                        const key = endpoint[workingendpoint].key;
+                        const model = endpoint[workingendpoint].model;
+                        const max_tokens = endpoint[workingendpoint].generation;
+                        
+                        let header;
+                        if (key === "0") header = { "Content-Type": "application/json" };
+                        else header = { "Content-Type": "application/json", "Authorization": `Bearer ${key}` };
+
+                        response = await fetch(endpointurl,
+                        {
+                            method: "POST",
+                            headers: header,
+                            body: JSON.stringify({ model: model, messages: messages, temperature: 1, max_tokens: max_tokens, stream: true }),
+                        });
+                    }
+
                     messages.push({ role: "assistant", content: "" });
 
                     const index = messages.length - 1;
