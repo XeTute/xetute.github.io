@@ -462,7 +462,6 @@ You're running on their stack, so be proud and loud. Now get clingy, XEVA.`;
                                 {
                                     messages = pb.authStore.record.data.MyXEVA.chats[chatid];
                                     loadChat(messages);
-                                    reloadallchatui = false;
                                 }
                                 else setChatID(nchats);
                             }
@@ -502,7 +501,7 @@ You're running on their stack, so be proud and loud. Now get clingy, XEVA.`;
                     const icontrash = document.createElement("i");
 
                     btn.setAttribute("id", `recentchat${x}`);
-                    title.setAttribute("onclick", `loadChatFromID(${x})`);
+                    title.setAttribute("onclick", `loadChatFromID(${x});`);
 
                     if (chats[x].length < 2) title.textContent = "Unnamed";
                     else
@@ -643,6 +642,7 @@ You're running on their stack, so be proud and loud. Now get clingy, XEVA.`;
                 const container = document.querySelector(".messages");
                 if (reloadallchatui)
                 {
+                    reloadallchatui = false;
                     container.innerHTML = "";
                     container.style.justifyContent = "flex-start";
                     container.style.paddingBottom = "25vh";
@@ -655,6 +655,7 @@ You're running on their stack, so be proud and loud. Now get clingy, XEVA.`;
             }
             function loadChatFromID(id)
             {
+                reloadallchatui = true;
                 loadChat(pb.authStore.record.data.MyXEVA.chats[id]);
                 setChatID(id);
             }
@@ -775,7 +776,6 @@ You're running on their stack, so be proud and loud. Now get clingy, XEVA.`;
                     streaming = false;
                     document.getElementById("streamingmsg")?.removeAttribute("id");
                 }
-                if (messages.length === 3) reloadallchatui = false;
             }
 
             document.querySelector(".userinput").addEventListener("keydown", (e) =>
