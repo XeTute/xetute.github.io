@@ -582,6 +582,8 @@ You’re running on their stack, so be proud and loud. Now get clingy, XEVA. ヽ
                     {
                         div.classList = "msg assistantmsg";
                         div.innerHTML += marked.parse(msg.content);
+                        container.appendChild(div);
+                        container.scrollTo(0, container.scrollHeight);
                     }
                 }
             }
@@ -678,7 +680,7 @@ You’re running on their stack, so be proud and loud. Now get clingy, XEVA. ヽ
                     catch (e) {}
                 }
 
-                if (!endpoint[workingendpoint].vision)
+                if (!endpoint[workingendpoint].vision && needsvision)
                 {
                     for (let x = 0; x < endpoint.length; ++x)
                     {
