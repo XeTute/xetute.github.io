@@ -121,7 +121,7 @@ iwrapper
     max-height: 36px;
     border: 2px solid var(--border-color-dark-mode);
     border-radius: 12px;
-    background: #222;
+    backdrop-filter: blur(4px);
     color: #fff;
     
     transition: 0.2s ease-in-out;

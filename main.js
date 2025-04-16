@@ -12,8 +12,7 @@ function getOverlay(id)
     overlay.style.top = 0;
     overlay.style.left = 0;
     overlay.style.textAlign = "center";
-    overlay.style.background = "var(--background-color-dark-mode)";
-    overlay.style.opacity = 0.95;
+    overlay.style.backdropFilter = "blur(24px)";
     overlay.style.zIndex = 10;
     return overlay;
 }
