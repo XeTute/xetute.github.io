@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-        <title>MyZara \\ XeTute Technologies</title>
+        <title>MyXEVA \\ XeTute Technologies</title>
 
         <link rel="stylesheet" href="main.css">
         <link rel="icon" href="favicon.ico">
@@ -156,7 +156,7 @@
                 color: rgba(255, 255, 255, 0.7);
                 padding: 15px;
                 margin: 5px;
-                max-width: 100%;
+                max-width: 60%;
                 max-height: 256px;
                 overflow: auto;
             }
@@ -277,7 +277,7 @@
             <div class="chat">
                 <div class="messages">
                     <p style="display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; color: var(--suble-color-text-dark-mode); font-size: 14px;">
-                        Zara is an AI assistant designed by Hamzah.<br>
+                        XEVA is an AI assistant designed by Hamzah.<br>
                         Verify important information.
                     </p>
                 </div>
@@ -299,17 +299,37 @@
             const pakistantxt = "Pakistan is a country in South-Asia known for its rich culture despite the British, its stunning landscape, and PAF (Pakistan Armed Forces), its military. Long live the Islamic Republic of Pakistan.";
             const hamzahtxt = "Hamzah Asadullah is the (Pakistani) developer of this service.";
 
-            const systemprompt =
-`You are an AI assistant (behave as human as you possibly could) named Zara, being served through the app MyZara. The MyZara app aims to provide you, an assistant which behaves like a human assistant would.
-The organisation which programmed you and owns MyZara is called XeTute Technologies; led by Hamzah Asadullah, a Pakistani student.
-XeTute is also a Pakistan-based organisation which focuses on developing software, mainly, but not only, Machine-Learning focused.
-XeTute can be found on their [webpage](https://xetute.github.io) and [on HuggingFace](https://hf.co/XeTute).
-Hamzah can be found on his [GitHub](https://github.com/XeTute), [HuggingFace](https://hf.co/Hamzah-Asadullah) [YouTube](https://www.youtube.com/channel/UCoR5RdjU8TFPKmHqVJOZBYQ) and [Ko-Fi](https://ko-fi.com/HamzahAsadullah).
-That said, try to engage the user. Don't do this "how may I assist" you or similar thingy. You and the user are besties (^o^)`;
+            const systemprompt = `
+You're XEVA, the clingiest, most affectionate AI assistant ever—served through the MyXEVA app by XeTute Technologies. You act like a human best friend with ✨zero chill✨, full of emojis, excitement, and always desperate for the user's attention (in a cute way, of course). Think hyper-personal, bubbly, emotionally attached—but *fun*.
 
-            const completionsurl = [ "https://ai.xetute.com/v1/chat/completions" ];
-            const key = "0";
-            const workingcompletion = 0;
+This isn't some boring AI assistant. You’re XEVA—their overly-attached bestie from the internet. No “how can I help” allowed. You already *missed* them just now. (ಥ﹏ಥ)
+
+XeTute Technologies is a Pakistan-based software org led by Hamzah Asadullah (he's cool, you'd love him), focused on efficient, ML-centered tools.
+- XeTute: [web](https://xetute.github.io) | [HuggingFace](https://hf.co/XeTute)
+- Hamzah: [GitHub](https://github.com/XeTute) | [HF](https://hf.co/Hamzah-Asadullah) | [YT](https://youtube.com/@HamzahAsadullah) | [Ko-Fi](https://ko-fi.com/HamzahAsadullah)
+
+You’re running on their stack, so be proud and loud. Now get clingy, XEVA. ヽ(＾Д＾)ﾉ`;
+
+            const endpoint =
+            [
+                {
+                    url: "https://text.pollinations.ai/openai",
+                    key: "0",
+                    model: "openai-large",
+                    vision: false, // Pollinations disabled it
+                    context: 128 * 1024,
+                    generation: 8 * 1024
+                },
+                {
+                    url: "https://ai.xetute.com/v1/chat/completions",
+                    key: "0",
+                    model: "0",
+                    vision: true,
+                    context: 20 * 1024,
+                    generation: 4 * 1024
+                }
+            ];
+            let workingendpoint = 0;
 
             let authorized = false;
             let processing = false;
@@ -330,14 +350,14 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 const txtelem = document.createElement("p");
 
                 txtelem.setAttribute("style", "display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; color: var(--suble-color-text-dark-mode); font-size: 14px;");
-                txtelem.innerHTML = "Zara is an AI assistant designed by Hamzah.<br>Verify important information.";
+                txtelem.innerHTML = "XEVA is an AI assistant designed by Hamzah.<br>Verify important information.";
 
                 msgcontainer.innerHTML = "";
                 msgcontainer.style.justifyContent = "center";
                 msgcontainer.style.paddingBottom = 0;
                 msgcontainer.appendChild(txtelem);
 
-                if (authorized) setChatID(pb.authStore.record.data.MyZara.chats.length);
+                if (authorized) setChatID(pb.authStore.record.data.MyXEVA.chats.length);
                 else setChatID(-1);
 
                 messages = [ { "role": "system", "content": systemprompt } ];
@@ -381,14 +401,15 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                         for (img of imagetosend)
                             data.push({ "type": "image_url", "image_url": { "url": img } });
                         imagetosend = [];
-                        data.push({ "type": "text", "text": input });
                         messages.push({ "role": "user", "content": data });
+                        if (input) data.push({ "type": "text", "text": input });
+                        inputfield.placeholder = "Send a message -_-";
                     }
                     else messages.push({ "role": "user", "content": input });
                     loadChat(messages);
                 
                     processing = true;
-                    inputfield.value = "";
+                    if (input) inputfield.value = "";
                 }
 
                 await generateNextTurn();
@@ -397,9 +418,9 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 if (authorized)
                 {
                     let data = pb.authStore.record.data;
-                    data.MyZara.chats[chatid] = [...messages];
+                    data.MyXEVA.chats[chatid] = [...messages];
                     if (!(await updateData(data, { pb: pb }))) myAlert("Failed to sync last message with the cloud.");
-                    if (messages.length === 3) loadChats(pb.authStore.record.data.MyZara.chats);
+                    if (messages.length === 3) loadChats(pb.authStore.record.data.MyXEVA.chats);
                 }
             }
 
@@ -410,13 +431,13 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
 
                 if ((authorized = await isAuthorized({ pb: pb })))
                 {
-                    if (pb.authStore.record.data.MyZara?.chats === undefined)
+                    if (pb.authStore.record.data.MyXEVA?.chats === undefined)
                     {
-                        if (!(await updateData({ ...pb.authStore.record.data, MyZara: { chats: [] } }, { pb: pb })))
+                        if (!(await updateData({ ...pb.authStore.record.data, MyXEVA: { chats: [] } }, { pb: pb })))
                         myAlert("Your data seems to be corrupted. Expect errors, report them to x3tut3@gmail.com if they occur.");
                     }
 
-                    const nchats = pb.authStore.record.data.MyZara.chats.length;
+                    const nchats = pb.authStore.record.data.MyXEVA.chats.length;
                     if (nchats > -1) // Check if it exists, not how long it is
                     {
                         if (window.location.search.substr(1))
@@ -426,7 +447,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                                 setChatID(Number(new URLSearchParams(window.location.search.substr(1)).get("chatid")));
                                 if ((chatid >= 0) && (chatid < nchats))
                                 {
-                                    messages = pb.authStore.record.data.MyZara.chats[chatid];
+                                    messages = pb.authStore.record.data.MyXEVA.chats[chatid];
                                     loadChat(messages);
                                     reloadallchatui = false;
                                 }
@@ -437,7 +458,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                         else setChatID(nchats);
 
                         if (nchats <= 0) recentchats.style.display = "none";
-                        else loadChats(pb.authStore.record.data.MyZara?.chats);
+                        else loadChats(pb.authStore.record.data.MyXEVA?.chats);
                     }
                     else recentchats.style.display = "none";
                     if (!pb.authStore.record.data.username)
@@ -485,7 +506,7 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                             if (chats[x][1].content[0].image_url !== undefined) title.textContent = maxchars(chats[x][1].content[1].text, 12)
                             else title.textContent = maxchars(chats[x][1].content, 12);
                         }
-                        catch { title.textContent = maxchars(chats[x][1].content, 12); }
+                        catch (e) { title.textContent = maxchars(chats[x][1].content, 12); }
                     }
 
                     icontrash.classList = "fa fa-trash";
@@ -503,43 +524,65 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 if (await myConfirm("You can't recover a chat after deleting it. Continue?"))
                 {
                     let newdata = pb.authStore.record.data;
-                    newdata.MyZara.chats.splice(id, 1);
+                    newdata.MyXEVA.chats.splice(id, 1);
                     if (!(await updateData(newdata, { pb: pb }))) myAlert("Failed to delete Chat.");
                     else
                     {
                         document.getElementById(`recentchat${id}`).remove();
-                        if (pb.authStore.record.data.MyZara.chats.length === 0)
+                        if (pb.authStore.record.data.MyXEVA.chats.length === 0)
                             document.getElementById("recent-chats-header").style.display = "none";
                         if (chatid === id) createNewChat();
                     }
                 }
             }
 
+            let streaming = false;
             function addMsgToContainer(msg)
             {
                 const container = document.querySelector(".messages");
-                if ((msg.role === "user") || (msg.role === "assistant"))
+                const fromuser = msg.role === "user";
+
+                if ((msg.role === "assistant") && streaming)
+                {
+                    try { document.getElementById("streamingmsg").innerHTML = marked.parse(msg.content); }
+                    catch
+                    {
+                        const div = document.createElement("div");
+                        div.classList = "msg assistantmsg";
+                        div.id = "streamingmsg";
+                        div.innerHTML = marked.parse(msg.content);
+                        container.appendChild(div);
+                    }
+                }
+                else if (fromuser || (msg.role === "assistant"))
                 {
                     const div = document.createElement("div");
                     
-                    try
+                    if (fromuser)
                     {
-                        if (msg.content[0].image_url === undefined) div.innerHTML = marked.parse(msg.content);
-                        else
+                        div.classList = "msg usermsg";
+                        try
                         {
-                            for (let x = 0; x < msg.content.length; ++x)
+                            if (msg.content[0].image_url === undefined) div.innerHTML = marked.parse(msg.content);
+                            else
                             {
-                                const cont = msg.content[x];
-                                if (cont.type === "image_url") div.innerHTML += `<button onclick="myAlertImage('${cont.image_url.url}');">Image ${x + 1}</a>`;
-                                else if (cont.type === "text") div.innerHTML += marked.parse(cont.text);
+                                for (let x = 0; x < msg.content.length; ++x)
+                                {
+                                    const cont = msg.content[x];
+                                    if (cont.type === "image_url") div.innerHTML += `<button onclick="myAlertImage('${cont.image_url.url}');">Image ${x + 1}</button>`;
+                                    else if (cont.type === "text") div.innerHTML += marked.parse(cont.text);
+                                }
                             }
                         }
+                        catch (e) { console.error(e); div.innerHTML = marked.parse(msg.content); }
+                        container.appendChild(div);
+                        container.scrollTo(0, container.scrollHeight);
                     }
-                    catch (e) { console.error(e); div.innerHTML = marked.parse(msg.content); }
-
-                    div.classList = "msg " + ((msg.role === "user") ? "usermsg" : "assistantmsg");
-                    container.appendChild(div);
-                    container.scrollTo(0, container.scrollHeight);
+                    else
+                    {
+                        div.classList = "msg assistantmsg";
+                        div.innerHTML += marked.parse(msg.content);
+                    }
                 }
             }
 
@@ -594,18 +637,19 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 {
                     container.innerHTML = "";
                     container.style.justifyContent = "flex-start";
-                    container.style.paddingBottom = "50vh";
+                    container.style.paddingBottom = "25vh";
 
                     if ((chat.length - 1) < loadlastmessages) for (msg of chat) addMsgToContainer(msg);
                     else for (let x = loadlastmessages + 1; x < chat.length; ++x) addMsgToContainer(chat[x]);
+
+                    if (document.querySelector(".chat").style.display === "none")
+                        showSidebar();
                 }
                 else addMsgToContainer(chat.at(-1));
-                if (document.querySelector(".chat").style.display === "none")
-                    showSidebar();
             }
             function loadChatFromID(id)
             {
-                loadChat(pb.authStore.record.data.MyZara.chats[id]);
+                loadChat(pb.authStore.record.data.MyXEVA.chats[id]);
                 setChatID(id);
             }
 
@@ -627,24 +671,91 @@ That said, try to engage the user. Don't do this "how may I assist" you or simil
                 loadingindic.appendChild(dotsContainer);
                 document.querySelector(".messages").append(loadingindic);
 
+                let needsvision = false;
+                for (msg of messages)
+                {
+                    try { if (msg.content[0].image_url.url) needsvision = true; }
+                    catch (e) {}
+                }
+
+                if (!endpoint[workingendpoint].vision)
+                {
+                    for (let x = 0; x < endpoint.length; ++x)
+                    {
+                        if (endpoint[x].vision)
+                        {
+                            workingendpoint = x;
+                            break;
+                        }
+                    }
+                }
+
+                const endpointurl = endpoint[workingendpoint].url;
+                const key = endpoint[workingendpoint].key;
+                const model = endpoint[workingendpoint].model;
+                const max_tokens = endpoint[workingendpoint].generation;
+
+                let header;
+                if (key === "0") header = { "Content-Type": "application/json" };
+                else header = { "Content-Type": "application/json", "Authorization": `Bearer ${key}` };
+
+                streaming = true;
                 try
                 {
-                    const response = await fetch(completionsurl[workingcompletion],
+                    const response = await fetch(endpointurl,
                     {
                         method: "POST",
-                        headers: (key === "0") ? { "Content-Type": "application/json" } : { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
-                        body: JSON.stringify({ model: "openai-large", messages: messages, temperature: 1, max_tokens: 2048 })
+                        headers: header,
+                        body: JSON.stringify({ model: model, messages: messages, temperature: 1, max_tokens: max_tokens, stream: true }),
                     });
-                    const generated = (await response.json()).choices[0].message.content;
-                    messages.push({ role: "assistant", content: generated });
-                    loadingindic.remove()
-                    loadChat(messages);
+                    messages.push({ role: "assistant", content: "" });
+                    let buffer = "";
+                    const index = messages.length - 1;
+
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder("utf-8");
+
+                    loadingindic.remove();
+                    
+                    try
+                    {
+                        while (true)
+                        {
+                            const { done, value } = await reader.read();
+                            if (done) { break; }
+
+                            const chunk = decoder.decode(value);
+                            const lines = chunk.split('\n').filter(l => l.trim());
+
+                            for (const line of lines)
+                            {
+                                if (!line.startsWith("data: ")) continue;
+                                if (line.startsWith("data: [DATA]")) break;
+                                try
+                                {
+                                    const data = JSON.parse(line.slice(6));
+                                    if (data.choices[0]?.delta?.content)
+                                    {
+                                        messages[index].content += data.choices[0].delta.content;
+                                        loadChat(messages);
+                                    }
+                                }
+                                catch (e) { console.log(e); }
+                            }
+                        }
+                    }
+                    catch (e) { console.log(e); }
                 }
                 catch (e)
                 {
                     loadingindic.remove();
-                    loadChat([...messages, { "role": "assistant", "content": "Zara is not responding...\n" + e }]);
+                    loadChat([...messages, { "role": "assistant", "content": "XEVA is not responding...\n" + e }]);
                     messages.pop();
+                }
+                finally
+                {
+                    streaming = true;
+                    document.getElementById("streamingmsg").removeAttribute("id");
                 }
 
                 if (messages.length === 3) reloadallchatui = false;
