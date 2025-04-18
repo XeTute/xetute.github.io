@@ -224,6 +224,16 @@
                 50% { transform: scale(1); opacity: 0.8; }
             }
 
+            #lastmsgoptions
+            {
+                flex-direction: row;
+                max-width: fit-content;
+                max-height: fit-content;
+            }
+            #lastmsgoptions iwrapper:hover { scale: 0.85; background: var(--color-dark-mode); }
+            #lastmsgoptions iwrapper i { transition: 0.2s ease-in-out; }
+            #lastmsgoptions iwrapper i:hover { scale: 1.15; color: var(--background-color-dark-mode); }
+
             @media (orientation: portrait)
             {
                 .sidebar { display: none; padding-top: 8rem; }
@@ -541,6 +551,29 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 }
             }
 
+            function regenLastMsg()
+            {
+                messages.pop();
+                document.getElementById("lastmsg").remove();
+                generateNextTurn();
+            }
+
+            function copyLastMsg()
+            {
+                navigator.clipboard.writeText(messages.at(-1).content);
+                myAlert("Copied message.");
+            }
+
+            function addOptionsToLastMsg()
+            {
+                try { document.getElementById("lastmsgoptions").remove(); } catch (e) {}
+                document.getElementById("lastmsg").innerHTML +=
+`<div id="lastmsgoptions">
+    <iwrapper onclick="regenLastMsg();"><i class="fa fa-refresh"></i></iwrapper>
+    <iwrapper onclick="copyLastMsg();"><i class="fa fa-copy"></i></iwrapper>
+</div>`;
+            }
+
             let streaming = false;
             function addMsgToContainer(msg)
             {
@@ -585,9 +618,13 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     }
                     else
                     {
+                        try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
+
                         div.classList = "msg assistantmsg";
-                        div.innerHTML += marked.parse(msg.content);
-                        container.appendChild(div);
+                        div.id = "lastmsg";
+                        div.innerHTML = marked.parse(msg.content);
+
+                        container.appendChild(div); addOptionsToLastMsg();
                         container.scrollTo(0, container.scrollHeight);
                     }
                 }
@@ -761,7 +798,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                                     loadChat(messages);
                                 }
                             }
-                            catch(e){ console.log(e); }
+                            catch(e) { console.log(e); }
                         }
                     }
                 }
@@ -774,7 +811,8 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 finally
                 {
                     streaming = false;
-                    document.getElementById("streamingmsg")?.removeAttribute("id");
+                    document.getElementById("streamingmsg").id = "lastmsg";
+                    addOptionsToLastMsg();
                 }
             }
 
