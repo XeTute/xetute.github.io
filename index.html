@@ -566,7 +566,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
 
             function addOptionsToLastMsg()
             {
-                try { document.getElementById("lastmsgoptions").remove(); } catch (e) {}
+                try { document.getElementById("lastmsgoptions").remove(); } catch (e) { console.error(e); }
                 document.getElementById("lastmsg").innerHTML +=
 `<div id="lastmsgoptions">
     <iwrapper onclick="regenLastMsg();"><i class="fa fa-refresh"></i></iwrapper>
@@ -618,8 +618,6 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     }
                     else
                     {
-                        try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
-
                         div.classList = "msg assistantmsg";
                         div.id = "lastmsg";
                         div.innerHTML = marked.parse(msg.content);
@@ -762,7 +760,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                         {
                             method: "POST",
                             headers: header,
-                            body: JSON.stringify({ model: model, messages: messages, temperature: 1, max_tokens: max_tokens, stream: true }),
+                            body: JSON.stringify({ model: model, messages: messages, temperature: 0.85, max_tokens: max_tokens, stream: true }),
                         });
                     }
 
@@ -811,6 +809,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 finally
                 {
                     streaming = false;
+                    try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) { console.error(e); }
                     document.getElementById("streamingmsg").id = "lastmsg";
                     addOptionsToLastMsg();
                 }
