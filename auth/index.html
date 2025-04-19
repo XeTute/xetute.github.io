@@ -21,7 +21,7 @@
         <h2 id="header"></h2>
         <p id="loading">Thanks for your patience...</p>
 
-        <input id="email"        placeholder="Email"    type="email"    autocomplete="offf"/>
+        <input id="email"        placeholder="Email"    type="email"    autocomplete="off"/>
         <input id="password"     placeholder="Password" type="password" />
         <input id="passconfirm"  placeholder="Password" type="password" />
 
@@ -47,11 +47,12 @@
         {
             if (await isAuthorized({ pb: pb }))
             {
-                if (confirm("You're already authorized. Go back?"))
+                if (await myConfirm("You're already authorized. Go back?"))
                     window.location.href = from;
             }
 
         }
+        load();
 
         let form = "signin";
         function loadForm()
