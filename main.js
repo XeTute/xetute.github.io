@@ -93,16 +93,17 @@ function myConfirm(message)
     });
 }
 
-function myPrompt(message)
+function myPrompt(message, fillwith="")
 {   return new Promise((resolve) => {
 
     const eightypercent = 0.8 * document.body.getBoundingClientRect().width;
     const id = `overlay-${Date.now()}`;
     const overlay = getOverlay(id);
-    const input = document.createElement("input");
+    const input = document.createElement("textarea");
     const button = document.createElement("button");
 
     input.placeholder = message;
+    input.textContent = fillwith;
     input.style.margin = "5px";
     input.style.padding = "10px";
     input.style.borderBottom = "2px solid var(--border-color-dark-mode)";
