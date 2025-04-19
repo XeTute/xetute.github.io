@@ -354,6 +354,14 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
             let reloadallchatui = true;
             let loadlastmessages = 64;
 
+            function injectUserInformation()
+            {
+                if (pb.authStore.record.data.MyXEVA.persona)
+                {
+                    messages.push({ "role": "system", "content": `Following is information about the user:\n${pb.authStore.record.data.MyXEVA.persona}` });
+                }
+            }
+
             function setChatID(newid)
             {
                 chatid = newid;
@@ -379,6 +387,8 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     showSidebar();
 
                 messages = [ { "role": "system", "content": systemprompt } ];
+                injectUserInformation();
+
                 reloadallchatui = true;
             }
 
@@ -444,11 +454,12 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 const recentchats = document.getElementById("recent-chats-header");
                 const authbtn = document.getElementById("authbtn");
 
-                if ((authorized = await isAuthorized({ pb: pb })))
+                authorized = await isAuthorized({ pb: pb });
+                if (authorized)
                 {
                     if (pb.authStore.record.data.MyXEVA?.chats === undefined)
                     {
-                        if (!(await updateData({ ...pb.authStore.record.data, MyXEVA: { chats: [] } }, { pb: pb })))
+                        if (!(await updateData({ ...pb.authStore.record.data, MyXEVA: { chats: [], persona: "Not specified" } }, { pb: pb })))
                         myAlert("Your data seems to be corrupted. Expect errors, report them to x3tut3@gmail.com if they occur.");
                     }
 
@@ -460,6 +471,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     }
                     authbtn.getElementsByTagName('p')[0].textContent = pb.authStore.record.data.username;
 
+                    injectUserInformation();
                     const nchats = pb.authStore.record.data.MyXEVA.chats.length;
                     if (nchats > -1) // Check if it exists, not how long it is
                     {
