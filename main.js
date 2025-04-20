@@ -12,9 +12,38 @@ function getOverlay(id)
     overlay.style.top = 0;
     overlay.style.left = 0;
     overlay.style.textAlign = "center";
-    overlay.style.backdropFilter = "blur(24px)";
     overlay.style.zIndex = 10;
     return overlay;
+}
+
+async function fadeinOverlay(id)
+{
+    const overlay = document.getElementById(id);
+    overlay.style.backdropFilter = "blur(0px)";
+    overlay.style.opacity = 0;
+
+    let to1sec = 1 / 12;
+    for (let x = 0; x < 12; ++x)
+    {
+        await sleep(to1sec);
+        overlay.style.backdropFilter = `blur(${x}px)`;
+        overlay.style.opacity = x * to1sec;
+    }
+}
+
+async function fadeoutOverlay(id)
+{
+    const overlay = document.getElementById(id);
+    overlay.style.backdropFilter = "blur(12px)";
+    overlay.style.opacity = 1;
+
+    let to1sec = 1 / 12;
+    for (let x = 12; x >= 0; --x)
+    {
+        await sleep(to1sec);
+        overlay.style.backdropFilter = `blur(${x}px)`;
+        overlay.style.opacity = x * to1sec;
+    }
 }
 
 function getOverlayText(message)
@@ -38,11 +67,12 @@ function myAlert(message)
     const button = document.createElement("button");
 
     button.textContent = "Close";
-    button.setAttribute("onclick", `document.getElementById("${id}").remove();`);
+    button.onclick = async () => { await fadeoutOverlay(id); document.getElementById(id).remove(); };
 
     overlay.appendChild(text);
     overlay.appendChild(button);
     document.body.appendChild(overlay);
+    fadeinOverlay(id);
 }
 
 function myAlertImage(imgdata)
@@ -59,11 +89,12 @@ function myAlertImage(imgdata)
     image.src = imgdata;
 
     button.textContent = "Close";
-    button.setAttribute("onclick", `document.getElementById("${id}").remove();`);
+    button.onclick = async () => { await fadeoutOverlay(id); document.getElementById(id).remove(); };
 
     overlay.appendChild(image);
     overlay.appendChild(button);
     document.body.appendChild(overlay);
+    fadeinOverlay(id);
 }
 
 function myConfirm(message)
@@ -82,14 +113,15 @@ function myConfirm(message)
     btns.appendChild(confirm);
 
     confirm.textContent = "Confirm";
-    confirm.onclick = () => { document.getElementById(id).remove(); resolve(true); }
+    confirm.onclick = async () => { await fadeoutOverlay(); document.getElementById(id).remove(); resolve(true); }
 
     cancel.textContent = "Cancel";
-    cancel.onclick = () => { document.getElementById(id).remove(); resolve(false); }
+    cancel.onclick = async () => { await fadeoutOverlay(); document.getElementById(id).remove(); resolve(false); }
 
     overlay.appendChild(text);
     overlay.appendChild(btns);
     document.body.appendChild(overlay);
+    fadeinOverlay(id);
     });
 }
 
@@ -111,11 +143,12 @@ function myPrompt(message, fillwith="")
     input.style.maxHeight = "fit-content";
 
     button.textContent = "Done";
-    button.onclick = () => { if (input.value) { document.getElementById(id).remove(); resolve(input.value); } }
+    button.onclick = async () => { if (input.value) { await fadeoutOverlay(id); document.getElementById(id).remove(); resolve(input.value); } }
 
     overlay.appendChild(input);
     overlay.appendChild(button);
     document.body.appendChild(overlay);
+    fadeinOverlay(id);
     input.focus();
     });
 }
