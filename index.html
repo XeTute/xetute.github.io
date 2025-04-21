@@ -855,8 +855,8 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     {
                         if ((workingendpoint === (endpoint.length - 1)) && !endpoint[endpoint.length - 1].vision && needsvision)
                             throw new Error("No AI with image processing is currently online.");
-                        if (needsvision) selectVisionEndpoint(startfrom=workingendpoint + 1);
-                        else selectTextEndpoint(startfrom=workingendpoint + 1);
+                        if (needsvision) selectVisionEndpoint(startfrom=Math.min(workingendpoint + 1, endpoint.length - 1));
+                        else selectTextEndpoint(startfrom=Math.min(workingendpoint + 1, endpoint.length - 1));
 
                         const endpointurl = endpoint[workingendpoint].url;
                         const key = endpoint[workingendpoint].key;
