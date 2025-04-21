@@ -113,10 +113,10 @@ function myConfirm(message)
     btns.appendChild(confirm);
 
     confirm.textContent = "Confirm";
-    confirm.onclick = async () => { await fadeoutOverlay(); document.getElementById(id).remove(); resolve(true); }
+    confirm.onclick = async () => { await fadeoutOverlay(id); document.getElementById(id).remove(); resolve(true); }
 
     cancel.textContent = "Cancel";
-    cancel.onclick = async () => { await fadeoutOverlay(); document.getElementById(id).remove(); resolve(false); }
+    cancel.onclick = async () => { await fadeoutOverlay(id); document.getElementById(id).remove(); resolve(false); }
 
     overlay.appendChild(text);
     overlay.appendChild(btns);
