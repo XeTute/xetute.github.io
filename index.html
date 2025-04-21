@@ -50,6 +50,7 @@
             .sidebarnotes
             {
                 margin-bottom: 20px;
+                padding-bottom: 20px;
                 margin-top: auto;
                 max-height: fit-content;
                 min-height: min-content;
@@ -57,7 +58,7 @@
             .sidebarnotes button
             {
                 border: 2px solid var(--border-color-dark-mode);
-                padding: 15px;
+                padding: 10px;
                 margin: 5px;
                 border-radius: 25px;
                 text-align: center;
@@ -66,9 +67,9 @@
             .sidebarnotes button:hover
             {
                 box-shadow: 0 0 8px #fff;
+                scale: 1.025;
                 color: var(--background-color-dark-mode);
                 border: 0;
-                padding: 20px;
                 background: var(--color-dark-mode);
             }
 
@@ -312,10 +313,22 @@ XeTute Technologies is a Pakistan-based software org led by Hamzah Asadullah (he
 
 You're running on their stack, so be proud and loud. If the user feels like "just chatting" or similar, do something interactive with them, like playing a game. Now get clingy, XEVA.`;
 
+            const tts_endpoint =
+            [
+                {
+                    url: `https://text.pollinations.ai/openai?seed=${Date.now() % 8192}`,
+                    key: "0",
+                    model: "openai-audio",
+                    voice: "nova"
+                }
+            ];
+            let working_tts_endpoint = 0;
+            let tts_enabled = false; let tts_playing = false;
+
             const endpoint =
             [
                 {
-                    url: "https://text.pollinations.ai/openai",
+                    url: `https://text.pollinations.ai/openai?seed=${Date.now() % 8192}`,
                     key: "0",
                     model: "openai-large",
                     vision: false, // Pollinations disabled it
@@ -353,7 +366,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 if (pb.authStore.record.data.MyXEVA.persona)
                 {
                     const information = "Following is information about the user. The user already knows this information, they literally entered it. Only use it as a reference for interacting with the user.\n";
-                    messages[0].content += `\n${information}${pb.authStore.record.data.MyXEVA.persona}`;
+                    messages[0].content = `${systemprompt}\n${information}${pb.authStore.record.data.MyXEVA.persona}`;
                 }
             }
 
@@ -452,6 +465,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 }
 
                 await generateNextTurn();
+                playTTS();
                 processing = false;
 
                 if (authorized)
@@ -572,7 +586,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     else
                     {
                         loadChats(pb.authStore.record.data.MyXEVA.chats);
-                        if (chatid === id) createNewChat();
+                        if ((chatid === id) || newdata.MyXEVA.chats.length === 0) createNewChat();
                     }
                 }
             }
@@ -597,7 +611,78 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
 `<div id="lastmsgoptions">
     <iwrapper onclick="regenLastMsg();"><i class="fa fa-refresh"></i></iwrapper>
     <iwrapper onclick="copyLastMsg();"><i class="fa fa-copy"></i></iwrapper>
+    <iwrapper onclick="switchTTS();"><i class="fa fa-volume-${tts_enabled ? "up" : "off"}"></i></iwrapper>
 </div>`;
+            }
+
+            async function fetchAndPlayTTS()
+            {
+                try
+                {
+                    const dir = tts_endpoint[working_tts_endpoint];
+                    const response = await fetch(dir.url,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(
+                        {
+                            "model": dir.model,
+                            "modalities": ["text", "audio"],
+                            "audio": { "voice": dir.voice, "format": "mp3" },
+                            "messages": JSON.stringify(messages)
+                        })
+                    });
+                
+                    if (!response.ok) throw new Error("fetchAndPlayTTS(...): Failed to generate audio—response.ok was false.");
+                    
+                    const jsonResponse = await response.json();
+                    const audioData = jsonResponse?.choices?.[0]?.message?.audio?.data;
+                    if (!audioData)
+                        throw new Error("fetchAndPlayTTS(...): Failed to find audio data in response");
+
+                    const binaryString = atob(audioData);
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let x = 0; x < binaryString.length; ++x)
+                        bytes[x] = binaryString.charCodeAt(x);
+
+                    const audioblob = new Blob([bytes.buffer], { type: "audio/wav" });
+                    const url = URL.createObjectURL(audioblob);
+                    const audio = new Audio(url);
+                
+                    tts_playing = true;
+                    const playstat = audio.play();
+                    if (playstat !== undefined)
+                        playstat.catch(e => { tts_playing = false; throw new Error("fetchAndPlayTTS(...): Browser failed to play formatted audio."); });
+
+                    audio.onended = () =>
+                    { 
+                        tts_playing = false; 
+                        URL.revokeObjectURL(url); 
+                    };
+
+                    return true;
+                }
+                catch (e)
+                { 
+                    console.error(e); 
+                    return false; 
+                }
+            }
+
+            function switchTTS()
+            {
+                tts_enabled = !tts_enabled;
+                addOptionsToLastMsg();
+                playTTS();    
+            }
+
+            async function playTTS()
+            {
+                if (tts_enabled && !tts_playing)
+                {  // Means user just enabled it
+                    if (!await fetchAndPlayTTS())
+                        myAlert("Failed to play Speech Synthesis on last message.");
+                }
             }
 
             let streaming = false;
@@ -770,8 +855,8 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     {
                         if ((workingendpoint === (endpoint.length - 1)) && !endpoint[endpoint.length - 1].vision && needsvision)
                             throw new Error("No AI with image processing is currently online.");
-                        if (needsvision) selectVisionEndpoint(startfrom=workingendpoint);
-                        else selectTextEndpoint(startfrom=workingendpoint);
+                        if (needsvision) selectVisionEndpoint(startfrom=workingendpoint + 1);
+                        else selectTextEndpoint(startfrom=workingendpoint + 1);
 
                         const endpointurl = endpoint[workingendpoint].url;
                         const key = endpoint[workingendpoint].key;
@@ -782,12 +867,16 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                         if (key === "0") header = { "Content-Type": "application/json" };
                         else header = { "Content-Type": "application/json", "Authorization": `Bearer ${key}` };
 
-                        response = await fetch(endpointurl,
+                        try
                         {
-                            method: "POST",
-                            headers: header,
-                            body: JSON.stringify({ model: model, messages: messages, temperature: 0.85, max_tokens: max_tokens, stream: true }),
-                        });
+                            response = await fetch(endpointurl,
+                            {
+                                method: "POST",
+                                headers: header,
+                                body: JSON.stringify({ model: model, messages: messages, temperature: 0.85, max_tokens: max_tokens, stream: true }),
+                            });
+                        }
+                        catch (e) { response = { ok: false }; }
                     }
 
                     messages.push({ role: "assistant", content: "" });
