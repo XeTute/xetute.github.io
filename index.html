@@ -876,7 +876,13 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                                 body: JSON.stringify({ model: model, messages: messages, temperature: 0.85, max_tokens: max_tokens, stream: true }),
                             });
                         }
-                        catch (e) { response = { ok: false }; }
+                        catch (e)
+                        {
+                            response = { ok: false };
+                            const inp = document.querySelector("userinput");
+                            inp.placeholder = "Trying to bypass server issues";
+                            for (let x = 0; x < 3; ++x) { await sleep(500); inp.placeholder += '.'; }
+                        }
                     }
 
                     messages.push({ role: "assistant", content: "" });
