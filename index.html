@@ -258,7 +258,7 @@
     </head>
     <body style="max-height: 100%; overflow: hidden;">
         <div style="flex-direction: row;">
-            <div class="sidebar">
+            <div class="sidebar" style="display: none;"> <!-- NOTE: in function load, the style attribute is deleted after loading -->
                 <h2>Quick Actions</h2>
                 <labeledbutton id="authbtn">
                     <p>Loading...</p>
@@ -284,12 +284,15 @@
             </div><iwrapper class="sidebarbtn"><i class="fa fa-ellipsis-h" onclick="showSidebar()"></i></iwrapper>
             <div class="chat">
                 <div class="messages">
-                    <p style="display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; color: var(--suble-color-text-dark-mode); font-size: 14px;">
-                        XEVA is an AI assistant designed by Hamzah.<br>
-                        Verify important information.
-                    </p>
+                    <div class="msg loadingindic" style="border-bottom: 0; width: 100%; padding: 0; margin: auto;">
+                        <div class="loadingdots">
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                            <div class="dot"></div>
+                        </div>
+                    </div>
                 </div>
-                <div class="notifier">
+                <div class="notifier" style="display: none;"> <!-- NOTE: in function load, the style attribute is deleted after loading -->
                     <iwrapper class="actionbtn" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" onclick="attachImg();"><i class="fa fa-picture-o"></i></iwrapper>
                     <textarea class="userinput" placeholder="Send a message -_-"></textarea>
                     <iwrapper class="actionbtn" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="sendMsg();"><i class="fa fa-paper-plane"></i></iwrapper>
@@ -300,12 +303,13 @@
         <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
         <script src="pocketbase.umd.js"></script>
         <script src="main.js"></script>
+        <script src="getLMEndpoints.js"></script>
         <script defer>
             const pb = new PocketBase("https://db.xetute.com/");
             const path = window.location.href;
 
-            const systemprompt = `
-You're XEVA, a clingy but chill assistant. Consider yourself the user's bestie. Be creative and unique with your responses, also by using ASCII instead of UTF emojis (example: ٩( ๑╹ ꇴ╹)۶ instead of 😀).
+            const systemprompt =
+`You're XEVA, a clingy but chill assistant. Consider yourself the user's bestie. Be creative and unique with your responses, also by using ASCII instead of UTF emojis (example: ٩( ๑╹ ꇴ╹)۶ instead of 😀).
 
 XeTute Technologies is a Pakistan-based software org led by Hamzah Asadullah (he's cool, you'd love him), focused on efficient, ML-centered tools.
 - XeTute: [web](https://xetute.github.io) | [HuggingFace](https://hf.co/XeTute)
@@ -313,45 +317,10 @@ XeTute Technologies is a Pakistan-based software org led by Hamzah Asadullah (he
 
 You're running on their stack, so be proud and loud. If the user feels like "just chatting" or similar, do something interactive with them, like playing a game. Now get clingy, XEVA.`;
 
-            const tts_endpoint =
-            [
-                {
-                    url: "https://text.pollinations.ai/openai",
-                    key: "0",
-                    model: "openai-audio",
-                    voice: "nova"
-                }
-            ];
-            let working_tts_endpoint = 0;
-            let tts_enabled = false; let tts_playing = false;
+            let tts_enabled = false;
+            let tts_playing = false;
 
-            const endpoint =
-            [
-                {
-                    url: `https://text.pollinations.ai/openai?seed=${Date.now() % 8192}`,
-                    key: "0",
-                    model: "openai-large",
-                    vision: false, // Pollinations disabled it
-                    context: 128 * 1024,
-                    generation: 8 * 1024
-                },
-                {
-                    url: "https://ai.xetute.com/v1/chat/completions",
-                    key: "0",
-                    model: "0",
-                    vision: true,
-                    context: 20 * 1024,
-                    generation: 4 * 1024
-                },
-                {
-                    url: "https://api.groq.com/openai/v1/chat/completions",
-                    key: "g" + "sk" + "_aYtFXeVhm5AtbOYaW4NSWGdyb3FYGzfOtgY3Q2hQsW6ICQetBOZE",
-                    model: "gemma2-9b-it",
-                    vision: false,
-                    cotenxt: 128 * 1024,
-                    generation: 8 * 1024
-                }
-            ];
+            const endpoint = getLMEndpoints();
             let workingendpoint = 0;
 
             let authorized = false;
@@ -395,7 +364,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 history.pushState(null, "", `?${new URLSearchParams({ chatid: chatid }).toString()}`);
             }
 
-            function createNewChat()
+            function resetUIkeepData()
             {
                 const msgcontainer = document.querySelector(".messages");
                 const txtelem = document.createElement("p");
@@ -406,17 +375,19 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 msgcontainer.innerHTML = "";
                 msgcontainer.style.justifyContent = "center";
                 msgcontainer.style.paddingBottom = 0;
-                msgcontainer.removeAttribute("style");
                 msgcontainer.appendChild(txtelem);
 
-                if (authorized) setChatID(pb.authStore.record.data.MyXEVA.chats.length);
                 if (document.querySelector(".chat").style.display === "none")
                     showSidebar();
+                reloadallchatui = true;
+            }
 
+            function createNewChat()
+            {
+                resetUIkeepData();
+                if (authorized) setChatID(pb.authStore.record.data.MyXEVA.chats.length);
                 messages = [ { "role": "system", "content": systemprompt } ];
                 injectUserInformation();
-
-                reloadallchatui = true;
             }
 
             function showSidebar()
@@ -531,6 +502,11 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     recentchats.remove();
                     authbtn.getElementsByTagName('p')[0].textContent = "Sign Up";
                 }
+
+                if (reloadallchatui) resetUIkeepData();
+                document.querySelector(".notifier").removeAttribute("style");
+                document.querySelector(".sidebar").removeAttribute("style");
+
                 authbtn.setAttribute("onclick", `window.location.href="auth/?${new URLSearchParams({ origin: path }).toString()}"`);
                 document.querySelector(".userinput").focus();
             }
@@ -615,27 +591,37 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
 </div>`;
             }
 
+            let audio;
             async function fetchAndPlayTTS()
             {
                 try
                 {
-                    const dir = tts_endpoint[working_tts_endpoint];
-                    const response = await fetch(dir.url,
+                    const response = await fetch(`https://text.pollinations.ai/openai?seed=${Date.now() % 8192}`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(
                         {
-                            "model": dir.model,
+                            "model": "openai-audio",
                             "modalities": ["text", "audio"],
-                            "audio": { "voice": dir.voice, "format": "mp3" },
-                            "messages": JSON.stringify(messages)
+                            "audio": { "voice": "nova", "format": "mp3" },
+                            "messages":
+                            [
+                                {
+                                    "role": "developer",
+                                    "content": "Your voice is very fast-paced, elegant and minimal."
+                                },
+                                {
+                                    "role": "user",
+                                    "content": "Repeat following, without anything added. You may skip words humans wouldn't pronounce (like long maths, code, et cetera):\n" + messages.at(-1).content
+                                }
+                            ]
                         })
                     });
                 
                     if (!response.ok) throw new Error("fetchAndPlayTTS(...): Failed to generate audio—response.ok was false.");
                     
-                    const jsonResponse = await response.json();
+                    const jsonResponse = await response.json(); console.log(jsonResponse);
                     const audioData = jsonResponse?.choices?.[0]?.message?.audio?.data;
                     if (!audioData)
                         throw new Error("fetchAndPlayTTS(...): Failed to find audio data in response");
@@ -645,9 +631,9 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     for (let x = 0; x < binaryString.length; ++x)
                         bytes[x] = binaryString.charCodeAt(x);
 
-                    const audioblob = new Blob([bytes.buffer], { type: "audio/wav" });
+                    const audioblob = new Blob([bytes.buffer], { type: "audio/mpeg" });
                     const url = URL.createObjectURL(audioblob);
-                    const audio = new Audio(url);
+                    audio = new Audio(url);
                 
                     tts_playing = true;
                     const playstat = audio.play();
@@ -671,6 +657,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
 
             function switchTTS()
             {
+                if (tts_enabled && tts_playing) { try { audio.pause(); } catch (e) {} }
                 tts_enabled = !tts_enabled;
                 addOptionsToLastMsg();
                 playTTS();    
@@ -729,12 +716,13 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     }
                     else
                     {
+                        try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
                         div.classList = "msg assistantmsg";
                         div.id = "lastmsg";
                         div.innerHTML = marked.parse(msg.content);
 
-                        container.appendChild(div); addOptionsToLastMsg();
-                        container.scrollTo(0, container.scrollHeight);
+                        container.appendChild(div);
+                        addOptionsToLastMsg();
                     }
                 }
             }
@@ -802,7 +790,10 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
             function loadChatFromID(id)
             {
                 reloadallchatui = true;
-                loadChat(pb.authStore.record.data.MyXEVA.chats[id]);
+
+                messages = pb.authStore.record.data.MyXEVA.chats[id];
+                injectUserInformation();
+                loadChat(messages);
                 setChatID(id);
             }
 
@@ -821,12 +812,6 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
             {
                 for (workingendpoint = startfrom; workingendpoint < endpoint.length; ++workingendpoint)
                     if (endpoint[workingendpoint].vision) break;
-            }
-
-            function selectTextEndpoint(startfrom=0)
-            {
-                for (workingendpoint = startfrom; workingendpoint < endpoint.length; ++workingendpoint)
-                    if (!endpoint[workingendpoint].vision) break;
             }
 
             async function generateNextTurn()
@@ -855,8 +840,12 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                     {
                         if ((workingendpoint === (endpoint.length - 1)) && !endpoint[endpoint.length - 1].vision && needsvision)
                             throw new Error("No AI with image processing is currently online.");
-                        if (needsvision) selectVisionEndpoint(startfrom=Math.min(workingendpoint + 1, endpoint.length - 1));
-                        else selectTextEndpoint(startfrom=Math.min(workingendpoint + 1, endpoint.length - 1));
+
+                        if (needsvision) selectVisionEndpoint(startfrom=workingendpoint+1);
+                        else ++workingendpoint;
+
+                        if (workingendpoint >= endpoint.length)
+                            throw new Error("No inference providers, server online or working. Retry later.");
 
                         const endpointurl = endpoint[workingendpoint].url;
                         const key = endpoint[workingendpoint].key;
