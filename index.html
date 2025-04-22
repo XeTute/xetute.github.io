@@ -923,9 +923,9 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 }
                 catch (e)
                 {
+                    messages[index].content = "XEVA is not responding...\n" + e;
                     loadingindic.remove();
-                    loadChat([...messages, { role: "assistant", content: "XEVA is not responding...\n" + e }]);
-                    messages.pop();
+                    loadChat(messages);
                 }
                 finally
                 {
