@@ -365,8 +365,8 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
             {
                 if (pb.authStore.record.data.MyXEVA.persona)
                 {
-                    const information = "Following is information about the user. The user already knows this information, they literally entered it. Only use it as a reference for interacting with the user.\n";
-                    messages[0].content = `${systemprompt}\n${information}${pb.authStore.record.data.MyXEVA.persona}`;
+                    const information = "Following is information about the user. The user already knows this information, they literally entered it. Only use it as a reference for interacting with the user.";
+                    messages[0].content = `${systemprompt}\n${information}\n${pb.authStore.record.data.MyXEVA.persona}`;
                 }
             }
 
@@ -606,7 +606,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
 
             function addOptionsToLastMsg()
             {
-                try { document.getElementById("lastmsgoptions").remove(); } catch (e) { console.error(e); }
+                try { document.getElementById("lastmsgoptions").remove(); } catch (e) {}
                 document.getElementById("lastmsg").innerHTML +=
 `<div id="lastmsgoptions">
     <iwrapper onclick="regenLastMsg();"><i class="fa fa-refresh"></i></iwrapper>
@@ -930,7 +930,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 finally
                 {
                     streaming = false;
-                    try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) { console.error(e); }
+                    try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
                     document.getElementById("streamingmsg").id = "lastmsg";
                     addOptionsToLastMsg();
                 }
