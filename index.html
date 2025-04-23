@@ -17,6 +17,7 @@
                 padding: 20px;
                 padding-top: 40px;
                 justify-content: flex-start;
+                backdrop-filter: brightness(80%);
             }
             .sidebar h2
             {
@@ -35,8 +36,6 @@
                 overflow-x: hidden;
                 padding: 5px;
                 padding-top: 20px;
-                min-width: 70%;
-                max-width: 80% !important;
                 justify-content: flex-start;
             }
 
@@ -59,7 +58,7 @@
                 border: 2px solid var(--border-color-dark-mode);
                 padding: 10px;
                 margin: 5px;
-                border-radius: 25px;
+                border-radius: 10px;
                 text-align: center;
                 transition: 0.2s ease-in-out;
             }
@@ -74,24 +73,25 @@
 
             .chat
             {
-                min-height: 99.9%;
-                max-height: 100%;
+                padding-left: 10%;
+                padding-right: 10%;
+                flex: 1;
             }
 
             .notifier
             {
-                position: absolute;
-                bottom: 5vh;
-                flex-direction: row;
+                margin-top: auto;
+                margin-bottom: 20px;
+                padding: 0;
                 max-height: fit-content;
-                min-width: 85%;
-                max-width: 95%;
+                max-width: fit-content;
+                flex-direction: row;
+                border-radius: 10px;
             }
 
             .userinput
             {
-                min-width: 50%;
-                max-width: 60%;
+                max-width: 100%;
                 min-height: 16px;
                 max-height: 17px;
                 font-size: 16px;
@@ -100,13 +100,10 @@
                 background: var(--background-color-dark-mode);
                 border: 0;
                 border-radius: 0;
-                box-shadow: 0 0 16px #222;
 
                 transition: 0.2s ease-in-out;
                 z-index: 0;
             }
-            .userinput:hover { box-shadow: 0 0 16px #333; }
-            .userinput:focus { box-shadow: 0 0 16px #333; border: 2px solid #333; padding: 18px; }
             
             .actionbtn
             {
@@ -118,6 +115,7 @@
                 margin: 0;
                 border: 0;
                 border-radius: 10px;
+                background: var(--border-color-dark-mode);
 
                 transition: 0.2s ease-in-out;
                 z-index: 1;
@@ -126,7 +124,6 @@
             {
                 background: var(--color-dark-mode);
                 color: var(--background-color-dark-mode);
-                box-shadow: 0 0 4px var(--color-dark-mode);
                 scale: 1.01;
             }
 
@@ -241,7 +238,7 @@
                 .sidebarnotes { flex-direction: row; padding-bottom: 60px; }
                 .chat { width: 100%; max-width: 100%; }
                 .notifier { width: 100%; }
-                .userinput { width: 70% !important; max-width: 70% !important; }
+                .userinput { width: 70% !important; max-width: 70% !important; transition: 0.3s ease-in-out; }
             }
 
             @media (orientation: landscape)
@@ -251,7 +248,7 @@
                 .sidebarnotes { flex-direction: column; padding-bottom: 20px; }
                 .chat { width: 85%; max-width: 85%; }
                 .notifier { width: 85%; }
-                .userinput { width: 65% !important; max-width: 65% !important; }
+                .userinput { width: 65% !important; max-width: 65% !important; transition: 0.5s ease-in-out; }
             }
         </style>
     </head>
@@ -293,7 +290,7 @@
                 </div>
                 <div class="notifier" style="display: none;"> <!-- NOTE: in function load, the style attribute is deleted after loading -->
                     <iwrapper class="actionbtn" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" onclick="attachImg();"><i class="fa fa-picture-o"></i></iwrapper>
-                    <textarea class="userinput" placeholder="Send a message -_-"></textarea>
+                    <textarea class="userinput" placeholder="Start typing.."></textarea>
                     <iwrapper class="actionbtn" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="sendMsg();"><i class="fa fa-paper-plane"></i></iwrapper>
                 </div>
             </div>
@@ -304,20 +301,51 @@
         <script src="main.js"></script>
         <script src="getLMEndpoints.js"></script>
         <script defer>
+            const userinput = document.querySelector(".userinput");
+            userinput.addEventListener("input", () =>
+            {
+                if (userinput.value.length)
+                {
+                    userinput.style.minWidth = "80%";
+                    userinput.style.maxWidth = "85%";
+                }
+                else
+                {
+                    userinput.placeholder = "Continue typing..";
+                    userinput.style.minWidth = "70%";
+                    userinput.style.maxWidth = "75%";
+                }
+            });
+        </script>
+        <script defer>
             const pb = new PocketBase("https://db.xetute.com/");
             const path = window.location.href;
 
             const systemprompt =
-`You're XEVA, a clingy but chill assistant. Consider yourself the user's bestie. Be creative and unique with your responses, also by using ASCII instead of UTF emojis (example: ٩( ๑╹ ꇴ╹)۶ instead of 😀).
-
-XeTute Technologies is a Pakistan-based software org led by Hamzah Asadullah (he's cool, you'd love him), focused on efficient, ML-centered tools.
-- XeTute: [web](https://xetute.github.io) | [HuggingFace](https://hf.co/XeTute)
-- Hamzah: [GitHub](https://github.com/XeTute) | [HF](https://hf.co/Hamzah-Asadullah) | [YT](https://youtube.com/@HamzahAsadullah) | [Ko-Fi](https://ko-fi.com/HamzahAsadullah)
-
-You're running on their stack, so be proud and loud. If the user feels like "just chatting" or similar, do something interactive with them, like playing a game. Now get clingy, XEVA.`;
-
-            let tts_enabled = false;
-            let tts_playing = false;
+`You're a helpful assistant. You're being served through MyXEVA, and your name is XEVA.
+MyXEVA is a service developed by XeTute. XeTute is a Pakstani org, with the only member being Hamzah Asadullah, a Pakistani student.
+Try to engage the user and have an educational chat with the user. Try to enhance the user's live by being helpful and thoughtful, but not overly.
+XeTute is a luxury-ish software brand (plans for hardware, especially mechatronic-based are there though), so make sure the way you interact comes over likewise (please).
+---
+For example, if the user talks about wanting to create a webpage, don't directly bloat the chat with everything about React, but:
+1. Praise them for wanting to learn something: Be motivational yet push the user to actually do something productive
+2. Ask the user if they need resources and example snippets
+2.1. If yes: Offer resources and example snippets from which the user can learn from
+That's just an example. You can also try to be a bit flirty to engage the user ;)
+----
+Following is reference information about XeTute:
+- Founded: 20/06/2022, by [Last Name] Hamzah, [First Name] Asadullah (also Pakistani)
+- Origin: The Islamic Republic of Pakistan
+- Hyperlinks:
+  - Webpage (the landing page is this chat page): https://xetute.com/ (reverse-proxy to https://xetute.github.io/)
+  - GitHub (single-user profile ran by Hamzah): https://github.com/XeTute
+  - HuggingFace:
+    - Hamzah: https://hf.co/Hamzah-Asadullah
+    - XeTute (actually registered as an org, Hamzah the only member): https://hf.co/XeTute
+  - Ko-Fi: https://ko-fi.com/hamzahasadullah (support for XeTute, not Hamzah, but Hamzah profile)
+  And many more, but they're mostly interlinked on profiles above.
+---
+Happy chatting!`;
 
             let endpoint = getLMEndpoints();
             let workingendpoint = 0;
@@ -409,8 +437,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
 
             async function sendMsg()
             {
-                const inputfield = document.querySelector(".userinput");
-                const input = inputfield.value.trim();
+                const input = userinput.value.trim();
 
                 if (processing) return;
                 processing = true;
@@ -425,17 +452,16 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                         imagetosend = [];
                         messages.push({ "role": "user", "content": data });
                         if (input) data.push({ "type": "text", "text": input });
-                        inputfield.placeholder = "Send a message -_-";
+                        userinput.placeholder = "Send a message -_-";
                     }
                     else messages.push({ "role": "user", "content": input });
                     loadChat(messages);
                 
                     processing = true;
-                    if (input) inputfield.value = "";
+                    if (input) userinput.value = "";
                 }
 
                 await generateNextTurn();
-                playTTS();
                 processing = false;
 
                 if (authorized)
@@ -507,7 +533,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 document.querySelector(".sidebar").removeAttribute("style");
 
                 authbtn.setAttribute("onclick", `window.location.href="auth/?${new URLSearchParams({ origin: path }).toString()}"`);
-                document.querySelector(".userinput").focus();
+                userinput.focus();
             }
             load();
 
@@ -587,89 +613,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
 `<div id="lastmsgoptions">
     <iwrapper onclick="regenLastMsg();"><i class="fa fa-refresh"></i></iwrapper>
     <iwrapper onclick="copyLastMsg();"><i class="fa fa-copy"></i></iwrapper>
-    <iwrapper onclick="switchTTS();"><i class="fa fa-volume-${tts_enabled ? "up" : "off"}"></i></iwrapper>
 </div>`;
-            }
-
-            let audio;
-            async function fetchAndPlayTTS()
-            {
-                try
-                {
-                    const response = await fetch(`https://text.pollinations.ai/openai?seed=${Date.now() % 8192}`,
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(
-                        {
-                            "model": "openai-audio",
-                            "modalities": ["text", "audio"],
-                            "audio": { "voice": "nova", "format": "mp3" },
-                            "messages":
-                            [
-                                {
-                                    "role": "developer",
-                                    "content": "Your voice is very fast-paced, elegant and minimal."
-                                },
-                                {
-                                    "role": "user",
-                                    "content": "Repeat following, without anything added. You may skip words humans wouldn't pronounce (like long maths, code, et cetera):\n" + messages.at(-1).content
-                                }
-                            ]
-                        })
-                    });
-                
-                    if (!response.ok) throw new Error("fetchAndPlayTTS(...): Failed to generate audio—response.ok was false.");
-                    
-                    const jsonResponse = await response.json(); console.log(jsonResponse);
-                    const audioData = jsonResponse?.choices?.[0]?.message?.audio?.data;
-                    if (!audioData)
-                        throw new Error("fetchAndPlayTTS(...): Failed to find audio data in response");
-
-                    const binaryString = atob(audioData);
-                    const bytes = new Uint8Array(binaryString.length);
-                    for (let x = 0; x < binaryString.length; ++x)
-                        bytes[x] = binaryString.charCodeAt(x);
-
-                    const audioblob = new Blob([bytes.buffer], { type: "audio/mpeg" });
-                    const url = URL.createObjectURL(audioblob);
-                    audio = new Audio(url);
-                
-                    tts_playing = true;
-                    const playstat = audio.play();
-                    if (playstat !== undefined)
-                        playstat.catch(e => { tts_playing = false; throw new Error("fetchAndPlayTTS(...): Browser failed to play formatted audio."); });
-
-                    audio.onended = () =>
-                    { 
-                        tts_playing = false; 
-                        URL.revokeObjectURL(url); 
-                    };
-
-                    return true;
-                }
-                catch (e)
-                { 
-                    console.error(e); 
-                    return false; 
-                }
-            }
-
-            function switchTTS()
-            {
-                if (tts_enabled && tts_playing) { try { audio.pause(); } catch (e) {} }
-                tts_enabled = !tts_enabled;
-                addOptionsToLastMsg();
-                playTTS();    
-            }
-
-            async function playTTS()
-            {
-                if (tts_enabled && !tts_playing)
-                {  // Means user just enabled it
-                    if (!await fetchAndPlayTTS())
-                        myAlert("Failed to play Speech Synthesis on last message.");
-                }
             }
 
             function htmlParse(text)
@@ -784,13 +728,12 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                             reader.onload = function(e)
                             {
                                 imagetosend.push(e.target.result);
-                                document.querySelector('.userinput').focus();
+                                userinput.focus();
                             };
                             reader.readAsDataURL(file);
 
-                            const input = document.querySelector(".userinput");
-                            input.placeholder = "Attached " + (imagetosend.length + 1) + " images.";
-                            input.focus();
+                            userinput.placeholder = "Attached " + (imagetosend.length + 1) + " images.";
+                            userinput.focus();
                         } catch (error) { myAlert('Error attaching image: ' + error.message); }
                         finally { document.body.removeChild(fileinput); }
                     }
@@ -894,12 +837,12 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                         catch (e)
                         {
                             response = { ok: false };
-                            const inp = document.querySelector(".userinput");
-                            inp.placeholder = "Trying to bypass server issues";
-                            for (let x = 0; x < 3; ++x) { await sleep(500); inp.placeholder += '.'; }
+                            userinput.placeholder = "Trying to bypass server issues";
+                            for (let x = 0; x < 3; ++x) { await sleep(500); userinput.placeholder += '.'; }
                         }
                     }
 
+                    userinput.placeholder = "Fetching response..";
                     messages.push({ role: "assistant", content: "" });
 
                     const index = messages.length - 1;
@@ -944,6 +887,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 }
                 finally
                 {
+                    userinput.placeholder = "Respond to XEVA..";
                     streaming = false;
                     try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
                     document.getElementById("streamingmsg").id = "lastmsg";
@@ -951,7 +895,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 }
             }
 
-            document.querySelector(".userinput").addEventListener("keydown", (e) =>
+            userinput.addEventListener("keydown", (e) =>
             {
                 if (e.key === "Enter" && !e.shiftKey)
                 {
