@@ -14,7 +14,14 @@ function getLMEndpoints()
         {
             url: pollendpoint,
             key: "0",
-            model: "openai",
+            model: "unity", // mistral uncensored
+            vision: true,
+            generation: maxgen
+        },
+        {
+            url: pollendpoint,
+            key: "0",
+            model: "searchgpt",
             vision: true,
             generation: maxgen
         },
@@ -43,20 +50,6 @@ function getLMEndpoints()
             url: pollendpoint,
             key: "0",
             model: "mistral", // small 3
-            vision: true,
-            generation: maxgen
-        },
-        {
-            url: pollendpoint,
-            key: "0",
-            model: "unity", // mistral uncensored
-            vision: true,
-            generation: maxgen
-        },
-        {
-            url: pollendpoint,
-            key: "0",
-            model: "searchgpt",
             vision: true,
             generation: maxgen
         },
