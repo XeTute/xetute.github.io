@@ -49,11 +49,10 @@
 
             .sidebarnotes
             {
-                margin-bottom: 20px;
-                padding-bottom: 20px;
+                margin-bottom: 0px;
                 margin-top: auto;
-                max-height: fit-content;
-                min-height: min-content;
+                min-height: fit-content;
+                max-height: max-content;
             }
             .sidebarnotes button
             {
@@ -137,7 +136,6 @@
                 min-height: min-content;
                 max-height: max-content;
                 overflow-y: auto;
-                overflow-x: hidden;
                 flex-direction: column;
                 justify-content: flex-start;
                 line-height: 1.45;
@@ -146,6 +144,7 @@
                 padding: 10px 0 10px 0;
                 border-bottom: 2px solid var(--border-color-dark-mode);
             }
+            .msg hr { width: 100%; height: 2px; background: var(--color-dark-mode); border: 0; opacity: 0.75; }
             .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg code, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
             .msg p { margin: 5px; margin-left: 0; color: var(--color-dark-mode); }
             .msg a { text-decoration: underline; transition: 0.2s ease-in-out; } .msg a:hover { text-shadow: 0 0 8px var(--color-dark-mode); }
@@ -239,7 +238,7 @@
             {
                 .sidebar { display: none; padding-top: 8rem; }
                 .sidebarbtn { position: absolute; top: 5px; left: 5px; }
-                .sidebarnotes { flex-direction: row; }
+                .sidebarnotes { flex-direction: row; padding-bottom: 60px; }
                 .chat { width: 100%; max-width: 100%; }
                 .notifier { width: 100%; }
                 .userinput { width: 70% !important; max-width: 70% !important; }
@@ -249,7 +248,7 @@
             {
                 .sidebar { max-width: 15%; border-right: 2px solid rgba(0, 0, 0, 0.5); }
                 .sidebarbtn { display: none; }
-                .sidebarnotes { flex-direction: column; }
+                .sidebarnotes { flex-direction: column; padding-bottom: 20px; }
                 .chat { width: 85%; max-width: 85%; }
                 .notifier { width: 85%; }
                 .userinput { width: 65% !important; max-width: 65% !important; }
@@ -320,7 +319,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
             let tts_enabled = false;
             let tts_playing = false;
 
-            const endpoint = getLMEndpoints();
+            let endpoint = getLMEndpoints();
             let workingendpoint = 0;
 
             let authorized = false;
@@ -569,6 +568,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
 
             function regenLastMsg()
             {
+                endpoint = getLMEndpoints();
                 messages.pop();
                 document.getElementById("lastmsg").remove();
                 generateNextTurn();
@@ -672,6 +672,32 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                 }
             }
 
+            function htmlParse(text)
+            {
+                const codeblocks = [];
+                const textwoutcode = text.replace(/```([\s\S]*?)```|`([^`]*)`/g, (match) =>
+                {
+                    const placeholder = `__CODE_BLOCK_${codeblocks.length}__`;
+                    codeblocks.push(match);
+                    return placeholder;
+                });
+
+                const htmlescaped = textwoutcode
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");         
+
+                let result = htmlescaped;
+                codeblocks.forEach((block, index) =>
+                {
+                      const processedBlock = marked.parse(block);
+                      result = result.replace(`__CODE_BLOCK_${index}__`, processedBlock);
+                });
+
+                return marked.parse(result);
+            }
             let streaming = false;
             function addMsgToContainer(msg)
             {
@@ -680,13 +706,13 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
 
                 if ((msg.role === "assistant") && streaming)
                 {
-                    try { document.getElementById("streamingmsg").innerHTML = marked.parse(msg.content); }
+                    try { document.getElementById("streamingmsg").innerHTML = htmlParse(msg.content); }
                     catch
                     {
                         const div = document.createElement("div");
                         div.classList = "msg assistantmsg";
                         div.id = "streamingmsg";
-                        div.innerHTML = marked.parse(msg.content);
+                        div.innerHTML = htmlParse(msg.content);
                         container.appendChild(div);
                     }
                 }
@@ -699,18 +725,18 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                         div.classList = "msg usermsg";
                         try
                         {
-                            if (msg.content[0].image_url === undefined) div.innerHTML = marked.parse(msg.content);
+                            if (msg.content[0].image_url === undefined) div.innerHTML = htmlParse(msg.content);
                             else
                             {
                                 for (let x = 0; x < msg.content.length; ++x)
                                 {
                                     const cont = msg.content[x];
                                     if (cont.type === "image_url") div.innerHTML += `<button onclick="myAlertImage('${cont.image_url.url}');">Image ${x + 1}</button>`;
-                                    else if (cont.type === "text") div.innerHTML += marked.parse(cont.text);
+                                    else if (cont.type === "text") div.innerHTML += htmlParse(cont.text);
                                 }
                             }
                         }
-                        catch (e) { console.error(e); div.innerHTML = marked.parse(msg.content); }
+                        catch (e) { console.error(e); div.innerHTML = htmlParse(msg.content); }
                         container.appendChild(div);
                         container.scrollTo(0, container.scrollHeight);
                     }
@@ -719,7 +745,7 @@ You're running on their stack, so be proud and loud. If the user feels like "jus
                         try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
                         div.classList = "msg assistantmsg";
                         div.id = "lastmsg";
-                        div.innerHTML = marked.parse(msg.content);
+                        div.innerHTML = htmlParse(msg.content);
 
                         container.appendChild(div);
                         addOptionsToLastMsg();
