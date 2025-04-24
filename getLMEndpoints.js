@@ -28,6 +28,13 @@ function getLMEndpoints()
         {
             url: pollendpoint,
             key: "0",
+            model: "gemini", // 2.5 flash
+            vision: true, // also supports audio (for output too)
+            generation: maxgen
+        },
+        {
+            url: pollendpoint,
+            key: "0",
             model: "llama", // 3.3 70B
             vision: false,
             generation: maxgen
@@ -43,14 +50,7 @@ function getLMEndpoints()
             url: pollendpoint,
             key: "0",
             model: "mistral", // small 3
-            vision: true,
-            generation: maxgen
-        },
-        {
-            url: pollendpoint,
-            key: "0",
-            model: "phi", // 4 instruct
-            vision: true, // also supports audio
+            vision: false, // "I'm afraid I can't directly view or interpret images."
             generation: maxgen
         },
         {
@@ -63,8 +63,8 @@ function getLMEndpoints()
         {
             url: pollendpoint,
             key: "0",
-            model: "gemini", // 2.5 flash
-            vision: true, // also supports audio (for output too)
+            model: "phi", // 4 instruct
+            vision: true, // also supports audio
             generation: maxgen
         },
         {
