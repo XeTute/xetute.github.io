@@ -14,13 +14,6 @@ function getLMEndpoints()
         {
             url: pollendpoint,
             key: "0",
-            model: "unity", // mistral uncensored
-            vision: true,
-            generation: maxgen
-        },
-        {
-            url: pollendpoint,
-            key: "0",
             model: "searchgpt",
             vision: true,
             generation: maxgen
