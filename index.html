@@ -146,7 +146,7 @@
             }
             .msg button { border-radius: 25px; font-size: 14px; margin: 4px; }
             .msg hr { width: 100%; height: 2px; background: var(--color-dark-mode); border: 0; opacity: 0.75; }
-            .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg code, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
+            .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
             .msg p { margin: 5px; margin-left: 0; color: var(--color-dark-mode); }
             .msg a { text-decoration: underline; transition: 0.2s ease-in-out; } .msg a:hover { text-shadow: 0 0 8px var(--color-dark-mode); }
             .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { margin-top: 10px; margin-bottom: 5px; font-family: "Inria Sans"; font-size: 18px; font-weight: 800; }
@@ -157,7 +157,7 @@
                 color: rgba(255, 255, 255, 0.7);
                 padding: 15px;
                 margin: 5px;
-                max-width: 60%;
+                max-width: 256px;
                 max-height: 256px;
                 overflow: auto;
             }
@@ -315,7 +315,7 @@
                 }
                 else
                 {
-                    userinput.placeholder = "Continue typing..";
+                    userinput.placeholder = "Start typing..";
                     userinput.style.minWidth = "70%";
                     userinput.style.maxWidth = "75%";
                 }
