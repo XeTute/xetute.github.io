@@ -71,6 +71,7 @@
                 border: 0;
                 background: var(--color-dark-mode);
             }
+            .sidebar labeledbutton iwrapper { border: 0; }
 
             .chat
             {
@@ -161,8 +162,8 @@
                 max-height: 256px;
                 overflow: auto;
             }
-            .msg ol, .msg ul { margin: 10px 5px 10px 5px; padding: 0; }
-            .msg table { overflow: auto; margin: 10px 5px 10px 5px; }
+            .msg ol, .msg ul { margin: 0; padding: 0; }
+            .msg table { overflow: auto; max-width: 256px; max-height: 256px; margin: 0; }
             .msg th, .msg td { border: 1px solid var(--border-color-dark-mode); margin: 0; padding: 5px; }
             .msg img { border-radius: 15px; max-width: 85%; margin: 10px; box-shadow: 0 0 8px var(--border-color-dark-mode); }
 
@@ -246,7 +247,7 @@
 
             @media (orientation: landscape)
             {
-                .sidebar { max-width: 15%; border-right: 2px solid rgba(0, 0, 0, 0.5); }
+                .sidebar { max-width: 15%; }
                 .sidebarbtn { display: none; }
                 .sidebarnotes { flex-direction: column; padding-bottom: 20px; }
                 .chat { width: 85%; max-width: 85%; }
@@ -479,6 +480,7 @@ Happy chatting!`;
 
             async function load()
             {
+                resizeUserinput();
                 const recentchats = document.getElementById("recent-chats-header");
                 const authbtn = document.getElementById("authbtn");
 
@@ -845,7 +847,7 @@ Happy chatting!`;
                         {
                             response = { ok: false };
                             userinput.placeholder = "Trying to bypass server issues";
-                            for (let x = 0; x < 3; ++x) { await sleep(500); userinput.placeholder += '.'; }
+                            for (let x = 0; x < 3; ++x) { await sleep(250); userinput.placeholder += '.'; }
                         }
                     }
 

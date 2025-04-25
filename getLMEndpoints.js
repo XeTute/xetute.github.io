@@ -1,6 +1,7 @@
 function getLMEndpoints()
 {
     const pollendpoint = `https://text.pollinations.ai/openai?seed=${Date.now() % 8192}`;
+    const llm7ioendpoint = `https://api.llm7.io/v1/chat/completions`;
     const maxgen = 8 * 1024;
     const endpoints =
     [
@@ -68,11 +69,18 @@ function getLMEndpoints()
             generation: maxgen
         },
         {
-            url: "https://ai.xetute.com/v1/chat/completions",
+            url: llm7ioendpoint,
             key: "0",
-            model: "0",
+            model: "gpt-4.1",
             vision: true,
-            generation: maxgen / 2 // Not cuz of compute, local endpoint is only ~40tps, which is too slow to handle mult. req.
+            generation: maxgen
+        },
+        {
+            url: llm7ioendpoint,
+            key: "0",
+            model: "searchgpt",
+            vision: true,
+            generation: maxgen
         },
         {
             url: "https://api.groq.com/openai/v1/chat/completions",
@@ -80,6 +88,13 @@ function getLMEndpoints()
             model: "gemma2-9b-it",
             vision: false,
             generation: maxgen
+        },
+        {   // My endpoint is barely online, that's why last
+            url: "https://ai.xetute.com/v1/chat/completions",
+            key: "0",
+            model: "0",
+            vision: true,
+            generation: maxgen / 2 // Not cuz of compute, local endpoint is only ~40tps, which is too slow to handle mult. req.
         }
     ];
     return endpoints;
