@@ -93,7 +93,7 @@ function getLMEndpoints()
             url: "https://ai.xetute.com/v1/chat/completions",
             key: "0",
             model: "0",
-            vision: true,
+            vision: false,
             generation: maxgen / 2 // Not cuz of compute, local endpoint is only ~40tps, which is too slow to handle mult. req.
         }
     ];
