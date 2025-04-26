@@ -26,6 +26,7 @@
                 text-transform: uppercase;
                 font-family: "Orbitron", sans-serif;
                 font-weight: 550;
+                font-size: 22px;
                 color: var(--subheader-dark-mode);
             }
             .sidebar labeledbutton { min-width: 94%; max-width: 95%; }
@@ -78,9 +79,9 @@
             .userinput
             {
                 max-width: 100%;
-                min-height: 16px;
+                min-height: 14px;
                 max-height: 17px;
-                font-size: 16px;
+                font-size: 14px;
                 margin: 0;
                 padding: 20px;
                 background: var(--background-color-dark-mode);
@@ -127,8 +128,8 @@
                 padding: 10px 0 10px 0;
                 border-bottom: 2px solid var(--border-color-dark-mode);
             }
-            .msg button { border-radius: 25px; font-size: 16px; margin: 4px; }
-            .msg hr { width: 100%; height: 2px; background: var(--color-dark-mode); border: 0; opacity: 0.75; }
+            .msg button { border-radius: 25px; font-size: 14px; margin: 4px; }
+            .msg hr { width: 95%; height: 2px; background: var(--color-dark-mode); border: 0; opacity: 0.75; margin: 10px 0 10px 0; }
             .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
             .msg p { margin: 5px; margin-left: 0; color: var(--color-dark-mode); }
             .msg a { text-decoration: underline; transition: 0.2s ease-in-out; } .msg a:hover { text-shadow: 0 0 8px var(--color-dark-mode); }
@@ -386,7 +387,7 @@ Happy chatting!`;
                 const msgcontainer = document.querySelector(".messages");
                 const txtelem = document.createElement("p");
 
-                txtelem.setAttribute("style", "display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; color: var(--suble-color-text-dark-mode); font-size: 16px;");
+                txtelem.setAttribute("style", "display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; color: var(--suble-color-text-dark-mode); font-size: 14px;");
                 txtelem.innerHTML = "XEVA is an AI assistant, which may make mistakes.<br>Verify important information.";
 
                 msgcontainer.innerHTML = "";
@@ -610,7 +611,7 @@ Happy chatting!`;
             function htmlParse(text)
             {
                 const codeblocks = [];
-                const textwoutcode = text.replace(/```([\s\S]*?)```|`([^`]*)`/g, (match) =>
+                const textwoutcode = text.replace(/```([\s\S]*?)```/g, (match) =>
                 {
                     const placeholder = `__CODE_BLOCK_${codeblocks.length}__`;
                     codeblocks.push(match);
@@ -633,6 +634,7 @@ Happy chatting!`;
 
                 return marked.parse(result);
             }
+
             let streaming = false;
             function addMsgToContainer(msg)
             {
@@ -876,17 +878,15 @@ Happy chatting!`;
                 catch (e)
                 {
                     messages[index].content = "XEVA is not responding...\n" + e;
-                    loadingindic.remove();
+                    try { if (loadingindic) loadingindic.remove(); } catch (e) {}
                     loadChat(messages);
                 }
-                finally
-                {
-                    userinput.placeholder = "Respond to XEVA..";
-                    streaming = false;
-                    try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
-                    document.getElementById("streamingmsg").id = "lastmsg";
-                    addOptionsToLastMsg();
-                }
+
+                userinput.placeholder = "Respond to XEVA..";
+                streaming = false;
+                try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
+                document.getElementById("streamingmsg").id = "lastmsg";
+                addOptionsToLastMsg();
             }
 
             userinput.addEventListener("keydown", (e) =>
