@@ -119,7 +119,6 @@ iwrapper
     min-height: 35px;
     max-width: 36px;
     max-height: 36px;
-    border: 2px solid var(--border-color-dark-mode);
     border-radius: 12px;
     backdrop-filter: blur(4px);
     color: #fff;

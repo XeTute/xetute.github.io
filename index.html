@@ -29,7 +29,7 @@
                 color: var(--subheader-dark-mode);
             }
             .sidebar labeledbutton { min-width: 94%; max-width: 95%; }
-            .sidebar labeledbutton p { word-wrap: break-word; overflow-wrap: break-word; }
+            .sidebar labeledbutton p { overflow-wrap: break-word; }
 
             .messages
             {
@@ -54,24 +54,6 @@
                 min-height: fit-content;
                 max-height: max-content;
             }
-            .sidebarnotes button
-            {
-                border: 2px solid var(--border-color-dark-mode);
-                padding: 10px;
-                margin: 5px;
-                border-radius: 10px;
-                text-align: center;
-                transition: 0.2s ease-in-out;
-            }
-            .sidebarnotes button:hover
-            {
-                box-shadow: 0 0 8px #fff;
-                scale: 1.025;
-                color: var(--background-color-dark-mode);
-                border: 0;
-                background: var(--color-dark-mode);
-            }
-            .sidebar labeledbutton iwrapper { border: 0; }
 
             .chat
             {
@@ -145,7 +127,7 @@
                 padding: 10px 0 10px 0;
                 border-bottom: 2px solid var(--border-color-dark-mode);
             }
-            .msg button { border-radius: 25px; font-size: 14px; margin: 4px; }
+            .msg button { border-radius: 25px; font-size: 16px; margin: 4px; }
             .msg hr { width: 100%; height: 2px; background: var(--color-dark-mode); border: 0; opacity: 0.75; }
             .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
             .msg p { margin: 5px; margin-left: 0; color: var(--color-dark-mode); }
@@ -276,9 +258,12 @@
                 <div id="recent-chats" class="recent-chats"></div>
 
                 <div class="sidebarnotes">
-                    <button id="modifypersona" onclick="modifyPersona();" style="display: none;">
-                        Modify your persona
-                    </button>
+                    <labeledbutton id="modifypersona" onclick="modifyPersona();" style="display: none;">
+                        <p>Modify your persona</p>
+                        <iwrapper>
+                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                        </iwrapper>
+                    </labeledbutton>
                 </div>
             </div><iwrapper class="sidebarbtn"><i class="fa fa-ellipsis-h" onclick="showSidebar()"></i></iwrapper>
             <div class="chat">
@@ -401,8 +386,8 @@ Happy chatting!`;
                 const msgcontainer = document.querySelector(".messages");
                 const txtelem = document.createElement("p");
 
-                txtelem.setAttribute("style", "display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; color: var(--suble-color-text-dark-mode); font-size: 14px;");
-                txtelem.innerHTML = "XEVA is an AI assistant designed by Hamzah.<br>Verify important information.";
+                txtelem.setAttribute("style", "display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; color: var(--suble-color-text-dark-mode); font-size: 16px;");
+                txtelem.innerHTML = "XEVA is an AI assistant, which may make mistakes.<br>Verify important information.";
 
                 msgcontainer.innerHTML = "";
                 msgcontainer.style.justifyContent = "center";
@@ -822,9 +807,6 @@ Happy chatting!`;
                         if (needsvision) selectVisionEndpoint(startfrom=workingendpoint+1);
                         else ++workingendpoint;
 
-                        if (workingendpoint >= endpoint.length)
-                            throw new Error("No inference providers, server online or working. Retry later.");
-
                         const endpointurl = endpoint[workingendpoint].url;
                         const key = endpoint[workingendpoint].key;
                         const model = endpoint[workingendpoint].model;
@@ -848,6 +830,9 @@ Happy chatting!`;
                             response = { ok: false };
                             userinput.placeholder = "Trying to bypass server issues";
                             for (let x = 0; x < 3; ++x) { await sleep(250); userinput.placeholder += '.'; }
+
+                            if (workingendpoint === (endpoint.length - 1))
+                                throw new Error("No inference providers, server online or working. Retry later.");
                         }
                     }
 
