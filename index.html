@@ -38,7 +38,6 @@
                 overflow-x: hidden;
                 padding: 5px;
                 padding-top: 20px;
-                justify-content: flex-start;
             }
 
             .recent-chats
@@ -126,7 +125,6 @@
                 transition: 0.2s ease-in-out;
                 margin:  5px 0 5px 0;
                 padding: 10px 0 10px 0;
-                border-bottom: 2px solid var(--border-color-dark-mode);
             }
             .msg button { border-radius: 25px; font-size: 14px; margin: 4px; }
             .msg hr { width: 95%; height: 2px; background: var(--color-dark-mode); border: 0; opacity: 0.75; margin: 10px 0 10px 0; }
@@ -154,10 +152,13 @@
             {
                 align-items: flex-end;
                 align-self: flex-end;
-                text-align: right;
                 width: fit-content;
+                max-width: 70%;
+                background: var(--border-color-dark-mode);
+                border: 2px solid var(--border-color-dark-mode);
+                border-radius: 10px;
+                padding: 5px 5px 5px 10px;
             }
-            .usermsg pre { text-align: left; }
 
             .assistantmsg
             {
@@ -214,10 +215,11 @@
                 flex-direction: row;
                 max-width: fit-content;
                 max-height: fit-content;
+                margin: -5px auto auto -10px;
             }
-            #lastmsgoptions iwrapper:hover { scale: 0.85; background: var(--color-dark-mode); }
+            #lastmsgoptions iwrapper { margin: 0; backdrop-filter: none; }
             #lastmsgoptions iwrapper i { transition: 0.2s ease-in-out; }
-            #lastmsgoptions iwrapper i:hover { scale: 1.15; color: var(--background-color-dark-mode); }
+            #lastmsgoptions iwrapper i:hover { padding-bottom: 5px; text-decoration: underline; }
 
             @media (orientation: portrait)
             {
@@ -744,7 +746,7 @@ Happy chatting!`;
                     reloadallchatui = false;
                     container.innerHTML = "";
                     container.style.justifyContent = "flex-start";
-                    container.style.paddingBottom = "25vh";
+                    container.style.paddingBottom = "5vh";
 
                     for (msg of chat) addMsgToContainer(msg);
                     if (document.querySelector(".chat").style.display === "none")
