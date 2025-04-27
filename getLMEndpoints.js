@@ -36,13 +36,6 @@ function getLMEndpoints()
         {
             url: pollendpoint,
             key: "0",
-            model: "llama", // 3.3 70B
-            vision: false,
-            generation: maxgen
-        },
-        {
-            url: pollendpoint,
-            key: "0",
             model: "llamascout",
             vision: false,
             generation: maxgen

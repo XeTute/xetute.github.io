@@ -83,7 +83,7 @@
                 font-size: 14px;
                 margin: 0;
                 padding: 20px;
-                background: var(--background-color-dark-mode);
+                background: rgba(128, 128, 128, 0.05);
                 border: 0;
                 border-radius: 0;
 
@@ -115,6 +115,7 @@
 
             .msg
             {
+                font-size: 16px;
                 width: fit-content;
                 min-height: min-content;
                 max-height: max-content;
@@ -215,7 +216,7 @@
                 flex-direction: row;
                 max-width: fit-content;
                 max-height: fit-content;
-                margin: -5px auto auto -10px;
+                margin: 0 auto auto -10px;
             }
             #lastmsgoptions iwrapper { margin: 0; backdrop-filter: none; }
             #lastmsgoptions iwrapper i { transition: 0.2s ease-in-out; }
@@ -348,7 +349,6 @@ Happy chatting!`;
             let messages = [ { "role": "system", "content": systemprompt } ];
             let chatid = -1;
             let reloadallchatui = true;
-            let loadlastmessages = 64;
 
             function injectUserInformation()
             {
@@ -448,21 +448,22 @@ Happy chatting!`;
                     }
                     else messages.push({ "role": "user", "content": input });
                     loadChat(messages);
-                
-                    processing = true;
+
                     if (input) userinput.value = "";
                     resizeUserinput();
-                }
 
-                await generateNextTurn();
-                processing = false;
+                    await generateNextTurn();
+                    loadChat(messages);
+                    addOptionsToLastMsg();
 
-                if (authorized)
-                {
-                    let data = pb.authStore.record.data;
-                    data.MyXEVA.chats[chatid] = [...messages];
-                    if (!(await updateData(data, { pb: pb }))) myAlert("Failed to sync last message with the cloud.");
-                    if (messages.length === 3) loadChats(pb.authStore.record.data.MyXEVA.chats);
+                    processing = false;
+                    if (authorized)
+                    {
+                        let data = pb.authStore.record.data;
+                        data.MyXEVA.chats[chatid] = [...messages];
+                        if (!(await updateData(data, { pb: pb }))) myAlert("Failed to sync last message with the cloud.");
+                        if (messages.length === 3) loadChats(pb.authStore.record.data.MyXEVA.chats);
+                    }
                 }
             }
 
@@ -637,25 +638,12 @@ Happy chatting!`;
                 return marked.parse(result);
             }
 
-            let streaming = false;
             function addMsgToContainer(msg)
             {
                 const container = document.querySelector(".messages");
                 const fromuser = msg.role === "user";
 
-                if ((msg.role === "assistant") && streaming)
-                {
-                    try { document.getElementById("streamingmsg").innerHTML = htmlParse(msg.content); }
-                    catch
-                    {
-                        const div = document.createElement("div");
-                        div.classList = "msg assistantmsg";
-                        div.id = "streamingmsg";
-                        div.innerHTML = htmlParse(msg.content);
-                        container.appendChild(div);
-                    }
-                }
-                else if (fromuser || (msg.role === "assistant"))
+                if (fromuser || (msg.role === "assistant"))
                 {
                     const div = document.createElement("div");
                     
@@ -710,27 +698,28 @@ Happy chatting!`;
                     {
                         const file = fileinput.files[0];
 
-                        if (file.size > 5 * 1024 * 1024)
+                        if (file.size > (5 * 1024 * 1024))
                         {
                             myAlert('Image size too large. Please select an image under 5MB.');
-                            document.body.removeChild(fileinput);
+                            fileinput.remove();
                             return;
                         }
 
                         try
                         {
                             const reader = new FileReader();
-                            reader.onload = function(e)
+                            reader.onload = (e) =>
                             {
                                 imagetosend.push(e.target.result);
                                 userinput.focus();
                             };
                             reader.readAsDataURL(file);
 
+                            const mult_images = Boolean(imagetosend.length);
                             userinput.placeholder =
                                 "Attached " +
-                                (imagetosend.length ? (imagetosend.length + 1) : "one") +
-                                (imagetosend.length ? " images." : " image.");
+                                (mult_images ? (imagetosend.length + 1) : "one") +
+                                (mult_images ? " images." : " image.");
                             userinput.focus();
                         } catch (error) { myAlert('Error attaching image: ' + error.message); }
                         finally { document.body.removeChild(fileinput); }
@@ -746,7 +735,7 @@ Happy chatting!`;
                     reloadallchatui = false;
                     container.innerHTML = "";
                     container.style.justifyContent = "flex-start";
-                    container.style.paddingBottom = "5vh";
+                    container.style.paddingBottom = "10vh";
 
                     for (msg of chat) addMsgToContainer(msg);
                     if (document.querySelector(".chat").style.display === "none")
@@ -777,6 +766,7 @@ Happy chatting!`;
 
             function selectVisionEndpoint(startfrom=0)
             {
+                if (startfrom > (endpoint.length - 1)) startfrom = startfrom % (endpoint.length - 1);
                 for (workingendpoint = startfrom; workingendpoint < endpoint.length; ++workingendpoint)
                     if (endpoint[workingendpoint].vision) break;
             }
@@ -797,13 +787,13 @@ Happy chatting!`;
                 loadingindic.appendChild(dotsContainer);
                 document.querySelector(".messages").append(loadingindic);
 
-                streaming = true;
+                messages.push({ "role": "assistant", "content": "" });
                 try
                 {
                     let needsvision = chatNeedsVision(messages);
                     let response = { ok: false };
-                    workingendpoint = 0; // Try unlimited ones, limited ones as last-resort.
-                    while (!response.ok)
+
+                    while (!response.ok) // Try all available endpoints till one works
                     {
                         if ((workingendpoint === (endpoint.length - 1)) && !endpoint[endpoint.length - 1].vision && needsvision)
                             throw new Error("No AI with image processing is currently online.");
@@ -826,69 +816,33 @@ Happy chatting!`;
                             {
                                 method: "POST",
                                 headers: header,
-                                body: JSON.stringify({ model: model, messages: messages, temperature: 0.85, max_tokens: max_tokens, stream: true }),
+                                body: JSON.stringify({ model: model, messages: messages, temperature: 0.85, max_tokens: max_tokens }),
                             });
+                            if (!response.ok) throw new Error("Server rejected request.");
                         }
                         catch (e)
                         {
                             response = { ok: false };
                             userinput.placeholder = "Trying to bypass server issues";
-                            for (let x = 0; x < 3; ++x) { await sleep(250); userinput.placeholder += '.'; }
+                            for (let x = 0; x < 3; ++x) { await sleep(150); userinput.placeholder += '.'; }
 
                             if (workingendpoint === (endpoint.length - 1))
                                 throw new Error("No inference providers, server online or working. Retry later.");
                         }
                     }
 
-                    userinput.placeholder = "Fetching response..";
-                    messages.push({ role: "assistant", content: "" });
-
-                    const index = messages.length - 1;
-                    const reader = response.body.getReader();
-                    const decoder = new TextDecoder("utf-8");
-                    let partial = "";
-
+                    // Remember this defo simple format: choices.{X}.message.content
+                    messages.at(-1).content = (await response.json()).choices[0].message.content;
                     loadingindic.remove();
-                    while (true)
-                    {
-                        const { done, value } = await reader.read();
-                        if (done) break;
-
-                        partial += decoder.decode(value, { stream: true });
-                        const lines = partial.split('\n');
-                        partial = lines.pop();
-                        
-                        for (const line of lines)
-                        {
-                            const trimmedLine = line.trim();
-                            if (!trimmedLine.startsWith("data: ")) continue;
-                            if (trimmedLine.startsWith("data: [DATA]")) continue;
-                            if (trimmedLine.startsWith("data: [DONE]")) continue;
-                            try
-                            {
-                                const data = JSON.parse(trimmedLine.slice(6));
-                                if (data.choices[0]?.delta?.content)
-                                {
-                                    messages[index].content += data.choices[0].delta.content;
-                                    loadChat(messages);
-                                }
-                            }
-                            catch(e) { console.log(e); }
-                        }
-                    }
                 }
                 catch (e)
                 {
-                    messages[index].content = "XEVA is not responding...\n" + e;
+                    messages.at(-1).content = "XEVA is not responding...\n" + e;
                     try { if (loadingindic) loadingindic.remove(); } catch (e) {}
                     loadChat(messages);
                 }
 
                 userinput.placeholder = "Respond to XEVA..";
-                streaming = false;
-                try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
-                document.getElementById("streamingmsg").id = "lastmsg";
-                addOptionsToLastMsg();
             }
 
             userinput.addEventListener("keydown", (e) =>
