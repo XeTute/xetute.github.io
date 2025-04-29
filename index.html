@@ -127,12 +127,12 @@
                 margin:  5px 0 5px 0;
                 padding: 10px 0 10px 0;
             }
+            .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
             .msg button { border-radius: 25px; font-size: 14px; margin: 4px; }
             .msg hr { width: 95%; height: 2px; background: var(--color-dark-mode); border: 0; opacity: 0.75; margin: 10px 0 10px 0; }
-            .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
             .msg p { margin: 5px; margin-left: 0; color: var(--color-dark-mode); }
             .msg a { text-decoration: underline; transition: 0.2s ease-in-out; } .msg a:hover { text-shadow: 0 0 8px var(--color-dark-mode); }
-            .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { margin-top: 10px; margin-bottom: 5px; font-family: "Inria Sans"; font-size: 18px; font-weight: 800; }
+            .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { margin-top: 10px; margin-bottom: 5px; font-size: 18px; font-weight: 700; }
             .msg pre
             {
                 border: 2px solid var(--border-color-dark-mode);
@@ -140,11 +140,13 @@
                 color: rgba(255, 255, 255, 0.7);
                 padding: 15px;
                 margin: 5px;
+                width: fit-content;
                 max-width: 256px;
                 max-height: 256px;
                 overflow: auto;
             }
-            .msg ol, .msg ul { margin: 0; padding: 0; }
+            .msg ol, .msg ul { margin: 10px 0 10px 0; padding: 5px; border-top: 2px solid var(--border-color-dark-mode); border-bottom: 2px solid var(--border-color-dark-mode); }
+            .msg li { padding: 5px; padding-left: 10px; }
             .msg table { overflow: auto; max-width: 256px; max-height: 256px; margin: 0; }
             .msg th, .msg td { border: 1px solid var(--border-color-dark-mode); margin: 0; padding: 5px; }
             .msg img { border-radius: 15px; max-width: 85%; margin: 10px; box-shadow: 0 0 8px var(--border-color-dark-mode); }
@@ -342,7 +344,7 @@ Following is reference information about XeTute:
 Happy chatting!`;
 
             let endpoint = getLMEndpoints();
-            let workingendpoint = 0;
+            let workingendpoint = -1;
 
             let authorized = false;
             let processing = false;
@@ -587,12 +589,18 @@ Happy chatting!`;
                 }
             }
 
-            function regenLastMsg()
+            async function regenLastMsg()
             {
                 endpoint = getLMEndpoints();
                 messages.pop();
+                document.getElementById("lastmsgoptions").remove();
                 document.getElementById("lastmsg").remove();
-                generateNextTurn();
+                await generateNextTurn();
+                loadChat(messages);
+                
+                let newdata = pb.authStore.record.data;
+                newdata.MyXEVA.chats[chatid] = [...messages];
+                await updateData(newdata, { pb: pb });
             }
 
             function copyLastMsg()
@@ -839,7 +847,6 @@ Happy chatting!`;
                 {
                     messages.at(-1).content = "XEVA is not responding...\n" + e;
                     try { if (loadingindic) loadingindic.remove(); } catch (e) {}
-                    loadChat(messages);
                 }
 
                 userinput.placeholder = "Respond to XEVA..";

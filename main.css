@@ -24,6 +24,9 @@ html, body
     -ms-overflow-style: none;
 }
 
+h1, h2, h3, h4, h5, h6, p, em, i, del, a, button, sub, sup, b, blockquote, small, ins, pre, code, li
+{ font-family: Arial, sans-serif; }
+
 ::-webkit-scrollbar { width: 0; }
 * { scrollbar-width: 0; }
 
