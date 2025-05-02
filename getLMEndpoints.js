@@ -1,7 +1,6 @@
 function getLMEndpoints()
 {
     const pollendpoint = `https://text.pollinations.ai/openai?seed=${Date.now() % 8192}`;
-    const llm7ioendpoint = `https://api.llm7.io/v1/chat/completions`;
     const maxgen = 8 * 1024;
     const endpoints =
     [
@@ -59,20 +58,6 @@ function getLMEndpoints()
             key: "0",
             model: "phi", // 4 instruct
             vision: true, // also supports audio
-            generation: maxgen
-        },
-        {
-            url: llm7ioendpoint,
-            key: "0",
-            model: "gpt-4.1",
-            vision: true,
-            generation: maxgen
-        },
-        {
-            url: llm7ioendpoint,
-            key: "0",
-            model: "searchgpt",
-            vision: true,
             generation: maxgen
         },
         {
