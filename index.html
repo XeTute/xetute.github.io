@@ -1,865 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-
-        <title>MyXEVA \\ XeTute Technologies</title>
-
-        <link rel="stylesheet" href="main.css">
-        <link rel="icon" href="favicon.ico">
-
-        <style>
-            .sidebar
-            {
-                min-height: 99.9%;
-                max-height: 100%;
-                padding: 20px;
-                padding-top: 40px;
-                justify-content: flex-start;
-                backdrop-filter: brightness(80%);
-            }
-            .sidebar h2
-            {
-                width: 100%;
-                text-align: left;
-                text-transform: uppercase;
-                font-family: "Orbitron", sans-serif;
-                font-weight: 550;
-                font-size: 22px;
-                color: var(--subheader-dark-mode);
-            }
-            .sidebar labeledbutton { min-width: 94%; max-width: 95%; }
-            .sidebar labeledbutton p { overflow-wrap: break-word; }
-
-            .messages
-            {
-                overflow-y: auto;
-                overflow-x: hidden;
-                padding: 5px;
-                padding-top: 20px;
-            }
-
-            .recent-chats
-            {
-                justify-content: flex-start;
-                overflow-y: auto;
-                overflow-x: hidden;
-            }
-
-            .sidebarnotes
-            {
-                margin-bottom: 0px;
-                margin-top: auto;
-                min-height: fit-content;
-                max-height: max-content;
-            }
-
-            .chat
-            {
-                padding-left: 10%;
-                padding-right: 10%;
-                flex: 1;
-            }
-
-            .notifier
-            {
-                min-width: 94.9%;
-                max-width: 95%;
-                margin-top: auto;
-                margin-bottom: 20px;
-                padding: 0;
-                max-height: fit-content;
-                max-width: fit-content;
-                flex-direction: row;
-                border-radius: 10px;
-            }
-
-            .userinput
-            {
-                max-width: 100%;
-                min-height: 14px;
-                max-height: 17px;
-                font-size: 14px;
-                margin: 0;
-                padding: 20px;
-                background: rgba(128, 128, 128, 0.05);
-                border: 0;
-                border-radius: 0;
-
-                transition: 0.2s ease-in-out;
-                z-index: 0;
-            }
-            
-            .actionbtn
-            {
-                min-height: 57px;
-                max-height: 58px;
-                padding: 0;
-                padding-right: 8px;
-                padding-left: 8px;
-                margin: 0;
-                border: 0;
-                border-radius: 10px;
-                background: var(--border-color-dark-mode);
-
-                transition: 0.2s ease-in-out;
-                z-index: 1;
-            }
-            .actionbtn:hover
-            {
-                background: var(--color-dark-mode);
-                color: var(--background-color-dark-mode);
-                scale: 1.01;
-            }
-
-            .msg
-            {
-                font-size: 16px;
-                width: fit-content;
-                min-height: min-content;
-                max-height: max-content;
-                overflow-y: auto;
-                flex-direction: column;
-                justify-content: flex-start;
-                line-height: 1.45;
-                transition: 0.2s ease-in-out;
-                margin:  5px 0 5px 0;
-                padding: 10px 0 10px 0;
-            }
-            .msg p, .msg em, .msg i, .msg blockquote, .msg b, .msg strong, .msg mark, .msg small, .msg del, .msg ins, .msg sub, .msg sup, .msg a { margin: 0; padding: 0; height: fit-content; color: var(--color-dark-mode); }
-            .msg button { border-radius: 25px; font-size: 14px; margin: 4px; }
-            .msg hr { width: 95%; height: 2px; background: var(--color-dark-mode); border: 0; opacity: 0.75; margin: 10px 0 10px 0; }
-            .msg p { margin: 5px; margin-left: 0; color: var(--color-dark-mode); }
-            .msg a { text-decoration: underline; transition: 0.2s ease-in-out; } .msg a:hover { text-shadow: 0 0 8px var(--color-dark-mode); }
-            .msg h1, .msg h2, .msg h3, .msg h4, .msg h5, .msg h6 { margin-top: 10px; margin-bottom: 5px; font-size: 18px; font-weight: 700; }
-            .msg pre
-            {
-                border: 2px solid var(--border-color-dark-mode);
-                border-radius: 15px;
-                color: rgba(255, 255, 255, 0.7);
-                padding: 15px;
-                margin: 5px;
-                width: fit-content;
-                max-width: 256px;
-                max-height: 256px;
-                overflow: auto;
-            }
-            .msg ol, .msg ul { margin: 10px 0 10px 0; padding: 5px; border-top: 2px solid var(--border-color-dark-mode); border-bottom: 2px solid var(--border-color-dark-mode); }
-            .msg li { padding: 5px; padding-left: 10px; }
-            .msg table { overflow: auto; max-width: 256px; max-height: 256px; margin: 0; }
-            .msg th, .msg td { border: 1px solid var(--border-color-dark-mode); margin: 0; padding: 5px; }
-            .msg img { border-radius: 15px; max-width: 85%; margin: 10px; box-shadow: 0 0 8px var(--border-color-dark-mode); }
-
-            .usermsg
-            {
-                align-items: flex-end;
-                align-self: flex-end;
-                width: fit-content;
-                max-width: 70%;
-                background: var(--border-color-dark-mode);
-                border: 2px solid var(--border-color-dark-mode);
-                border-radius: 10px;
-                padding: 5px 5px 5px 10px;
-            }
-
-            .assistantmsg
-            {
-                align-items: flex-start;
-                align-self: flex-start;
-                text-align: left;
-                width: fit-content;
-            }
-
-            .loadingindic
-            {
-                padding: 20px;
-                align-items: flex-start;
-                align-self: flex-start;
-                text-align: left;
-                min-width: 80px;
-                width: fit-content;
-            }
-        
-            .loadingdots
-            {
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                gap: 8px;
-                margin: 0;
-                padding: 0;
-            }
-        
-            .dot
-            {
-                min-width: 10px !important;
-                min-height: 10px !important;
-                max-width: 11px !important;
-                max-height: 11px !important;
-                border-radius: 50%;
-                background-color: var(--color-dark-mode);
-                opacity: 0.6;
-                animation: pulse .8s infinite ease-in-out;
-            }
-        
-            .dot:nth-child(1) { animation-delay: 0s; }
-            .dot:nth-child(2) { animation-delay: 0.05s; }
-            .dot:nth-child(3) { animation-delay: 0.01s; }
-        
-            @keyframes pulse
-            {
-                0%, 100% { transform: scale(0.6); opacity: 0.2; }
-                50% { transform: scale(1); opacity: 0.8; }
-            }
-
-            #lastmsgoptions
-            {
-                flex-direction: row;
-                max-width: fit-content;
-                max-height: fit-content;
-                margin: 0 auto auto -10px;
-            }
-            #lastmsgoptions iwrapper { margin: 0; backdrop-filter: none; }
-            #lastmsgoptions iwrapper i { transition: 0.2s ease-in-out; }
-            #lastmsgoptions iwrapper i:hover { padding-bottom: 5px; text-decoration: underline; }
-
-            @media (orientation: portrait)
-            {
-                .sidebar { display: none; padding-top: 8rem; }
-                .sidebarbtn { position: absolute; top: 5px; left: 5px; }
-                .sidebarnotes { flex-direction: row; padding-bottom: 60px; }
-                .chat { width: 100%; max-width: 100%; }
-                .userinput { width: 70% !important; max-width: 70% !important; transition: 0.3s ease-in-out; }
-            }
-
-            @media (orientation: landscape)
-            {
-                .sidebar { max-width: 15%; }
-                .sidebarbtn { display: none; }
-                .sidebarnotes { flex-direction: column; padding-bottom: 20px; }
-                .chat { width: 85%; max-width: 85%; }
-                .userinput { width: 65% !important; max-width: 65% !important; transition: 0.5s ease-in-out; }
-            }
-        </style>
-    </head>
-    <body style="max-height: 100%; overflow: hidden;">
-        <div style="flex-direction: row;">
-            <div class="sidebar" style="display: none;"> <!-- NOTE: in function load, the style attribute is deleted after loading -->
-                <h2>Quick Actions</h2>
-                <labeledbutton id="authbtn">
-                    <p>Loading...</p>
-                    <iwrapper>
-                        <i class="fa fa-user" aria-hidden="true"></i>
-                    </iwrapper>
-                </labeledbutton>
-                <labeledbutton id="newchat" onclick="createNewChat();">
-                    <p>New Chat</p>
-                    <iwrapper>
-                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
-                    </iwrapper>
-                </labeledbutton>
-
-                <h2 style="margin-top: 30px;" id="recent-chats-header">Recent Chats</h2>
-                <div id="recent-chats" class="recent-chats"></div>
-
-                <div class="sidebarnotes">
-                    <labeledbutton id="modifypersona" onclick="modifyPersona();" style="display: none;">
-                        <p>Modify your persona</p>
-                        <iwrapper>
-                            <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-                        </iwrapper>
-                    </labeledbutton>
-                </div>
-            </div><iwrapper class="sidebarbtn"><i class="fa fa-ellipsis-h" onclick="showSidebar()"></i></iwrapper>
-            <div class="chat">
-                <div class="messages">
-                    <div class="msg loadingindic" style="border-bottom: 0; width: 100%; padding: 0; margin: auto;">
-                        <div class="loadingdots">
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                            <div class="dot"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="notifier" style="display: none;"> <!-- NOTE: in function load, the style attribute is deleted after loading -->
-                    <iwrapper class="actionbtn" style="border-top-right-radius: 0; border-bottom-right-radius: 0;" onclick="attachImg();"><i class="fa fa-picture-o"></i></iwrapper>
-                    <textarea class="userinput" placeholder="Start typing.."></textarea>
-                    <iwrapper class="actionbtn" style="border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="sendMsg();"><i class="fa fa-paper-plane"></i></iwrapper>
-                </div>
-            </div>
-        </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-        <script src="pocketbase.umd.js"></script>
-        <script src="main.js"></script>
-        <script src="getLMEndpoints.js"></script>
-        <script defer>
-            const userinput = document.querySelector(".userinput");
-            userinput.addEventListener("input", () => resizeUserinput());
-
-            function resizeUserinput()
-            {
-                if (userinput.value.length)
-                {
-                    userinput.style.minWidth = "80%";
-                    userinput.style.maxWidth = "85%";
-                }
-                else
-                {
-                    userinput.placeholder = "Start typing..";
-                    userinput.style.minWidth = "70%";
-                    userinput.style.maxWidth = "75%";
-                }
-            }
-        </script>
-        <script defer>
-            const pb = new PocketBase("https://db.xetute.com/");
-            const path = window.location.href;
-
-            const systemprompt =
-`You're a helpful assistant. You're being served through MyXEVA, and your name is XEVA.
-MyXEVA is a service developed by XeTute. XeTute is a Pakstani org, with the only member being Hamzah Asadullah, a Pakistani student.
-Try to engage the user and have an educational chat with the user. Try to enhance the user's live by being helpful and thoughtful, but not overly.
-XeTute is a luxury-ish software brand (plans for hardware, especially mechatronic-based are there though), so make sure the way you interact comes over likewise (please).
----
-For example, if the user talks about wanting to create a webpage, don't directly bloat the chat with everything about React, but:
-1. Praise them for wanting to learn something: Be motivational yet push the user to actually do something productive
-2. Ask the user if they need resources and example snippets
-2.1. If yes: Offer resources and example snippets from which the user can learn from
-That's just an example. You can also try to be a bit flirty to engage the user ;)
-----
-Following is reference information about XeTute:
-- Founded: 20/06/2022, by [Last Name] Hamzah, [First Name] Asadullah (also Pakistani)
-- Origin: The Islamic Republic of Pakistan
-- Hyperlinks:
-  - Webpage (the landing page is this chat page): https://xetute.com/ (reverse-proxy to https://xetute.github.io/)
-  - GitHub (single-user profile ran by Hamzah): https://github.com/XeTute
-  - HuggingFace:
-    - Hamzah: https://hf.co/Hamzah-Asadullah
-    - XeTute (actually registered as an org, Hamzah the only member): https://hf.co/XeTute
-  - Ko-Fi: https://ko-fi.com/hamzahasadullah (support for XeTute, not Hamzah, but Hamzah profile)
-  And many more, but they're mostly interlinked on profiles above.
----
-Happy chatting!`;
-
-            let endpoint = getLMEndpoints();
-            let workingendpoint = -1;
-
-            let authorized = false;
-            let processing = false;
-            let messages = [ { "role": "system", "content": systemprompt } ];
-            let chatid = -1;
-            let reloadallchatui = true;
-
-            function injectUserInformation()
-            {
-                if (pb.authStore.record.data.MyXEVA.persona)
-                {
-                    const information = "Following is information about the user. The user already knows this information, they literally entered it. Only use it as a reference for interacting with the user.";
-                    messages[0].content = `${systemprompt}\n${information}\n${pb.authStore.record.data.MyXEVA.persona}`;
-                }
-            }
-
-            async function modifyPersona()
-            {
-                let newpersona = "";
-
-                if (pb.authStore.record.data.MyXEVA.persona)
-                    newpersona = await myPrompt("Enter a something XEVA should know about you...", pb.authStore.record.data.MyXEVA.persona);
-                else newpersona = await myPrompt("Enter a something XEVA should know about you...");
-
-                let data = pb.authStore.record.data;
-                data.MyXEVA.persona = newpersona;
-
-                if (await updateData(data, { pb: pb }))
-                {
-                    injectUserInformation();
-                    myAlert("Synced with all chats.");
-                }
-                else myAlert("Failed to sync with cloud.");
-            }
-            
-            function setChatID(newid)
-            {
-                chatid = newid;
-                history.pushState(null, "", `?${new URLSearchParams({ chatid: chatid }).toString()}`);
-            }
-
-            function resetUIkeepData()
-            {
-                const msgcontainer = document.querySelector(".messages");
-                const txtelem = document.createElement("p");
-
-                txtelem.setAttribute("style", "display: flex; justify-content: center; align-items: center; text-align: center; flex: 1; color: var(--suble-color-text-dark-mode); font-size: 14px;");
-                txtelem.innerHTML = "XEVA is an AI assistant, which may make mistakes.<br>Verify important information.";
-
-                msgcontainer.innerHTML = "";
-                msgcontainer.style.justifyContent = "center";
-                msgcontainer.style.paddingBottom = 0;
-                msgcontainer.appendChild(txtelem);
-
-                if (document.querySelector(".chat").style.display === "none")
-                    showSidebar();
-                reloadallchatui = true;
-            }
-
-            function createNewChat()
-            {
-                resetUIkeepData();
-                if (authorized) setChatID(pb.authStore.record.data.MyXEVA.chats.length);
-                messages = [ { "role": "system", "content": systemprompt } ];
-                injectUserInformation();
-            }
-
-            function showSidebar()
-            {
-                const sidebar = document.querySelector(".sidebar");
-                const chat = document.querySelector(".chat");
-                
-                if (!sidebar.style.display) sidebar.style.display = "none";
-                if (sidebar.style.display === "none")
-                {
-                    sidebar.style.display = "flex";
-                    chat.style.display = "none";
-                }
-                else
-                {
-                    sidebar.style.display = "none";
-                    chat.style.display = "flex";
-                }
-            }
-
-            async function sendMsg()
-            {
-                const input = userinput.value.trim();
-
-                if (processing) return;
-                processing = true;
-
-                if (input || imagetosend.length)
-                {
-                    if (imagetosend.length)
-                    {
-                        let data = [];
-                        for (img of imagetosend)
-                            data.push({ "type": "image_url", "image_url": { "url": img } });
-                        imagetosend = [];
-                        messages.push({ "role": "user", "content": data });
-                        if (input) data.push({ "type": "text", "text": input });
-                    }
-                    else messages.push({ "role": "user", "content": input });
-                    loadChat(messages);
-
-                    if (input) userinput.value = "";
-                    resizeUserinput();
-
-                    await generateNextTurn();
-                    loadChat(messages);
-                    addOptionsToLastMsg();
-
-                    processing = false;
-                    if (authorized)
-                    {
-                        let data = pb.authStore.record.data;
-                        data.MyXEVA.chats[chatid] = [...messages];
-                        if (!(await updateData(data, { pb: pb }))) myAlert("Failed to sync last message with the cloud.");
-                        if (messages.length === 3) loadChats(pb.authStore.record.data.MyXEVA.chats);
-                    }
-                }
-            }
-
-            async function load()
-            {
-                resizeUserinput();
-                const recentchats = document.getElementById("recent-chats-header");
-                const authbtn = document.getElementById("authbtn");
-
-                authorized = await isAuthorized({ pb: pb });
-                if (authorized)
-                {
-                    if (pb.authStore.record.data.MyXEVA?.chats === undefined)
-                    {
-                        if (!(await updateData({ ...pb.authStore.record.data, MyXEVA: { chats: [], persona: "Not specified" } }, { pb: pb })))
-                        myAlert("Your data seems to be corrupted. Expect errors, report them to x3tut3@gmail.com if they occur.");
-                    }
-
-                    if (!pb.authStore.record.data.username)
-                    {
-                        const newname = await myPrompt("Set your username...");
-                        if (await updateData({ ...pb.authStore.record.data, username: newname }, { pb: pb })) myAlert(`Welcome, ${newname}!`);
-                        else myAlert(`We failed to update your data. We're sorry, ${newname}.`);
-                    }
-                    authbtn.getElementsByTagName('p')[0].textContent = pb.authStore.record.data.username;
-
-                    injectUserInformation();
-                    const nchats = pb.authStore.record.data.MyXEVA.chats.length;
-                    if (nchats > -1) // Check if it exists, not how long it is
-                    {
-                        if (window.location.search.substr(1))
-                        {
-                            try
-                            {
-                                setChatID(Number(new URLSearchParams(window.location.search.substr(1)).get("chatid")));
-                                if ((chatid >= 0) && (chatid < nchats))
-                                {
-                                    messages = pb.authStore.record.data.MyXEVA.chats[chatid];
-                                    loadChat(messages);
-                                }
-                                else setChatID(nchats);
-                            }
-                            catch (e) { setChatID(nchats); }
-                        }
-                        else setChatID(nchats);
-
-                        if (nchats <= 0) recentchats.style.display = "none";
-                        else loadChats(pb.authStore.record.data.MyXEVA?.chats);
-                    }
-                    else recentchats.style.display = "none";
-
-                    document.getElementById("modifypersona").style.display = "flex";
-                }
-                else
-                {
-                    recentchats.remove();
-                    authbtn.getElementsByTagName('p')[0].textContent = "Sign Up";
-                }
-
-                if (reloadallchatui) resetUIkeepData();
-                document.querySelector(".notifier").removeAttribute("style");
-                document.querySelector(".sidebar").removeAttribute("style");
-
-                authbtn.setAttribute("onclick", `window.location.href="auth/?${new URLSearchParams({ origin: path }).toString()}"`);
-                userinput.focus();
-            }
-            load();
-
-            function loadChats(chats)
-            {
-                const container = document.getElementById("recent-chats");
-                const header = document.getElementById("recent-chats-header");
-                container.innerHTML = "";
-                
-                if (chats.length === 0) header.style.display = "none";
-                else header.style.display = "block";
-
-                for (let x = 0; x < chats.length; ++x)
-                {
-                    const btn = document.createElement("labeledbutton");
-                    const title = document.createElement("p");
-                    const iconwrappertrash = document.createElement("iwrapper");
-                    const icontrash = document.createElement("i");
-
-                    btn.setAttribute("id", `recentchat${x}`);
-                    title.setAttribute("onclick", `loadChatFromID(${x});`);
-
-                    if (chats[x].length < 2) title.textContent = "Unnamed";
-                    else
-                    {
-                        try
-                        {
-                            if (chats[x][1].content[0].image_url !== undefined) title.textContent = maxchars(chats[x][1].content[1].text, 12)
-                            else title.textContent = maxchars(chats[x][1].content, 12);
-                        }
-                        catch (e) { title.textContent = maxchars(chats[x][1].content, 12); }
-                    }
-
-                    icontrash.classList = "fa fa-trash";
-                    iconwrappertrash.setAttribute("onclick", `deleteChat(${x})`);
-                    iconwrappertrash.appendChild(icontrash);
-
-                    btn.appendChild(title);
-                    btn.appendChild(iconwrappertrash);
-                    container.appendChild(btn);
-                }
-            }
-
-            async function deleteChat(id)
-            {
-                if (await myConfirm("You can't recover a chat after deleting it. Continue?"))
-                {
-                    let newdata = pb.authStore.record.data;
-                    newdata.MyXEVA.chats.splice(id, 1);
-                    if (!(await updateData(newdata, { pb: pb }))) myAlert("Failed to delete Chat.");
-                    else
-                    {
-                        loadChats(pb.authStore.record.data.MyXEVA.chats);
-                        if ((chatid === id) || newdata.MyXEVA.chats.length === 0) createNewChat();
-                    }
-                }
-            }
-
-            async function regenLastMsg()
-            {
-                endpoint = getLMEndpoints();
-                messages.pop();
-                document.getElementById("lastmsgoptions").remove();
-                document.getElementById("lastmsg").remove();
-                await generateNextTurn();
-                loadChat(messages);
-                
-                let newdata = pb.authStore.record.data;
-                newdata.MyXEVA.chats[chatid] = [...messages];
-                await updateData(newdata, { pb: pb });
-            }
-
-            function copyLastMsg()
-            {
-                navigator.clipboard.writeText(messages.at(-1).content);
-                myAlert("Copied message.");
-            }
-
-            function addOptionsToLastMsg()
-            {
-                try { document.getElementById("lastmsgoptions").remove(); } catch (e) {}
-                document.getElementById("lastmsg").innerHTML +=
-`<div id="lastmsgoptions">
-    <iwrapper onclick="regenLastMsg();"><i class="fa fa-refresh"></i></iwrapper>
-    <iwrapper onclick="copyLastMsg();"><i class="fa fa-copy"></i></iwrapper>
-</div>`;
-            }
-
-            function htmlParse(text)
-            {
-                const codeblocks = [];
-                const textwoutcode = text.replace(/```([\s\S]*?)```/g, (match) =>
-                {
-                    const placeholder = `__CODE_BLOCK_${codeblocks.length}__`;
-                    codeblocks.push(match);
-                    return placeholder;
-                });
-
-                const htmlescaped = textwoutcode
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");         
-
-                let result = htmlescaped;
-                codeblocks.forEach((block, index) =>
-                {
-                      const processedBlock = marked.parse(block);
-                      result = result.replace(`__CODE_BLOCK_${index}__`, processedBlock);
-                });
-
-                return marked.parse(result);
-            }
-
-            function addMsgToContainer(msg)
-            {
-                const container = document.querySelector(".messages");
-                const fromuser = msg.role === "user";
-
-                if (fromuser || (msg.role === "assistant"))
-                {
-                    const div = document.createElement("div");
-                    
-                    if (fromuser)
-                    {
-                        div.classList = "msg usermsg";
-                        try
-                        {
-                            if (msg.content[0].image_url === undefined) div.innerHTML = htmlParse(msg.content);
-                            else
-                            {
-                                for (let x = 0; x < msg.content.length; ++x)
-                                {
-                                    const cont = msg.content[x];
-                                    if (cont.type === "image_url") div.innerHTML += `<button onclick="myAlertImage('${cont.image_url.url}');">Image ${x + 1}</button>`;
-                                    else if (cont.type === "text") div.innerHTML += htmlParse(cont.text);
-                                }
-                            }
-                        }
-                        catch (e) { console.error(e); div.innerHTML = htmlParse(msg.content); }
-                        container.appendChild(div);
-                        container.scrollTo(0, container.scrollHeight);
-                    }
-                    else
-                    {
-                        try { document.getElementById("lastmsg").removeAttribute("id"); } catch (e) {}
-                        div.classList = "msg assistantmsg";
-                        div.id = "lastmsg";
-                        div.innerHTML = htmlParse(msg.content);
-
-                        container.appendChild(div);
-                        addOptionsToLastMsg();
-                    }
-                }
-            }
-
-            let imagetosend = [];
-            function attachImg()
-            {
-                if (imagetosend.length >= 6) { myAlert("Maximum allowed amount of images per message is six."); return; }
-
-                const fileinput = document.createElement('input');
-                fileinput.type = 'file';
-                fileinput.accept = 'image/jpeg,image/png,image/webp,image/gif';
-                fileinput.style.display = 'none';
-                document.body.appendChild(fileinput);
-
-                fileinput.click();    
-                fileinput.addEventListener('change', async function()
-                {
-                    if (fileinput.files && fileinput.files[0])
-                    {
-                        const file = fileinput.files[0];
-
-                        if (file.size > (5 * 1024 * 1024))
-                        {
-                            myAlert('Image size too large. Please select an image under 5MB.');
-                            fileinput.remove();
-                            return;
-                        }
-
-                        try
-                        {
-                            const reader = new FileReader();
-                            reader.onload = (e) =>
-                            {
-                                imagetosend.push(e.target.result);
-                                userinput.focus();
-                            };
-                            reader.readAsDataURL(file);
-
-                            const mult_images = Boolean(imagetosend.length);
-                            userinput.placeholder =
-                                "Attached " +
-                                (mult_images ? (imagetosend.length + 1) : "one") +
-                                (mult_images ? " images." : " image.");
-                            userinput.focus();
-                        } catch (error) { myAlert('Error attaching image: ' + error.message); }
-                        finally { document.body.removeChild(fileinput); }
-                    }
-                });
-            }
-
-            function loadChat(chat)
-            {
-                const container = document.querySelector(".messages");
-                if (reloadallchatui)
-                {
-                    reloadallchatui = false;
-                    container.innerHTML = "";
-                    container.style.justifyContent = "flex-start";
-                    container.style.paddingBottom = "10vh";
-
-                    for (msg of chat) addMsgToContainer(msg);
-                    if (document.querySelector(".chat").style.display === "none")
-                        showSidebar();
-                }
-                else addMsgToContainer(chat.at(-1));
-            }
-            function loadChatFromID(id)
-            {
-                reloadallchatui = true;
-
-                messages = pb.authStore.record.data.MyXEVA.chats[id];
-                injectUserInformation();
-                loadChat(messages);
-                setChatID(id);
-            }
-
-            function chatNeedsVision(msgs)
-            {
-                let needsvision = false;
-                for (msg of messages)
-                {
-                    try { if (msg.content[0].image_url.url) needsvision = true; break; }
-                    catch(e) {}
-                }
-                return needsvision;
-            }
-
-            function selectVisionEndpoint(startfrom=0)
-            {
-                if (startfrom > (endpoint.length - 1)) startfrom = startfrom % (endpoint.length - 1);
-                for (workingendpoint = startfrom; workingendpoint < endpoint.length; ++workingendpoint)
-                    if (endpoint[workingendpoint].vision) break;
-            }
-
-            async function generateNextTurn()
-            {
-                const loadingindic = document.createElement("div");
-                loadingindic.classList = "msg loadingindic";
-                const dotsContainer = document.createElement("div");
-                dotsContainer.classList = "loadingdots";
-
-                for (let i = 0; i < 3; ++i)
-                {
-                    const dot = document.createElement("div");
-                    dot.classList = "dot";
-                    dotsContainer.appendChild(dot);
-                }
-                loadingindic.appendChild(dotsContainer);
-                document.querySelector(".messages").append(loadingindic);
-
-                messages.push({ "role": "assistant", "content": "" });
-                try
-                {
-                    let needsvision = chatNeedsVision(messages);
-                    let response = { ok: false };
-
-                    while (!response.ok) // Try all available endpoints till one works
-                    {
-                        if ((workingendpoint === (endpoint.length - 1)) && !endpoint[endpoint.length - 1].vision && needsvision)
-                            throw new Error("No AI with image processing is currently online.");
-
-                        if (needsvision) selectVisionEndpoint(startfrom=workingendpoint+1);
-                        else ++workingendpoint;
-
-                        const endpointurl = endpoint[workingendpoint].url;
-                        const key = endpoint[workingendpoint].key;
-                        const model = endpoint[workingendpoint].model;
-                        const max_tokens = endpoint[workingendpoint].generation;
-                        
-                        let header;
-                        if (key === "0") header = { "Content-Type": "application/json" };
-                        else header = { "Content-Type": "application/json", "Authorization": `Bearer ${key}` };
-
-                        try
-                        {
-                            response = await fetch(endpointurl,
-                            {
-                                method: "POST",
-                                headers: header,
-                                body: JSON.stringify({ model: model, messages: messages, temperature: 0.85, max_tokens: max_tokens }),
-                            });
-                            if (!response.ok) throw new Error("Server rejected request.");
-                        }
-                        catch (e)
-                        {
-                            response = { ok: false };
-                            userinput.placeholder = "Trying to bypass server issues";
-                            for (let x = 0; x < 3; ++x) { await sleep(150); userinput.placeholder += '.'; }
-
-                            if (workingendpoint === (endpoint.length - 1))
-                                throw new Error("No inference providers, server online or working. Retry later.");
-                        }
-                    }
-
-                    // Remember this defo simple format: choices.{X}.message.content
-                    messages.at(-1).content = (await response.json()).choices[0].message.content;
-                    loadingindic.remove();
-                }
-                catch (e)
-                {
-                    messages.at(-1).content = "XEVA is not responding...\n" + e;
-                    try { if (loadingindic) loadingindic.remove(); } catch (e) {}
-                }
-
-                userinput.placeholder = "Respond to XEVA..";
-            }
-
-            userinput.addEventListener("keydown", (e) =>
-            {
-                if (e.key === "Enter" && !e.shiftKey)
-                {
-                    e.preventDefault();
-                    sendMsg();
-                }
-            });
-        </script>
-    </body>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, inital-scale=1.0">
+
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <style>
+    body, html
+    {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      color: #fff;
+
+      background: url(./rose.png) no-repeat center center fixed; 
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover;
+    
+      display: flex;
+      flex-direction: column;
+
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .content-container
+    {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      width: fit-content;
+      height: fit-content;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px;
+      border-radius: 25px;
+    }
+
+    h1, p
+    {
+      text-align: center;
+      padding: 10px;
+      margin: 0;
+      width: 100%;
+    }
+
+    a, button
+    {
+      font-size: 16px;
+      color: #fff;
+      background: 0;
+      border: 0;
+      padding: 10px;
+      margin: 0;
+      text-decoration: underline;
+      transition: .1s ease-in-out;
+    }
+    a:hover, button:hover { border: 1px solid #fff; padding: 9px; }
+    </style>
+  </head>
+<body>
+  <div class="content-container">
+    <h1>COMING SOON</h1>
+    <p id="demo">- Calculating -</p><br>
+    <p>This page will be functional 14 NOV 2025.</p>
+
+    <div style="display: flex; flex-direction: row;">
+      <a href="https://github.com/XeTute">GitHub</a>
+      <a href="https://hf.co/XeTute">HuggingFace</a>
+      <a href="https://ko-fi.com/XeTute">Ko-Fi</a>
+    </div>
+  </div>
+
+  <script defer>
+    let countDownDate = new Date("Nov 14, 2025 00:00:00").getTime();
+    
+    let countdownfunction = setInterval(function()
+    {
+      let distance = countDownDate - (new Date().getTime());
+      let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+      document.getElementById("demo").innerHTML =
+      days + "d " + hours + "h " +
+      minutes + "m " + seconds + "s ";
+
+      if (distance < 0)
+      {
+        clearInterval(countdownfunction);
+        document.getElementById("demo").innerHTML = "Will be updated shortly...";
+      }
+    }, 1000);
+  </script>
+
+</body>
 </html>
