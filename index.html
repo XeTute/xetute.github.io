@@ -1,198 +1,118 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XeTute \\ Coming Soon</title>
+<html lang="en">
+    <head>
+        <title>XeTute: Coming Soon</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta charset="UTF-8"/>
 
-    <link rel="icon" type="image/x-icon" href="./favicon.ico">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="icon" type="image/x-icon" href="./favicon.ico"/>
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"/>
 
-    <style>
-    @keyframes float
-    {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      33% { transform: translateY(-8px) rotate(0.5deg); }
-      66% { transform: translateY(4px) rotate(-0.3deg); }
-    }
+        <style>
+            html, body
+            {
+                width: 100%;
+                height: 100%;
 
-    @keyframes shimmer
-    {
-      0% { background-position: -200px 0; }
-      100% { background-position: 200px 0; }
-    }
+                background: #FFF;
+                color: #FFF;
 
-    @keyframes pulse
-    {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
 
-    body, html
-    {
-      width: 100%;
-      height: 100%;
-      margin: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
 
-      font-family: "Roboto", sans-serif;
-      color: #fff;
+                font-family: "Roboto Condensed", sans-serif;
+                font-weight: 200;
+            }
 
-      background: url(./blossom-pastel.jpeg) no-repeat center center fixed; 
-      -webkit-background-size: cover;
-      -moz-background-size: cover;
-      -o-background-size: cover;
-      background-size: cover;
-    
-      display: flex;
-      flex-direction: column;
+            div
+            {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
 
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
+                margin: 5px;
+                padding: 0;
+            }
 
-    .content-container
-    {
-      backdrop-filter: blur(4px);
-      box-shadow: 0 0 4px #000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: fit-content;
-      height: fit-content;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 15px;
-      border-radius: 25px;
-      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-      animation: float 6s ease-in-out infinite;
-      transform-origin: center center;
-    }
-    .content-container:hover
-    {
-      padding: 5vh;
-      margin: 20px;
-      background: rgba(0, 0, 0, 0.75);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-      animation-play-state: paused;
-    }
+            h1, p, a
+            {
+                color: #FFF;
+                background: #000;
 
-    h1, p
-    {
-      font-weight: 200;
-      text-align: center;
-      padding: 10px;
-      margin: 0;
-      width: 100%;
-    }
-    
-    h1
-    {
-      font-weight: 300;
-      background: linear-gradient(90deg, #fff 0%, #fff 50%, rgba(255,255,255,0.8) 100%);
-      background-size: 200px 100%;
-      -webkit-background-clip: text;
-      background-clip: text;
-      transition: all 0.3s ease;
-    }
-    h1:hover { animation: shimmer 2s infinite; }
+                padding: 5px;
+                margin: 5px;
 
-    #demo
-    {
-      font-family: 'Courier New', monospace;
-      font-weight: 300;
-      font-size: 1.1em;
-      letter-spacing: 1px;
-      animation: pulse 2s ease-in-out infinite;
-    }
+                font-family: "Roboto Condensed", sans-serif;
+                font-weight: 200;
 
-    .links-container
-    {
-      display: flex;
-      flex-direction: row;
-      gap: 5px;
-    }
+                width: fit-content;
+                height: fit-content;
+                transition: 0.2s ease-in-out;
+            }
 
-    a, button
-    {
-      font-size: 16px;
-      color: #fff;
-      background: 0;
-      border: 0;
-      padding: 10px;
-      margin: 0;
-      text-decoration: underline;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 5px;
-      position: relative;
-      overflow: hidden;
-    }
+            a:hover
+            {
+                color: #000;
+                background: #E8E8E8;
+                padding-bottom: 10px;
+                border: 1px solid #000;
+            }
 
-    a:nth-child(1) { transition-delay: 0s; }
-    a:nth-child(2) { transition-delay: 0.1s; }
-    a:nth-child(3) { transition-delay: 0.2s; }
+            img
+            {
+                padding: 0;
+                margin: 5px;
+                border: 2px solid #000;
+                filter: grayscale(75%);
+                transition: 0.2s ease-in-out;
+            }
+            img:hover { filter: grayscale(0%); }
+        </style>
+    </head>
+    <body>
+        <h1>Welcome.</h1>
+        <p id="countdown" style="margin-bottom: 0px;">Please have patience.</p>
+        <p style="margin-top: 0px;">This page will be functional NOV 14, 2024.</p>
 
-    a:hover, button:hover
-    {
-      border: 1px solid rgba(255, 255, 255, 0.8); 
-      padding: 9px;
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
+        <div>
+            <a href="https://huggingface.co/XeTute">HuggingFace</a>
+            <a href="https://github.com/XeTute">GitHub</a>
+            <a href="https://x.com/Hamzah4sadullah">X (formerly Twitter)</a>
+        </div>
 
-    a:active, button:active
-    {
-      transform: translateY(0px);
-      transition-duration: 0.1s;
-    }
+        <p>[View Counter]</p>
+        <img src="https://count.getloli.com/@XeTute-Webpage?theme=booru-lewd" />
+    </body>
+    <script defer>
+        const countdown = document.getElementById("countdown");
+        const ETA = new Date("Nov 14, 2025 00:00:00").getTime();
 
-    .launch-text
-    {
-      opacity: 0.8;
-      transition: opacity 0.3s ease;
-    }
+        const countdownfunction = setInterval(function()
+        {
+            let distance = ETA - (new Date().getTime());
+            let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    .content-container:hover .launch-text { opacity: 1; }
-    </style>
-  </head>
-<body>
-  <div class="content-container">
-    <h1>ALMOST BLOOMING</h1>
-    <p id="demo" style="margin-bottom: 10px; margin-top: -10px;">- Calculating -</p>
-    <p class="launch-text">This page will be functional 14 NOV 2025.</p>
+            document.getElementById("countdown").innerHTML =
+            days + "d " + hours + "h " +
+            minutes + "m " + seconds + "s remaining.";
 
-    <div class="links-container">
-      <a href="https://github.com/XeTute">GitHub</a>
-      <a href="https://hf.co/XeTute">HuggingFace</a>
-      <a href="./about/">About</a>
-    </div>
-  </div>
-
-  <script defer>
-    let countDownDate = new Date("Nov 14, 2025 00:00:00").getTime();
-    
-    let countdownfunction = setInterval(function()
-    {
-      let distance = countDownDate - (new Date().getTime());
-      let days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      let seconds = Math.floor((distance % (1000 * 60)) / 1000);
-    
-      document.getElementById("demo").innerHTML =
-      days + "d " + hours + "h " +
-      minutes + "m " + seconds + "s ";
-
-      if (distance < 0)
-      {
-        clearInterval(countdownfunction);
-        document.getElementById("demo").innerHTML = "Will be updated shortly...";
-      }
-    }, 1000);
-  </script>
-
-</body>
+            if (distance < 0)
+            {
+                clearInterval(countdownfunction);
+                document.getElementById("demo").innerHTML = "Will be updated shortly...";
+            }
+        }, 1000);
+    </script>
 </html>
