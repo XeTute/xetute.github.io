@@ -43,7 +43,15 @@
                 padding: 0;
             }
 
-            h1, p, a
+            .linkcontainer
+            {
+                flex-direction: column;
+                border: 2px solid #000;
+                transition: 0.2s ease-in-out;
+            }
+            .linkcontainer:hover { padding: 5px; border: 4px solid #000; }
+
+            h1, p, a, button
             {
                 color: #FFF;
                 background: #000;
@@ -59,7 +67,7 @@
                 transition: 0.2s ease-in-out;
             }
 
-            a:hover
+            a:hover, button:hover
             {
                 color: #000;
                 background: #E8E8E8;
@@ -71,26 +79,49 @@
             {
                 padding: 0;
                 margin: 5px;
-                border: 2px solid #000;
                 filter: grayscale(75%);
                 transition: 0.2s ease-in-out;
             }
             img:hover { filter: grayscale(0%); }
+
+            .nobottom { margin-bottom: 0; }
+            .notop { margin-top: 0; }
         </style>
     </head>
     <body>
-        <h1>Welcome.</h1>
-        <p id="countdown" style="margin-bottom: 0px;">Please have patience.</p>
-        <p style="margin-top: 0px;">This page will be functional NOV 14, 2024.</p>
+        <div style="display: flex; flex-direction: column; width: 100%; height: 100%;" id="mainpage">
+            <h1>Welcome.</h1>
+            <p id="countdown" class="nobottom">Please have patience.</p>
+            <p class="notop">This page will be functional NOV 14, 2024.</p>
 
-        <div>
-            <a href="https://huggingface.co/XeTute">HuggingFace</a>
-            <a href="https://github.com/XeTute">GitHub</a>
-            <a href="https://x.com/Hamzah4sadullah">X (formerly Twitter)</a>
+            <div class="linkcontainer">
+                <p>[Social Accounts]</p>
+                <div class="notop">
+                    <a href="https://huggingface.co/XeTute">HuggingFace</a>
+                    <a href="https://github.com/XeTute">GitHub</a>
+                    <a href="https://x.com/Hamzah4sadullah">X (formerly Twitter)</a>
+                </div>
+            </div>
+
+            <div class="linkcontainer">
+                <p>[About]</p>
+                <div class="notop">
+                    <button onclick="showHamzah();">About Hamzah</button>
+                    <button onclick="alert('That information will soon be online.');">About XeTute [Technologies]</a>
+                </div>
+            </div>
+
+            <div class="linkcontainer">
+                <p>[View Counter]</p>
+                <img src="https://count.getloli.com/@XeTute-Webpage?theme=booru-lewd"/>
+            </div>
         </div>
 
-        <p>[View Counter]</p>
-        <img src="https://count.getloli.com/@XeTute-Webpage?theme=booru-lewd" />
+        <div style="display: none; flex-direction: column; width: 100%; height: 100%;" id="hamzahlink">
+            <img src="https://gravatar.com/hamzahasadullah.qr" style="max-width: 512px; max-height: 512px;"/>
+            <a href="https://gravatar.com/hamzahasadullah">Can't scan QR — direct link</a>
+            <button onclick="showHamzah()">Close</button>
+        </div>
     </body>
     <script defer>
         const countdown = document.getElementById("countdown");
@@ -114,5 +145,22 @@
                 document.getElementById("demo").innerHTML = "Will be updated shortly...";
             }
         }, 1000);
+
+        function showHamzah()
+        {
+            const mainpage = document.getElementById("mainpage");
+            const hamzahlink = document.getElementById("hamzahlink");
+
+            if (mainpage.style.display === "none")
+            {
+                mainpage.style.display = "flex";
+                hamzahlink.style.display = "none";
+            }
+            else
+            {
+                mainpage.style.display = "none";
+                hamzahlink.style.display = "flex";
+            }
+        }
     </script>
 </html>
