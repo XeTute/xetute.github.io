@@ -3,7 +3,7 @@
 <head>
     <title>Imagine \\ XeTute</title>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -19,6 +19,8 @@
             --text-secondary: #a3a3a3;
             --border: #333333;
             --shadow: rgba(99, 102, 241, 0.1);
+            --mobile-header-height: 60px;
+            --mobile-action-bar-height: 70px;
         }
 
         * {
@@ -33,11 +35,65 @@
             color: var(--text-primary);
             overflow: hidden;
             height: 100vh;
+            -webkit-overflow-scrolling: touch;
         }
 
         .app-container {
             display: flex;
             height: 100vh;
+            position: relative;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--mobile-header-height);
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            z-index: 1001;
+            align-items: center;
+            padding: 0 16px;
+            justify-content: space-between;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            justify-content: space-between;
+            padding: 4px 0;
+        }
+
+        .hamburger span {
+            width: 100%;
+            height: 2px;
+            background: var(--text-primary);
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .mobile-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         /* Sidebar */
@@ -48,6 +104,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            z-index: 1000;
         }
 
         .sidebar-header {
@@ -72,6 +129,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .context-section {
@@ -93,10 +151,12 @@
             border-radius: 8px;
             padding: 12px;
             color: var(--text-primary);
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.5;
             resize: vertical;
             font-family: 'Inter', sans-serif;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .context-textarea:focus {
@@ -108,24 +168,34 @@
         .story-actions {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
 
         .btn {
-            padding: 10px 16px;
+            padding: 14px 16px;
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 8px;
             background: var(--bg-tertiary);
             color: var(--text-primary);
-            font-size: 13px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.2s ease;
             font-family: 'Inter', sans-serif;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn:hover {
             background: var(--bg-primary);
             border-color: var(--accent);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
         }
 
         .btn.primary {
@@ -141,6 +211,7 @@
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none;
         }
 
         /* Main Content */
@@ -167,6 +238,7 @@
             flex: 1;
             overflow-y: auto;
             padding: 32px;
+            -webkit-overflow-scrolling: touch;
         }
 
         .story-block {
@@ -195,7 +267,7 @@
 
         .block-header {
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
         }
@@ -225,17 +297,23 @@
         .block-content textarea {
             width: 100%;
             background: transparent;
-            border: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px;
             color: var(--text-primary);
             font-size: 15px;
             line-height: 1.7;
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
             font-family: 'Inter', sans-serif;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         .block-content textarea:focus {
             outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--shadow);
         }
 
         .block-actions {
@@ -244,21 +322,30 @@
             margin-top: 16px;
             padding-top: 16px;
             border-top: 1px solid var(--border);
+            flex-wrap: wrap;
         }
 
         .btn-small {
-            padding: 6px 12px;
+            padding: 8px 16px;
             font-size: 12px;
-            border-radius: 4px;
+            border-radius: 6px;
+            min-height: 36px;
         }
 
         .action-bar {
-            padding: 20px 32px;
+            padding: 16px;
             border-top: 1px solid var(--border);
             background: var(--bg-secondary);
             display: flex;
-            gap: 12px;
+            gap: 8px;
             align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .action-bar .btn {
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
         }
 
         .loading {
@@ -267,6 +354,9 @@
             gap: 8px;
             color: var(--text-secondary);
             font-size: 13px;
+            width: 100%;
+            justify-content: center;
+            margin-top: 8px;
         }
 
         .spinner {
@@ -298,14 +388,43 @@
         .empty-state p {
             font-size: 14px;
             margin-bottom: 24px;
+            line-height: 1.5;
         }
 
+        .empty-state a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .empty-state a:hover {
+            text-decoration: underline;
+        }
+
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        /* Mobile Styles */
         @media (max-width: 768px) {
+            .mobile-header {
+                display: flex;
+            }
+
             .sidebar {
                 position: fixed;
                 left: -300px;
-                z-index: 1000;
+                top: 0;
+                bottom: 0;
                 transition: left 0.3s ease;
+                width: 280px;
             }
             
             .sidebar.open {
@@ -314,13 +433,173 @@
             
             .main-content {
                 width: 100%;
+                padding-top: var(--mobile-header-height);
+            }
+
+            .main-header {
+                display: none;
+            }
+
+            .story-container {
+                padding: 16px;
+                padding-bottom: calc(var(--mobile-action-bar-height) + 16px);
+            }
+
+            .story-block {
+                padding: 16px;
+                margin-bottom: 12px;
+            }
+
+            .action-bar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: var(--mobile-action-bar-height);
+                padding: 12px 16px;
+                background: var(--bg-secondary);
+                border-top: 2px solid var(--border);
+                box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+            }
+
+            .action-bar .btn {
+                font-size: 12px;
+                padding: 8px 4px;
+                min-height: 40px;
+            }
+
+            .loading {
+                position: fixed;
+                bottom: var(--mobile-action-bar-height);
+                left: 0;
+                right: 0;
+                background: var(--bg-secondary);
+                padding: 8px;
+                border-top: 1px solid var(--border);
+                margin-top: 0;
+            }
+
+            .context-textarea {
+                height: 150px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .block-content textarea {
+                font-size: 16px; /* Prevents zoom on iOS */
+                min-height: 100px;
+            }
+
+            .btn {
+                font-size: 16px; /* Better touch target */
+            }
+
+            .empty-state {
+                padding: 32px 16px;
+            }
+
+            .empty-state h3 {
+                font-size: 20px;
+            }
+
+            .empty-state p {
+                font-size: 16px;
+            }
+
+            .sidebar-content {
+                padding: 16px;
+            }
+
+            .story-actions {
+                gap: 8px;
+            }
+
+            .block-actions {
+                gap: 6px;
+            }
+
+            .btn-small {
+                flex: 1;
+                min-width: 0;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 100vw;
+                left: -100vw;
+            }
+
+            .action-bar {
+                padding: 8px 12px;
+            }
+
+            .action-bar .btn {
+                font-size: 11px;
+                padding: 6px 2px;
+            }
+
+            .story-container {
+                padding: 12px;
+            }
+
+            .story-block {
+                padding: 12px;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .story-container {
+                padding-bottom: calc(var(--mobile-action-bar-height) + 8px);
+            }
+
+            .action-bar {
+                height: 50px;
+                padding: 8px 16px;
+            }
+
+            .action-bar .btn {
+                min-height: 34px;
+                font-size: 11px;
+            }
+        }
+
+        /* Touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .btn:hover {
+                background: var(--bg-tertiary);
+                border-color: var(--border);
+            }
+
+            .btn.primary:hover {
+                background: var(--accent);
+            }
+
+            .story-block:hover {
+                border-color: var(--border);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <div class="sidebar">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <div class="mobile-title">Imagine</div>
+            <div style="width: 24px;"></div> <!-- Spacer for centering -->
+        </div>
+
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h1>XeTute Technologies</h1>
                 <p>Imagine (that's this App's name)</p>
@@ -353,9 +632,9 @@
                 <div class="empty-state">
                     <h3>Start Your Story</h3>
                     <p>
-                        Add some context in the sidebar and click "Generate Next" to begin your story, or write your own opening block.<br>
+                        Add some context in the sidebar and click "Generate Next" to begin your story, or write your own opening block.<br><br>
                         XeTute Technologies is the public facing for rather professional work by Hamzah Asadullah.<br>
-                        <a href="https://gravatar.com/hamzahasadullah" style="color: grey;">Learn more here.</a>
+                        <a href="https://gravatar.com/hamzahasadullah" target="_blank">Learn more here.</a>
                     </p>
                 </div>
             </div>
@@ -365,10 +644,11 @@
                 <button class="btn" id="writeBlock">Write Block</button>
                 <button class="btn" id="regenerate" disabled>Regenerate</button>
                 <button class="btn" id="deleteBlock" disabled>Delete Last</button>
-                <div class="loading" id="loadingIndicator" style="display: none;">
-                    <div class="spinner"></div>
-                    Generating...
-                </div>
+            </div>
+            
+            <div class="loading" id="loadingIndicator" style="display: none;">
+                <div class="spinner"></div>
+                Generating...
             </div>
         </div>
     </div>
@@ -381,9 +661,11 @@
                 this.apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
                 this.apiKey = 'gs' + 'k_TojU3H7Tcl7YwBrLtZfEWGdyb3FYoA5ZMJ9b3l1krTAQV4xt91wm';
                 this.model = 'llama-3.3-70b-versatile';
+                this.sidebarOpen = false;
                 
                 this.initializeElements();
                 this.bindEvents();
+                this.initializeMobile();
             }
 
             initializeElements() {
@@ -398,6 +680,9 @@
                 this.loadStory = document.getElementById('loadStory');
                 this.newStory = document.getElementById('newStory');
                 this.clearContext = document.getElementById('clearContext');
+                this.sidebar = document.getElementById('sidebar');
+                this.hamburger = document.getElementById('hamburger');
+                this.sidebarOverlay = document.getElementById('sidebarOverlay');
             }
 
             bindEvents() {
@@ -405,10 +690,107 @@
                 this.writeBlock.addEventListener('click', () => this.addUserBlock());
                 this.regenerate.addEventListener('click', () => this.regenerateLastBlock());
                 this.deleteBlock.addEventListener('click', () => this.deleteLastBlock());
-                this.saveStory.addEventListener('click', () => this.saveStory());
+                this.saveStory.addEventListener('click', () => this.saveStoryMethod());
                 this.loadStory.addEventListener('click', () => this.loadStoryDialog());
-                this.newStory.addEventListener('click', () => this.newStory());
-                this.clearContext.addEventListener('click', () => this.clearContext());
+                this.newStory.addEventListener('click', () => this.newStoryMethod());
+                this.clearContext.addEventListener('click', () => this.clearContextMethod());
+            }
+
+            initializeMobile() {
+                // Hamburger menu toggle
+                this.hamburger.addEventListener('click', () => this.toggleSidebar());
+                
+                // Sidebar overlay close
+                this.sidebarOverlay.addEventListener('click', () => this.closeSidebar());
+                
+                // Touch gestures for sidebar
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let touchEndX = 0;
+                let touchEndY = 0;
+                
+                document.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                    touchStartY = e.changedTouches[0].screenY;
+                });
+                
+                document.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    touchEndY = e.changedTouches[0].screenY;
+                    this.handleGesture(touchStartX, touchStartY, touchEndX, touchEndY);
+                });
+                
+                // Prevent zoom on double tap for better UX
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', (e) => {
+                    const now = (new Date()).getTime();
+                    if (now - lastTouchEnd <= 300) {
+                        e.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+                
+                // Handle keyboard for mobile
+                this.handleMobileKeyboard();
+            }
+
+            handleGesture(startX, startY, endX, endY) {
+                const deltaX = endX - startX;
+                const deltaY = endY - startY;
+                const absDeltaX = Math.abs(deltaX);
+                const absDeltaY = Math.abs(deltaY);
+                
+                // Only handle horizontal swipes that are more horizontal than vertical
+                if (absDeltaX > absDeltaY && absDeltaX > 50) {
+                    if (deltaX > 0 && startX < 50 && !this.sidebarOpen) {
+                        // Swipe right from left edge - open sidebar
+                        this.openSidebar();
+                    } else if (deltaX < 0 && this.sidebarOpen) {
+                        // Swipe left when sidebar is open - close sidebar
+                        this.closeSidebar();
+                    }
+                }
+            }
+
+            handleMobileKeyboard() {
+                // Handle virtual keyboard appearance
+                const viewportHeight = window.innerHeight;
+                
+                window.addEventListener('resize', () => {
+                    const currentHeight = window.innerHeight;
+                    const heightDifference = viewportHeight - currentHeight;
+                    
+                    // If keyboard is likely open (significant height reduction)
+                    if (heightDifference > 150) {
+                        document.body.style.height = currentHeight + 'px';
+                    } else {
+                        document.body.style.height = '100vh';
+                    }
+                });
+            }
+
+            toggleSidebar() {
+                if (this.sidebarOpen) {
+                    this.closeSidebar();
+                } else {
+                    this.openSidebar();
+                }
+            }
+
+            openSidebar() {
+                this.sidebarOpen = true;
+                this.sidebar.classList.add('open');
+                this.hamburger.classList.add('active');
+                this.sidebarOverlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+
+            closeSidebar() {
+                this.sidebarOpen = false;
+                this.sidebar.classList.remove('open');
+                this.hamburger.classList.remove('active');
+                this.sidebarOverlay.style.display = 'none';
+                document.body.style.overflow = '';
             }
 
             async generateNextBlock() {
@@ -448,7 +830,6 @@
                         role: 'user',
                         content: 'Continue the story with the next part.'
                     });
-                    console.log(messages);
                     
                     const response = await fetch(this.apiUrl, {
                         method: 'POST',
@@ -490,6 +871,7 @@
                 };
                 
                 this.addBlock(block);
+                this.closeSidebar(); // Close sidebar on mobile after adding block
             }
 
             addBlock(block) {
@@ -504,7 +886,7 @@
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // **text** -> <strong>text</strong>
                     .replace(/\*(.*?)\*/g, '<em>$1</em>') // *text* -> <em>text</em>
                     .replace(/"([^"]*)"/g, '"$1"') // Keep quotes as-is but ensure they're not italicized
-                    .replace(/^(?!["\*])(.*?)$/gm, '<em>$1</em>'); // Everything else -> <em>text</em>
+                    .replace(/\n/g, '<br>'); // Convert line breaks to HTML
             }
 
             regenerateLastBlock() {
@@ -530,7 +912,7 @@
                     this.storyContainer.innerHTML = `
                         <div class="empty-state">
                             <h3>Start Your Story</h3>
-                            <p>Add some context in the sidebar and click "Generate Next" to begin your story, or write your own opening block.</p>
+                            <p>Add some context in the sidebar and click "Generate Next" to begin your story, or write your own opening block.<br><br>XeTute Technologies is the public facing for rather professional work by Hamzah Asadullah.<br><a href="https://gravatar.com/hamzahasadullah" target="_blank">Learn more here.</a></p>
                         </div>
                     `;
                     return;
@@ -539,7 +921,7 @@
                 const blocksHtml = this.blocks.map((block, index) => {
                     const isEditing = block.editing;
                     const contentHtml = isEditing 
-                        ? `<textarea placeholder="Write your story block..." onblur="storyGen.saveBlockEdit(${index}, this.value)" onkeydown="if(event.key==='Enter' && event.ctrlKey) this.blur()">${block.content}</textarea>`
+                        ? `<textarea placeholder="Write your story block... (Ctrl+Enter to save)" onblur="storyGen.saveBlockEdit(${index}, this.value)" onkeydown="if(event.key==='Enter' && event.ctrlKey) this.blur()">${block.content}</textarea>`
                         : `<div>${this.formatText(block.content)}</div>`;
                     
                     return `
@@ -557,6 +939,15 @@
 
                 this.storyContainer.innerHTML = blocksHtml;
                 this.storyContainer.scrollTop = this.storyContainer.scrollHeight;
+                
+                // Focus on textarea if editing
+                const editingTextarea = this.storyContainer.querySelector('textarea');
+                if (editingTextarea) {
+                    setTimeout(() => {
+                        editingTextarea.focus();
+                        editingTextarea.setSelectionRange(editingTextarea.value.length, editingTextarea.value.length);
+                    }, 100);
+                }
             }
 
             renderBlockActions(block, index) {
@@ -597,10 +988,13 @@
             setGenerating(generating) {
                 this.isGenerating = generating;
                 this.generateNext.disabled = generating;
+                this.writeBlock.disabled = generating;
+                this.regenerate.disabled = generating || this.blocks.length === 0 || this.blocks[this.blocks.length - 1].type !== 'ai';
+                this.deleteBlock.disabled = generating || this.blocks.length === 0;
                 this.loadingIndicator.style.display = generating ? 'flex' : 'none';
             }
 
-            saveStory() {
+            saveStoryMethod() {
                 const storyData = {
                     context: this.contextText.value,
                     blocks: this.blocks,
@@ -640,9 +1034,10 @@
                 this.blocks = storyData.blocks;
                 this.renderStory();
                 this.updateActionButtons();
+                this.closeSidebar(); // Close sidebar after loading
             }
 
-            newStory() {
+            newStoryMethod() {
                 if (confirm('Are you sure you want to start a new story? Unsaved changes will be lost.')) {
                     this.blocks = [];
                     this.renderStory();
@@ -650,7 +1045,7 @@
                 }
             }
 
-            clearContext() {
+            clearContextMethod() {
                 if (confirm('Are you sure you want to clear the context?')) {
                     this.contextText.value = '';
                 }
@@ -659,6 +1054,29 @@
 
         // Initialize the app
         const storyGen = new StoryGenerator();
+        
+        // Handle window resize for better mobile experience
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && storyGen.sidebarOpen) {
+                storyGen.closeSidebar();
+            }
+        });
+        
+        // Prevent pull-to-refresh on mobile
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        });
+        
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (e) => {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
     </script>
 </body>
 </html>
