@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Coming Soon \\ XeTute</title>
+        <meta chaset="UTF-8">
+        <meta name="viewport" content="width=device-width, inital-scale=1.0">
+
+        <link rel="icon" href="favicon.ico">
+        <link rel="stylesheet" href="basic.css">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+        <style>
+            .btn-class
+            {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                margin: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 style="text-transform: uppercase;">coming soon</h1>
+        <p>Meanwhile, visit our socials:</p>
+        <div class="btn-class" style="margin-top: 10px;">
+            <a href="https://www.youtube.com/channel/UCoR5RdjU8TFPKmHqVJOZBYQ">YouTube</a>
+            <a href="https://huggingface.co/XeTute">HuggingFace</a>
+        </div>
+        <div class="btn-class">
+            <a href="https://github.com/XeTute">GitHub</a>
+            <a href="https://gravatar.com/hamzahasadullah">Gravatar / Hamzah</a>
+        </div>
+    </body>
+    <script defer>
+        async function refer()
+        {
+            const links =
+            [
+                "https://www.youtube.com/channel/UCoR5RdjU8TFPKmHqVJOZBYQ",
+                "https://huggingface.co/XeTute",
+                "https://github.com/XeTute",
+                "https://gravatar.com/hamzahasadullah"
+            ];
+            await new Promise(resolve => setTimeout(resolve, 1000 * 60));
+            window.location.href = links[Math.floor(Math.random() * (links.length + 1))];
+        }
+        refer();
+    </script>
+</html>
