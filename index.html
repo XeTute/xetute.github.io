@@ -109,7 +109,7 @@
             <div class="screen">
                 <img style="max-width: 80%; max-height: 80%; border-radius: 25px; margin: 10px; box-shadow: 0 0 25px grey;" id="img-showcase"
                     src="https://huggingface.co/datasets/Hamzah-Asadullah/SID-0.5k/resolve/main/raw_data/0.png" />
-                    <p style="color: grey; text-align: right; margin-right: 20px;">Actual images generated using SIGE</p>
+                    <p style="color: grey; text-align: right; margin-right: 20px;">Images generated using "Fast" preset (SIGE)</p>
             </div>
         </div>
         <script defer>
@@ -117,7 +117,7 @@
 
             async function swap_images()
             {
-                const images = 442;
+                const images = 244;
                 for (let i = 0; i < images; ++i)
                 {
                     await new Promise(resolve => setTimeout(resolve, 1500));
