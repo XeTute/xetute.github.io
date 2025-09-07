@@ -20,7 +20,7 @@
             html, body
             {
                 width: 100%;
-                height: 100vh;
+                height: fit-content;
                 margin: 0;
                 padding: 0;
                 background: linear-gradient(45deg, #000, rgb(0, 0, 55), #000);
@@ -88,40 +88,150 @@
             }
             .textbox:hover { border-radius: 5px; }
             .textbox h1, .textbox p { margin: 5px; }
+
+            .wrap-images
+            {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: flex-start;
+                flex-wrap: wrap;
+                margin: 0;
+                padding: 0;
+                max-height: 40vh;
+            }
+            .wrap-images div p { text-align: center; }
+            .wrap-images img, .wrap-images div
+            {
+                margin: 10px;
+                max-width: calc(100vw/3);
+                max-height: calc(100vh/3);
+                border-radius: 20px;
+                transition: 0.1s;
+                object-fit: cover;
+            }
+            .wrap-images img:hover { border: 2px solid grey; }
+            .wrap-images div p:hover { color: white; }
         </style>
     </head>
     <body>
         <div class="splitscreen">
             <div class="screen">
                 <div class="textbox">
-                    <h1>Simply better.</h1>
-                    <p>Generate artifical illustrations in minutes.</p>
-                    <p>Visit us on:
-                        <a href="https://github.com/XeTute">GitHub,</a>
-                        <a style="padding-left: 2px;" href="https://x.com/Hamzah4sadullah">X,</a>
-                        <a style="padding-left: 2px;" href="https://gravatar.com/hamzahasadullah">Gravatar</a>
-                        and
-                        <a href="https://www.youtube.com/@Hamzah0Asadullah">YouTube</a>.
-                    </p>
+                    <h1>Introducing SIGE.</h1>
+                    <p>Generate anime-stylized images starting at 0.01€.</p>
+                    <button onclick="alert('You can write an e-mail to x3tut3@gmail.com, stating further contact information. A trial month for free (without inquiring your bank information in that period) can be arranged upon request.')">Contact for early access</button>
                 </div>
-                <button>Coming Soon</button>
             </div>
             <div class="screen">
                 <img style="max-width: 80%; max-height: 80%; border-radius: 25px; margin: 10px; box-shadow: 0 0 25px grey;" id="img-showcase"
-                    src="https://huggingface.co/datasets/Hamzah-Asadullah/SID-0.5k/resolve/main/raw_data/0.png" />
-                    <p style="color: grey; text-align: right; margin-right: 20px;">Images generated using "Fast" preset (SIGE)</p>
+                    src="./images/optimized-text--high-effort/0.png" />
+                    <p style="color: grey; text-align: right; margin-right: 20px;" id="showcase-description">Images generated using SIGE</p>
+            </div>
+        </div>
+        <div class="splitscreen" style="text-align: center; display: flex; flex-direction: column; justify-content: center;" id="effort-showcase">
+            <h1 style="width: 100%;">
+                Trade compute for quality
+                <p style="font-size: 14px; font-weight: 400;">
+                    Click on images to view their prompt.<br>
+                </p>
+            </h1>
+            <div class="screen" style="margin: 5px; padding: 0; height: min-content;">
+                <div id="normal-images" class="wrap-images">
+                    <div style="text-align: left; max-width: calc(100vw/8); justify-content: center;">
+                        <h3>Normal Effort</h3>
+                        <p style="text-align: left;">
+                            Each image took ~13.5s to generate, with each billing 0.01€ (0.012USD).
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="screen" style="margin: 5px; padding: 0; height: min-content;">
+                <div id="higheffort-images" class="wrap-images">
+                    <div style="text-align: left; max-width: calc(100vw/8); justify-content: center;">
+                        <h3>High Effort</h3>
+                        <p style="text-align: left;">
+                            Each image took ~20.5s to generate, with each billing 0.02€ (0.024USD).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="splitscreen">
+            <div class="screen" style="text-align: center; padding: 10px;">
+                <h1>Get your API-key today.</h1>
+                <p>
+                    You can contact <i>x3tut3@gmail.com</i> to inquire a cost-free API-key until early-access is over.<br>
+                    No banking or personal information will be required.<br>
+                    --<br>
+                    If you already have an API-key, you can generate images on <a href="./webui/">this interface.</a>
+                </p>
             </div>
         </div>
         <script defer>
-            const img_sc = document.getElementById("img-showcase");
+            const img_showcase = document.getElementById("img-showcase");
+            const showcase_description = document.getElementById("showcase-description");
+            const normal_images = document.getElementById("normal-images");
+            const higheffort_images = document.getElementById("higheffort-images");
+
+            if (window.innerWidth < window.innerHeight)
+                document.getElementById("effort-showcase").style.display = "none";
+
+            const prompts =
+            {
+                "normal text":
+                [
+                    "A cyberpunk samurai with glowing neon armor, standing on a rain-soaked rooftop under a futuristic Tokyo skyline, anime style with dramatic lighting.",
+                    "Post-apocalyptic wanderer in tattered clothing, holding a katana, surrounded by ruined skyscrapers and cherry blossoms blowing in the wind, anime art.",
+                    "Mecha battle in space, giant robots clashing with glowing plasma weapons, debris floating around, cinematic anime style.",
+                    "A mysterious shrine maiden with long flowing hair, standing before a torii gate in a forest illuminated by glowing fireflies, anime fantasy aesthetic.",
+                    "Steampunk airship crew in anime style, flying above the clouds with gears and mechanical details, vibrant sky colors.",
+                    "A slice-of-life café scene, friends laughing and sharing desserts, cozy anime atmosphere with warm tones.",
+                    "Epic shonen protagonist powering up, surrounded by crackling energy and broken ground beneath him, anime dynamic action pose."
+                ],
+                "optimized text":
+                [
+                    "male samurai, cyberpunk, neon armor, glowing eyes, katana, rooftop, cityscape, futuristic tokyo, rain, night, dramatic lighting, anime style",
+                    "male wanderer, katana, tattered clothes, post-apocalyptic, ruined skyscrapers, cherry blossoms, wind, moody atmosphere, anime style",
+                    "giant robot, mecha, space battle, plasma weapons, explosions, floating debris, dynamic action, cinematic composition, anime style",
+                    "female shrine maiden, long hair, traditional clothing, torii gate, forest, fireflies, glowing light, mystical atmosphere, anime style",
+                    "airship, steampunk, crew, goggles, mechanical details, gears, clouds, bright sky, adventure theme, anime style",
+                    "friends, café interior, desserts, laughing, cozy atmosphere, warm colors, casual clothing, slice of life, anime style",
+                    "male protagonist, power-up, glowing aura, crackling energy, broken ground, intense expression, dynamic pose, shonen battle, anime style"
+                ]
+            };
+            const images = prompts["normal text"].length;
+
+            // populate difference between normal images and high effort
+            for (let i = 0; i < Math.min(3, images); ++i)
+            {
+                const div = [document.createElement("div"), document.createElement("div")];
+                const img = [document.createElement("img"), document.createElement("img")];
+    
+                img[0].src = `./images/optimized-text--no-effort/${i}.png`;
+                img[1].src = `./images/optimized-text--high-effort/${i}.png`;
+
+                img.forEach(image =>
+                {
+                    image.onclick = () => { alert(prompts["optimized text"][i]); }
+                    image.alt = prompts["optimized text"][i];
+                });
+                div.forEach(d => { d.style.height = "fit-content"; d.style.width = "fit-content"; d.style.margin = 0; d.style.padding = 0; })
+
+                div[0].append(img[0]);
+                normal_images.append(div[0]);
+
+                div[1].append(img[1]);
+                higheffort_images.append(div[1]);
+            }
 
             async function swap_images()
             {
-                const images = 244;
                 for (let i = 0; i < images; ++i)
                 {
                     await new Promise(resolve => setTimeout(resolve, 1500));
-                    img_sc.src = `https://huggingface.co/datasets/Hamzah-Asadullah/SID-0.5k/resolve/main/images/${i}.png`;
+                    showcase_description.textContent = prompts["optimized text"][i].substring(0, 32) + "...";
+                    img_showcase.src = `./images/optimized-text--high-effort/${i}.png`;
                     if (i == (images - 1)) i = 0;
                 }
             }
