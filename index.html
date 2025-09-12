@@ -31,18 +31,41 @@
             margin: 0;
             justify-content: center;
             align-items: center;
+            overflow-x: hidden;
+
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 1) rgba(0, 0, 0, 0);
         }
         h1, h2, h3, h4, h5, h6, p, em, i
         {
             margin: 5px;
-            padding: 0;
+            padding: 5px;
+            border-radius: 15px;
+            max-width: fit-content;
             transition: 0.3s ease-in-out;
             backdrop-filter: brightness(0.85) blur(8px);
         }
         h1:hover, h2:hover, h3:hover, h4:hover, h5:hover, h6:hover, p:hover, em:hover, i:hover
         {
-            scale: 0.99;
+            scale: 1.01;
             transition: 0.3s ease-in-out;
+        }
+
+        a, button
+        {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+            margin: 10px;
+            border: 2px solid #fff;
+            border-radius: 10px;
+            transition: 0.2s ease-in-out;
+            backdrop-filter: brightness(0.85) blur(8px);
+        }
+        a:hover, button:hover
+        {
+            color: #000;
+            background: #fff;
         }
 
         .brand
@@ -55,6 +78,7 @@
             flex-direction: row;
             align-items: center;
             max-height: min-content;
+            max-width: fit-content;
             border-bottom-right-radius: 25px;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
@@ -85,6 +109,49 @@
             width: calc(100vw - 40px);
             height: calc(100vh - 40px);
         }
+
+        .flex-grid
+        {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flex-grid-box
+        {
+            margin: 20px;
+            padding: 20px;
+            border: 2px solid #fff;
+            border-radius: 25px;
+            transition: 0.2s ease-in-out;
+            filter: brightness(0.85) saturate(0.33);
+            background-size: cover;
+            background-repeat: no-repeat;
+            overflow-y: auto;
+        }
+        .flex-grid-box:hover
+        {
+            scale: 0.995;
+            filter: brightness(1) saturate(0.66);
+        }
+        .flex-grid-box p
+        {
+            border-radius: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 1) rgba(0, 0, 0, 0);
+            max-width: 350px;
+            overflow: auto;
+            margin: 5px;
+        }
+        .flex-grid-box div
+        {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin: 0;
+            padding: 0;
+        }
     </style>
 </head>
 <body>
@@ -94,7 +161,32 @@
     </div>
     <div class="page">
         <h1>The sun is the moon's dream</h1>
-        <p>A more detailed page will be when we're closer to the sun.</p>
+        <p>However, the moon knows it can never be the sun. Even so, the moon is a beauty in it's own way.</p>
+    </div>
+    <div class="page" style="overflow-y: auto; min-height: fit-content;">
+        <h1>Services</h1>
+        <div class="flex-grid">
+            <div class="flex-grid-box" style="background-image: url('./SIGE/thumbnail.png');">
+                <h3>SIGE</h3>
+                <p>
+                    SIGE, short for Simple Image Generation Endpoint, allows you to generate images.<br>
+                    It features limited access to a minimal API serving FLUX.1-schnell for a monthly fee of 5€.
+                </p>
+                <div>
+                    <a href="#Services" onclick="alert('SIGE is only a few days away from being released commercially—The API is still being tested to ensure you get the quality you deserve.')">Learn More</a>
+                </div>
+            </div>
+            <div class="flex-grid-box" style="background-image: url('./0b27f97b-d34b-4e4b-a85e-1b1bd94859ff.png');">
+                <h3>Many More Coming Soon</h3>
+                <p>
+                    Plans for other endpoints, like text classification, similarity and generation are roughtly already sketched out.<br>
+                    If enough demand exists, supply will. XeTute will be happy to offer affordable services.
+                </p>
+                <div>
+                    <a href="#Services">-#-</a>
+                </div>
+            </div>
+        </div>
     </div>
     <script defer>
 
